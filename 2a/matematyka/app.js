@@ -115,7 +115,7 @@ function renderStart() {
         <div class="start-icon" aria-hidden="true">
           <span class="start-icon-symbol">✖️</span>
         </div>
-        <h1 class="start-title">Tabliczka Mnożenia</h1>
+        <h1 class="start-title">Tabliczka Mnożenia do 100</h1>
         <p class="start-description">
           Rozwiąż 20 losowych zadań z mnożenia do 100. Wynik poznasz na samym końcu.
           Możesz pisać na klawiaturze lub klikać na ekranie!
