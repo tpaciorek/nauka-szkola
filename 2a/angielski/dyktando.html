@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyktando z lukami - Unit 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(rgba(147, 197, 253, 0.45) 1px, transparent 1px);
+            background-size: 18px 18px;
+        }
+
+        .page-shell {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 800;
+            color: #1d4ed8;
+            background: rgba(255, 255, 255, 0.94);
+            border: 2px solid #bfdbfe;
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.14);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link.active {
+            background: #dbeafe;
+            border-color: #60a5fa;
+        }
+
+        .input-gap {
+            border: none;
+            border-bottom: 3px solid #3b82f6;
+            background: transparent;
+            text-align: center;
+            font-weight: bold;
+            color: #1e3a8a;
+            outline: none;
+            width: 120px;
+            transition: all 0.3s;
+        }
+
+        .input-gap:focus {
+            border-bottom-color: #f59e0b;
+            background-color: #fffbeb;
+        }
+
+        .input-gap.correct {
+            border-bottom-color: #10b981;
+            color: #10b981;
+        }
+
+        .input-gap.wrong {
+            border-bottom-color: #ef4444;
+            color: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            .nav-link {
+                width: 100%;
+            }
+
+            .input-gap {
+                width: 96px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-6">
+
+    <div class="page-shell">
+        <nav class="nav-bar" aria-label="Nawigacja">
+            <a class="nav-link" href="../../index.html">🏠 Strona główna</a>
+            <a class="nav-link" href="../index.html">← Klasa 2a</a>
+            <a class="nav-link" href="./index.html">🔤 Brakujące litery</a>
+            <a class="nav-link active" href="./dyktando.html">🎧 Dyktando</a>
+        </nav>
+
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-auto overflow-hidden border-4 border-blue-200">
+            <div class="bg-blue-500 text-white text-center py-6 px-4 relative">
+                <h1 class="text-3xl font-extrabold tracking-wide"><i class="fa-solid fa-headphones mr-2"></i> Dyktando Unit 5</h1>
+                <p class="text-blue-100 mt-2 font-semibold">Action Verbs & I can / I can't</p>
+            </div>
+
+            <div id="start-screen" class="p-8 text-center space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800">Zasady gry:</h2>
+                <ul class="text-left text-gray-600 space-y-3 max-w-md mx-auto bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Usłyszysz zdanie po angielsku.</li>
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Na ekranie zobaczysz zdanie z <b>1 luką</b>.</li>
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Wpisz brakujące słowo z Unit 5.</li>
+                    <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Rundy są <b>losowe</b>! Za każdym razem inne zdania.</li>
+                </ul>
+
+                <div class="pt-4">
+                    <button onclick="startQuiz()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+                        <i class="fa-solid fa-play mr-2"></i> START
+                    </button>
+                    <p class="text-xs text-gray-400 mt-3">Upewnij się, że urządzenie nie jest wyciszone!</p>
+                </div>
+            </div>
+
+            <div id="quiz-screen" class="p-6 md:p-10 hidden">
+                <div class="flex justify-between items-center mb-6 gap-4 flex-wrap">
+                    <span id="progress-text" class="text-gray-500 font-bold bg-gray-100 py-1 px-3 rounded-full">Zdanie 1 / 10</span>
+                    <button onclick="toggleWordBank()" class="text-sm text-blue-500 underline hover:text-blue-700">
+                        Pokaż słowniczek
+                    </button>
+                </div>
+
+                <div id="word-bank" class="hidden mb-6 bg-blue-50 p-4 rounded-lg text-sm text-blue-800 text-center leading-relaxed">
+                    catch • climb • cook • dance • dive • fly • jump • run • shout • sing • swim • walk • float • play • throw
+                </div>
+
+                <div class="text-center mb-8">
+                    <button onclick="playAudio()" id="audio-btn" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 px-6 rounded-full shadow-md transform transition hover:scale-105 active:scale-95">
+                        <i id="audio-icon" class="fa-solid fa-volume-high text-3xl mb-1 block transition-all"></i>
+                        Posłuchaj
+                    </button>
+                    <p class="text-xs text-gray-400 mt-2" id="audio-status">Kliknij, aby usłyszeć zdanie</p>
+                </div>
+
+                <div class="text-center text-2xl md:text-3xl text-gray-700 mb-8 leading-loose break-words" id="sentence-container">
+                    <span id="text-pre"></span>
+                    <input type="text" id="answer-input" class="input-gap" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <span id="text-post"></span>
+                </div>
+
+                <div id="feedback-area" class="h-12 text-center text-xl font-bold rounded-lg flex items-center justify-center mb-6 opacity-0 transition-opacity px-2">
+                </div>
+
+                <div class="text-center">
+                    <button id="check-btn" onclick="checkAnswer()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-md transform transition hover:scale-105">
+                        Sprawdź <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-md transform transition hover:scale-105">
+                        Następne <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="result-screen" class="p-10 text-center hidden space-y-6">
+                <h2 class="text-4xl font-extrabold text-blue-600 mb-2">Koniec!</h2>
+                <div class="text-6xl mb-4" id="emoji-result">🎉</div>
+                <p class="text-2xl text-gray-700 font-bold">Twój wynik:</p>
+                <p class="text-5xl font-black text-amber-500" id="final-score">0 / 10</p>
+
+                <div class="pt-8">
+                    <button onclick="resetApp()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Zagraj jeszcze raz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const database = [
+            { pre: "Can you ", target: "catch", post: " the ball?" },
+            { pre: "My dog can ", target: "catch", post: " a frisbee." },
+            { pre: "I want to ", target: "catch", post: " a fish." },
+            { pre: "Look at the monkey ", target: "climb", post: " the tree." },
+            { pre: "I can't ", target: "climb", post: " that big rock." },
+            { pre: "Cats like to ", target: "climb", post: " on the roof." },
+            { pre: "My dad can ", target: "cook", post: " dinner today." },
+            { pre: "I help my mom ", target: "cook", post: " soup." },
+            { pre: "We can ", target: "cook", post: " pasta for lunch." },
+            { pre: "Let's ", target: "dance", post: " to the music!" },
+            { pre: "She can ", target: "dance", post: " very well." },
+            { pre: "They ", target: "dance", post: " at the party." },
+            { pre: "He can ", target: "dive", post: " into the deep water." },
+            { pre: "I am scared to ", target: "dive", post: " in the pool." },
+            { pre: "Penguins can ", target: "dive", post: " to catch fish." },
+            { pre: "Birds can ", target: "fly", post: " high in the sky." },
+            { pre: "Planes ", target: "fly", post: " very fast." },
+            { pre: "I wish I could ", target: "fly", post: " like a bird." },
+            { pre: "Frogs can ", target: "jump", post: " very far." },
+            { pre: "Can you ", target: "jump", post: " over the puddle?" },
+            { pre: "Children like to ", target: "jump", post: " on the bed." },
+            { pre: "I can ", target: "run", post: " fast in my new shoes." },
+            { pre: "Don't ", target: "run", post: " in the school corridor." },
+            { pre: "Cheetahs ", target: "run", post: " very quickly." },
+            { pre: "Please don't ", target: "shout", post: " in the library." },
+            { pre: "I had to ", target: "shout", post: " to hear him." },
+            { pre: "Why do you ", target: "shout", post: " at me?" },
+            { pre: "She can ", target: "sing", post: " a beautiful song." },
+            { pre: "We ", target: "sing", post: " carols in winter." },
+            { pre: "I like to ", target: "sing", post: " in the shower." },
+            { pre: "I want to ", target: "swim", post: " in the sea." },
+            { pre: "Fish ", target: "swim", post: " in the water." },
+            { pre: "Can you ", target: "swim", post: " across the lake?" },
+            { pre: "Let's ", target: "walk", post: " to the park." },
+            { pre: "I ", target: "walk", post: " my dog every morning." },
+            { pre: "We ", target: "walk", post: " to school together." },
+            { pre: "Wood can ", target: "float", post: " on water." },
+            { pre: "The boat will ", target: "float", post: " down the river." },
+            { pre: "A balloon can ", target: "float", post: " in the air." },
+            { pre: "He can ", target: "play", post: " the guitar at the concert." },
+            { pre: "I want to learn to ", target: "play", post: " the guitar." },
+            { pre: "My brother can ", target: "play", post: " the guitar very well." },
+            { pre: "Please ", target: "throw", post: " the ball to me." },
+            { pre: "Don't ", target: "throw", post: " trash on the ground." },
+            { pre: "How far can you ", target: "throw", post: " this?" }
+        ];
+
+        let currentQuiz = [];
+        let currentIndex = 0;
+        let score = 0;
+        let hasAnswered = false;
+        let availableVoices = [];
+
+        const screens = {
+            start: document.getElementById('start-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            result: document.getElementById('result-screen')
+        };
+
+        const els = {
+            progress: document.getElementById('progress-text'),
+            pre: document.getElementById('text-pre'),
+            post: document.getElementById('text-post'),
+            input: document.getElementById('answer-input'),
+            feedback: document.getElementById('feedback-area'),
+            checkBtn: document.getElementById('check-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            wordBank: document.getElementById('word-bank'),
+            audioIcon: document.getElementById('audio-icon'),
+            audioStatus: document.getElementById('audio-status')
+        };
+
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+        }
+
+        if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function shuffle(array) {
+            let localCurrentIndex = array.length;
+            let randomIndex;
+
+            while (localCurrentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * localCurrentIndex);
+                localCurrentIndex -= 1;
+                [array[localCurrentIndex], array[randomIndex]] = [array[randomIndex], array[localCurrentIndex]];
+            }
+
+            return array;
+        }
+
+        function toggleWordBank() {
+            els.wordBank.classList.toggle('hidden');
+        }
+
+        function unlockAudio() {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance('');
+                utterance.volume = 0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function startQuiz() {
+            unlockAudio();
+            loadVoices();
+
+            const shuffledDb = shuffle([...database]);
+            currentQuiz = shuffledDb.slice(0, 10);
+
+            currentIndex = 0;
+            score = 0;
+
+            screens.start.classList.add('hidden');
+            screens.result.classList.add('hidden');
+            screens.quiz.classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            hasAnswered = false;
+            const question = currentQuiz[currentIndex];
+
+            els.progress.innerText = `Zdanie ${currentIndex + 1} / 10`;
+            els.pre.innerText = question.pre;
+            els.post.innerText = question.post;
+
+            els.input.value = '';
+            els.input.disabled = false;
+            els.input.className = 'input-gap';
+
+            setTimeout(() => els.input.focus(), 100);
+
+            els.feedback.className = 'h-12 text-center text-xl font-bold rounded-lg flex items-center justify-center mb-6 opacity-0 transition-opacity px-2';
+            els.feedback.innerHTML = '';
+
+            els.checkBtn.classList.remove('hidden');
+            els.nextBtn.classList.add('hidden');
+        }
+
+        function playAudio() {
+            if (!('speechSynthesis' in window)) {
+                alert('Twoja przeglądarka nie obsługuje czytania na głos.');
+                return;
+            }
+
+            const question = currentQuiz[currentIndex];
+            let fullSentence = question.pre + question.target + question.post;
+
+            if (!fullSentence.endsWith('.') && !fullSentence.endsWith('?') && !fullSentence.endsWith('!')) {
+                fullSentence += '.';
+            }
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(fullSentence);
+
+            if (availableVoices.length === 0) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+
+            const englishVoice = availableVoices.find((voice) => voice.lang === 'en-GB' || voice.lang === 'en_GB')
+                || availableVoices.find((voice) => voice.lang === 'en-US' || voice.lang === 'en_US')
+                || availableVoices.find((voice) => voice.lang.startsWith('en'));
+
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            } else {
+                utterance.lang = 'en-US';
+            }
+
+            utterance.rate = 0.85;
+
+            els.audioIcon.className = 'fa-solid fa-spinner fa-spin text-3xl mb-1 block';
+            els.audioStatus.innerText = 'Odtwarzanie...';
+
+            utterance.onend = function() {
+                els.audioIcon.className = 'fa-solid fa-volume-high text-3xl mb-1 block transition-all';
+                els.audioStatus.innerText = 'Kliknij ponownie, aby posłuchać';
+            };
+
+            utterance.onerror = function(error) {
+                console.error('Błąd syntezatora mowy:', error);
+                els.audioIcon.className = 'fa-solid fa-triangle-exclamation text-3xl mb-1 block text-orange-500';
+                els.audioStatus.innerText = 'Błąd odtwarzania. Sprawdź dźwięk.';
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function checkAnswer() {
+            if (hasAnswered) {
+                return;
+            }
+
+            const question = currentQuiz[currentIndex];
+            const userAnswer = els.input.value.trim().toLowerCase();
+            const correctAnswer = question.target.toLowerCase();
+
+            hasAnswered = true;
+            els.input.disabled = true;
+            els.checkBtn.classList.add('hidden');
+            els.nextBtn.classList.remove('hidden');
+            els.feedback.classList.remove('opacity-0');
+
+            if (userAnswer === correctAnswer) {
+                score += 1;
+                els.input.classList.add('correct');
+                els.feedback.classList.add('bg-green-100', 'text-green-700');
+                els.feedback.innerHTML = '<i class="fa-solid fa-face-smile mr-2"></i> Świetnie! Poprawna odpowiedź.';
+            } else {
+                els.input.classList.add('wrong');
+                els.input.value = question.target;
+                els.feedback.classList.add('bg-red-100', 'text-red-700');
+                els.feedback.innerHTML = `<i class="fa-solid fa-xmark mr-2"></i> Błąd. Powinno być: <b>${question.target}</b>`;
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex += 1;
+
+            if (currentIndex < currentQuiz.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            screens.quiz.classList.add('hidden');
+            screens.result.classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = `${score} / 10`;
+
+            let emoji = '🎉';
+
+            if (score === 10) {
+                emoji = '🏆👑🤩';
+            } else if (score >= 7) {
+                emoji = '⭐😊👏';
+            } else if (score >= 4) {
+                emoji = '👍🙂';
+            } else {
+                emoji = '📚💪';
+            }
+
+            document.getElementById('emoji-result').innerText = emoji;
+        }
+
+        function resetApp() {
+            window.speechSynthesis.cancel();
+            startQuiz();
+        }
+
+        els.input.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+
+                if (!hasAnswered && els.input.value.trim() !== '') {
+                    checkAnswer();
+                } else if (hasAnswered) {
+                    nextQuestion();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
