@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brakujące Litery - Klasa 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        body {
+            font-family: 'Comic Neue', cursive, sans-serif;
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#bbf7d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .letter-box {
+            display: inline-block;
+            width: 60px;
+            height: 75px;
+            margin: 0 5px;
+            font-size: 2.5rem;
+            text-align: center;
+            text-transform: lowercase;
+            border: 4px solid #3b82f6;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 3px 3px 0px #2563eb;
+            transition: all 0.2s;
+        }
+
+        .letter-box:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 3px 3px 0px #d97706;
+            transform: translateY(-2px);
+        }
+
+        .letter-static {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 75px;
+            margin: 0 5px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .word-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            border: 3px dashed #93c5fd;
+            min-height: 120px;
+        }
+
+        .correct {
+            background-color: #bbf7d0 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+            box-shadow: 3px 3px 0px #16a34a !important;
+        }
+
+        .incorrect {
+            background-color: #fecaca !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+            box-shadow: 3px 3px 0px #dc2626 !important;
+        }
+
+        .btn {
+            box-shadow: 0 5px 0px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .hidden-screen {
+            display: none !important;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .animate-bounce-custom {
+            animation: bounce 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 flex flex-col items-center justify-center">
+
+    <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
+        <div class="bg-blue-400 text-white text-center py-6 px-4 relative">
+            <h1 class="text-4xl font-bold mb-2">⭐ Angielski - Unit 5 ⭐</h1>
+            <div id="progress-text" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
+                1 / 10
+            </div>
+        </div>
+
+        <div class="p-6 md:p-10 bg-blue-50 relative min-h-[400px] flex flex-col justify-center">
+            <div id="game-screen" class="flex flex-col h-full w-full">
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                    <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <div id="word-container" class="word-row">
+                </div>
+
+                <div id="result-message" class="text-center text-3xl font-bold my-4 h-10"></div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-auto pt-4">
+                    <button id="check-btn" onclick="checkAnswer()" class="btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
+                        ✔️ Sprawdź
+                    </button>
+                    <button id="next-btn" onclick="nextWord()" class="btn bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-blue-600 hidden-screen">
+                        ➡️ Następne
+                    </button>
+                </div>
+            </div>
+
+            <div id="summary-screen" class="hidden-screen flex-col items-center justify-center text-center h-full space-y-6">
+                <div class="text-7xl">🏆</div>
+                <h2 class="text-5xl font-bold text-blue-600">Koniec Gry!</h2>
+                <p class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
+                <button onclick="initGame()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
+                    🎲 Zagraj ponownie
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            "catch", "climb", "cook", "dance", "dive", "fly",
+            "jump", "run", "shout", "sing", "swim", "walk"
+        ];
+
+        let currentQuizWords = [];
+        let currentIndex = 0;
+
+        function initGame() {
+            const shuffledWords = [...vocabulary].sort(() => 0.5 - Math.random());
+            currentQuizWords = shuffledWords.slice(0, 10);
+            currentIndex = 0;
+
+            document.getElementById('summary-screen').classList.add('hidden-screen');
+            document.getElementById('game-screen').classList.remove('hidden-screen');
+            document.getElementById('progress-text').style.display = 'block';
+
+            showWord();
+        }
+
+        function showWord() {
+            const container = document.getElementById('word-container');
+            const resultDiv = document.getElementById('result-message');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            container.innerHTML = '';
+            resultDiv.innerText = '';
+            checkBtn.classList.remove('hidden-screen');
+            nextBtn.classList.add('hidden-screen');
+            container.classList.remove('correct', 'animate-bounce-custom');
+
+            const progressNum = currentIndex + 1;
+            document.getElementById('progress-text').innerText = `${progressNum} / 10`;
+            document.getElementById('progress-bar').style.width = `${(progressNum / 10) * 100}%`;
+
+            const word = currentQuizWords[currentIndex];
+            let blanksCount = word.length <= 3 ? 1 : Math.floor(Math.random() * 2) + 1;
+
+            let blankIndices = [];
+            while (blankIndices.length < blanksCount) {
+                let r = Math.floor(Math.random() * word.length);
+                if (!blankIndices.includes(r)) {
+                    blankIndices.push(r);
+                }
+            }
+
+            let firstInput = null;
+
+            for (let i = 0; i < word.length; i++) {
+                if (blankIndices.includes(i)) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.className = 'letter-box';
+                    input.dataset.answer = word[i].toLowerCase();
+
+                    if (!firstInput) firstInput = input;
+
+                    input.addEventListener('input', function() {
+                        this.classList.remove('correct', 'incorrect');
+                        if (this.value.length === 1) {
+                            const allInputs = Array.from(container.querySelectorAll('.letter-box'));
+                            const myIndex = allInputs.indexOf(this);
+                            if (myIndex < allInputs.length - 1) {
+                                allInputs[myIndex + 1].focus();
+                            }
+                        }
+                    });
+
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            if (!checkBtn.classList.contains('hidden-screen')) {
+                                checkAnswer();
+                            } else {
+                                nextWord();
+                            }
+                        }
+                    });
+
+                    container.appendChild(input);
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'letter-static';
+                    span.innerText = word[i];
+                    container.appendChild(span);
+                }
+            }
+
+            setTimeout(() => {
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+
+        function checkAnswer() {
+            const inputs = document.querySelectorAll('#word-container .letter-box');
+            let correctCount = 0;
+
+            inputs.forEach(input => {
+                const answer = input.dataset.answer;
+                const userAnswer = input.value.trim().toLowerCase();
+
+                input.classList.remove('correct', 'incorrect');
+
+                if (userAnswer === answer) {
+                    input.classList.add('correct');
+                    correctCount++;
+                } else {
+                    input.classList.add('incorrect');
+                }
+            });
+
+            const resultDiv = document.getElementById('result-message');
+
+            if (correctCount === inputs.length) {
+                resultDiv.innerText = "🎉 Świetnie!";
+                resultDiv.className = "text-center text-4xl font-bold my-4 h-10 text-green-600";
+
+                document.getElementById('word-container').classList.add('animate-bounce-custom');
+                document.getElementById('word-container').style.borderColor = '#22c55e';
+
+                document.getElementById('check-btn').classList.add('hidden-screen');
+                document.getElementById('next-btn').classList.remove('hidden-screen');
+
+                document.getElementById('next-btn').focus();
+            } else {
+                resultDiv.innerText = "💪 Spróbuj poprawić błędy!";
+                resultDiv.className = "text-center text-3xl font-bold my-4 h-10 text-orange-500";
+                document.getElementById('word-container').style.borderColor = '#93c5fd';
+            }
+        }
+
+        function nextWord() {
+            document.getElementById('word-container').style.borderColor = '#93c5fd';
+            currentIndex++;
+            if (currentIndex < 10) {
+                showWord();
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('game-screen').classList.add('hidden-screen');
+            document.getElementById('summary-screen').classList.remove('hidden-screen');
+            document.getElementById('progress-text').style.display = 'none';
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
