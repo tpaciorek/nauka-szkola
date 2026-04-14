@@ -102,7 +102,8 @@
         <nav class="nav-bar" aria-label="Nawigacja">
             <a class="nav-link" href="../../index.html">🏠 Strona główna</a>
             <a class="nav-link" href="../index.html">← Klasa 2a</a>
-            <a class="nav-link" href="./index.html">🔤 Brakujące litery</a>
+            <a class="nav-link" href="./index.html">🔤 Angielski</a>
+            <a class="nav-link" href="./brakujace-litery.html">🔠 Brakujące litery</a>
             <a class="nav-link active" href="./dyktando.html">🎧 Dyktando</a>
         </nav>
 
@@ -186,50 +187,35 @@
     <script>
         const database = [
             { pre: "Can you ", target: "catch", post: " the ball?" },
-            { pre: "My dog can ", target: "catch", post: " a frisbee." },
-            { pre: "I want to ", target: "catch", post: " a fish." },
-            { pre: "Look at the monkey ", target: "climb", post: " the tree." },
-            { pre: "I can't ", target: "climb", post: " that big rock." },
-            { pre: "Cats like to ", target: "climb", post: " on the roof." },
-            { pre: "My dad can ", target: "cook", post: " dinner today." },
-            { pre: "I help my mom ", target: "cook", post: " soup." },
-            { pre: "We can ", target: "cook", post: " pasta for lunch." },
-            { pre: "Let's ", target: "dance", post: " to the music!" },
-            { pre: "She can ", target: "dance", post: " very well." },
-            { pre: "They ", target: "dance", post: " at the party." },
-            { pre: "He can ", target: "dive", post: " into the deep water." },
-            { pre: "I am scared to ", target: "dive", post: " in the pool." },
-            { pre: "Penguins can ", target: "dive", post: " to catch fish." },
-            { pre: "Birds can ", target: "fly", post: " high in the sky." },
-            { pre: "Planes ", target: "fly", post: " very fast." },
-            { pre: "I wish I could ", target: "fly", post: " like a bird." },
-            { pre: "Frogs can ", target: "jump", post: " very far." },
-            { pre: "Can you ", target: "jump", post: " over the puddle?" },
-            { pre: "Children like to ", target: "jump", post: " on the bed." },
-            { pre: "I can ", target: "run", post: " fast in my new shoes." },
-            { pre: "Don't ", target: "run", post: " in the school corridor." },
-            { pre: "Cheetahs ", target: "run", post: " very quickly." },
-            { pre: "Please don't ", target: "shout", post: " in the library." },
-            { pre: "I had to ", target: "shout", post: " to hear him." },
-            { pre: "Why do you ", target: "shout", post: " at me?" },
-            { pre: "She can ", target: "sing", post: " a beautiful song." },
-            { pre: "We ", target: "sing", post: " carols in winter." },
-            { pre: "I like to ", target: "sing", post: " in the shower." },
-            { pre: "I want to ", target: "swim", post: " in the sea." },
-            { pre: "Fish ", target: "swim", post: " in the water." },
-            { pre: "Can you ", target: "swim", post: " across the lake?" },
-            { pre: "Let's ", target: "walk", post: " to the park." },
-            { pre: "I ", target: "walk", post: " my dog every morning." },
-            { pre: "We ", target: "walk", post: " to school together." },
+            { pre: "I can ", target: "catch", post: " a fish." },
+            { pre: "Monkeys can ", target: "climb", post: " trees." },
+            { pre: "I can ", target: "climb", post: " the ladder." },
+            { pre: "We can ", target: "cook", post: " soup." },
+            { pre: "Dad can ", target: "cook", post: " dinner." },
+            { pre: "I can ", target: "dance", post: " well." },
+            { pre: "Let's ", target: "dance", post: " now." },
+            { pre: "Can you ", target: "dive", post: " in the pool?" },
+            { pre: "I can ", target: "dive", post: " in water." },
+            { pre: "Birds can ", target: "fly", post: "." },
+            { pre: "Planes ", target: "fly", post: " in the sky." },
+            { pre: "Frogs can ", target: "jump", post: "." },
+            { pre: "I can ", target: "jump", post: " high." },
+            { pre: "I can ", target: "run", post: " fast." },
+            { pre: "Dogs can ", target: "run", post: " in the park." },
+            { pre: "Please don't ", target: "shout", post: "." },
+            { pre: "Don't ", target: "shout", post: " in class." },
+            { pre: "We can ", target: "sing", post: " a song." },
+            { pre: "I like to ", target: "sing", post: "." },
+            { pre: "Fish can ", target: "swim", post: "." },
+            { pre: "Can you ", target: "swim", post: "?" },
+            { pre: "We can ", target: "walk", post: " to school." },
+            { pre: "I can ", target: "walk", post: " home." },
+            { pre: "Boats can ", target: "float", post: "." },
             { pre: "Wood can ", target: "float", post: " on water." },
-            { pre: "The boat will ", target: "float", post: " down the river." },
-            { pre: "A balloon can ", target: "float", post: " in the air." },
-            { pre: "He can ", target: "play", post: " the guitar at the concert." },
-            { pre: "I want to learn to ", target: "play", post: " the guitar." },
-            { pre: "My brother can ", target: "play", post: " the guitar very well." },
-            { pre: "Please ", target: "throw", post: " the ball to me." },
-            { pre: "Don't ", target: "throw", post: " trash on the ground." },
-            { pre: "How far can you ", target: "throw", post: " this?" }
+            { pre: "I can ", target: "play", post: " football." },
+            { pre: "I can ", target: "play", post: " the guitar." },
+            { pre: "Can you ", target: "throw", post: " the ball?" },
+            { pre: "Don't ", target: "throw", post: " the toy." }
         ];
 
         let currentQuiz = [];
@@ -361,7 +347,7 @@
                 utterance.lang = 'en-US';
             }
 
-            utterance.rate = 0.85;
+            utterance.rate = 0.68;
 
             els.audioIcon.className = 'fa-solid fa-spinner fa-spin text-3xl mb-1 block';
             els.audioStatus.innerText = 'Odtwarzanie...';

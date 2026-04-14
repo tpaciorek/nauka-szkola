@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brakujące Litery - Klasa 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        body {
+            font-family: 'Comic Neue', cursive, sans-serif;
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#bbf7d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .letter-box {
+            display: inline-block;
+            width: 60px;
+            height: 75px;
+            margin: 0 5px;
+            font-size: 2.5rem;
+            text-align: center;
+            text-transform: lowercase;
+            border: 4px solid #3b82f6;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 3px 3px 0px #2563eb;
+            transition: all 0.2s;
+        }
+
+        .letter-box:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 3px 3px 0px #d97706;
+            transform: translateY(-2px);
+        }
+
+        .letter-static {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 75px;
+            margin: 0 5px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .word-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            border: 3px dashed #93c5fd;
+            min-height: 120px;
+        }
+
+        .correct {
+            background-color: #bbf7d0 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+            box-shadow: 3px 3px 0px #16a34a !important;
+        }
+
+        .incorrect {
+            background-color: #fecaca !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+            box-shadow: 3px 3px 0px #dc2626 !important;
+        }
+
+        .hinted {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+            box-shadow: 3px 3px 0px #d97706;
+        }
+
+        .btn {
+            box-shadow: 0 5px 0px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .hidden-screen {
+            display: none !important;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .animate-bounce-custom {
+            animation: bounce 0.5s ease;
+        }
+
+        .game-title {
+            font-size: 2.25rem;
+            line-height: 1.15;
+        }
+
+        .summary-title {
+            line-height: 1.1;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .summary-stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 16px;
+            border: 3px solid #bfdbfe;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+        }
+
+        .summary-stat-card-errors {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .summary-stat-card-hints {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .summary-stat-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .summary-stat-card-errors .summary-stat-label {
+            color: #b91c1c;
+        }
+
+        .summary-stat-card-hints .summary-stat-label {
+            color: #b45309;
+        }
+
+        .summary-stat-value {
+            font-size: 2.6rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .summary-stat-card-errors .summary-stat-value {
+            color: #dc2626;
+        }
+
+        .summary-stat-card-hints .summary-stat-value {
+            color: #d97706;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome-box {
+            background: white;
+            border-radius: 24px;
+            border: 3px dashed #93c5fd;
+            padding: 24px;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+        }
+
+        .welcome-heading {
+            font-size: 2rem;
+            color: #1d4ed8;
+            margin-bottom: 10px;
+            line-height: 1.15;
+        }
+
+        .welcome-text {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #374151;
+        }
+
+        .instructions-list {
+            margin: 16px 0 0;
+            padding-left: 1.25rem;
+            color: #1f2937;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .instructions-list li + li {
+            margin-top: 8px;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+
+        .word-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #dbeafe;
+            border: 2px solid #93c5fd;
+            color: #1e40af;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12);
+        }
+
+        .start-btn {
+            align-self: center;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #1d4ed8;
+            background: rgba(255, 255, 255, 0.92);
+            border: 2px solid #bfdbfe;
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.16);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link-active {
+            background: #dbeafe;
+            border-color: #60a5fa;
+        }
+
+        @media (max-width: 640px) {
+            .game-title {
+                font-size: 1.75rem;
+            }
+
+            .summary-title {
+                font-size: 2.2rem;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-stat-value {
+                font-size: 2.2rem;
+            }
+
+            .welcome-box {
+                padding: 18px;
+            }
+
+            .welcome-heading {
+                font-size: 1.6rem;
+            }
+
+            .welcome-text,
+            .instructions-list {
+                font-size: 1rem;
+            }
+
+            .word-pill {
+                font-size: 1rem;
+                padding: 8px 12px;
+            }
+
+            .word-row {
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                gap: 4px;
+                margin: 1.25rem 0;
+                padding: 14px 10px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .word-row::-webkit-scrollbar {
+                display: none;
+            }
+
+            .letter-box,
+            .letter-static {
+                width: 38px;
+                height: 50px;
+                margin: 0;
+            }
+
+            .letter-box {
+                font-size: 1.85rem;
+                border-width: 3px;
+                border-radius: 10px;
+                box-shadow: 2px 2px 0px #2563eb;
+            }
+
+            .letter-box:focus {
+                box-shadow: 2px 2px 0px #d97706;
+            }
+
+            .letter-static {
+                font-size: 2rem;
+            }
+
+            .nav-link {
+                width: 100%;
+            }
+
+            #progress-text {
+                font-size: 1rem;
+                padding: 0.35rem 0.65rem;
+            }
+
+            #result-message {
+                font-size: 1.5rem !important;
+                min-height: 2.5rem;
+                height: auto;
+            }
+
+            #check-btn,
+            #next-btn,
+            #hint-btn {
+                font-size: 1.65rem !important;
+                padding: 0.9rem 1.6rem !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .letter-box,
+            .letter-static {
+                width: 34px;
+                height: 46px;
+            }
+
+            .letter-box {
+                font-size: 1.65rem;
+            }
+
+            .letter-static {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+
+    <div class="max-w-5xl mx-auto w-full min-h-[calc(100vh-4rem)] flex flex-col">
+        <nav class="nav-bar" aria-label="Nawigacja">
+            <a class="nav-link" href="../../index.html">🏠 Strona główna</a>
+            <a class="nav-link" href="../index.html">← Klasa 2a</a>
+            <a class="nav-link" href="./index.html">🔤 Angielski</a>
+            <a class="nav-link nav-link-active" href="./brakujace-litery.html">🔠 Brakujące litery</a>
+        </nav>
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
+                <div class="bg-blue-400 text-white text-center py-6 px-4 relative">
+                    <h1 class="game-title font-bold mb-2">⭐ Angielski - Unit 5 ⭐</h1>
+                    <div id="progress-text" style="display: none;" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
+                        1 / 10
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-10 bg-blue-50 relative min-h-[400px] flex flex-col justify-center">
+                    <div id="welcome-screen" class="welcome-screen h-full w-full">
+                        <div class="welcome-box text-center">
+                            <div class="text-6xl mb-4">👋</div>
+                            <h2 class="welcome-heading font-bold">Welcome! Zanim zaczniesz, poznaj słówka</h2>
+                            <p class="welcome-text">
+                                W tej grze trzeba uzupełnić brakujące litery w angielskich wyrazach z Unit 5.
+                                Najpierw przeczytaj słówka, potem kliknij start i spróbuj wpisać brakujące literki.
+                            </p>
+                        </div>
+
+                        <div class="welcome-box">
+                            <h3 class="text-2xl font-bold text-blue-700 text-center mb-2">📚 Słówka do nauki</h3>
+                            <div id="vocabulary-list" class="word-bank"></div>
+                        </div>
+
+                        <div class="welcome-box">
+                            <h3 class="text-2xl font-bold text-blue-700 text-center mb-2">📝 Jak wykonać zadanie?</h3>
+                            <ol class="instructions-list">
+                                <li>Przeczytaj słowo i wpisz brakującą literę lub litery.</li>
+                                <li>Kliknij <strong>Sprawdź</strong>, aby zobaczyć, czy odpowiedź jest dobra.</li>
+                                <li>Jeśli się pomylisz, możesz użyć przycisku <strong>💡 Podpowiedź</strong>.</li>
+                                <li>Na końcu zobaczysz podsumowanie błędów i użytych podpowiedzi.</li>
+                            </ol>
+                        </div>
+
+                        <button onclick="initGame()" class="start-btn btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
+                            ▶️ Start
+                        </button>
+                    </div>
+
+                    <div id="game-screen" class="hidden-screen flex flex-col h-full w-full">
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                            <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+                        </div>
+
+                        <div id="word-container" class="word-row">
+                        </div>
+
+                        <div id="result-message" class="text-center text-3xl font-bold my-4 h-10"></div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-auto pt-4">
+                            <button id="check-btn" onclick="checkAnswer()" class="btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
+                                ✔️ Sprawdź
+                            </button>
+                            <button id="hint-btn" onclick="showHint()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 hidden-screen">
+                                💡 Podpowiedź
+                            </button>
+                            <button id="next-btn" onclick="nextWord()" class="btn bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-blue-600 hidden-screen">
+                                ➡️ Następne
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="summary-screen" class="hidden-screen flex flex-col items-center justify-center text-center h-full space-y-6">
+                        <div class="text-7xl">🏆</div>
+                        <h2 class="summary-title font-bold text-blue-600">Koniec Gry!</h2>
+                        <p id="summary-message" class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
+
+                        <div class="summary-stats">
+                            <div class="summary-stat-card summary-stat-card-errors">
+                                <span class="summary-stat-label">Błędy</span>
+                                <span id="summary-errors" class="summary-stat-value">0</span>
+                            </div>
+
+                            <div class="summary-stat-card summary-stat-card-hints">
+                                <span class="summary-stat-label">Podpowiedzi</span>
+                                <span id="summary-hints" class="summary-stat-value">0</span>
+                            </div>
+                        </div>
+
+                        <button onclick="showWelcomeScreen()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
+                            🎲 Zagraj ponownie
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            "catch", "climb", "cook", "dance", "dive", "fly",
+            "jump", "run", "shout", "sing", "swim", "walk"
+        ];
+
+        let currentQuizWords = [];
+        let currentIndex = 0;
+        let totalMistakes = 0;
+        let totalHintsUsed = 0;
+
+        function renderVocabularyList() {
+            const vocabularyList = document.getElementById('vocabulary-list');
+            vocabularyList.innerHTML = vocabulary
+                .map(word => `<span class="word-pill">${word}</span>`)
+                .join('');
+        }
+
+        function showWelcomeScreen() {
+            document.getElementById('welcome-screen').classList.remove('hidden-screen');
+            document.getElementById('game-screen').classList.add('hidden-screen');
+            document.getElementById('summary-screen').classList.add('hidden-screen');
+            document.getElementById('progress-text').style.display = 'none';
+            document.getElementById('word-container').style.borderColor = '#93c5fd';
+        }
+
+        function initGame() {
+            const shuffledWords = [...vocabulary].sort(() => 0.5 - Math.random());
+            currentQuizWords = shuffledWords.slice(0, 10);
+            currentIndex = 0;
+            totalMistakes = 0;
+            totalHintsUsed = 0;
+
+            document.getElementById('welcome-screen').classList.add('hidden-screen');
+            document.getElementById('summary-screen').classList.add('hidden-screen');
+            document.getElementById('game-screen').classList.remove('hidden-screen');
+            document.getElementById('progress-text').style.display = 'block';
+
+            showWord();
+        }
+
+        function showWord() {
+            const container = document.getElementById('word-container');
+            const resultDiv = document.getElementById('result-message');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const hintBtn = document.getElementById('hint-btn');
+
+            container.innerHTML = '';
+            resultDiv.innerText = '';
+            checkBtn.classList.remove('hidden-screen');
+            nextBtn.classList.add('hidden-screen');
+            hintBtn.classList.add('hidden-screen');
+            container.classList.remove('correct', 'animate-bounce-custom');
+
+            const progressNum = currentIndex + 1;
+            document.getElementById('progress-text').innerText = `${progressNum} / 10`;
+            document.getElementById('progress-bar').style.width = `${(progressNum / 10) * 100}%`;
+
+            const word = currentQuizWords[currentIndex];
+            let blanksCount = word.length <= 3 ? 1 : Math.floor(Math.random() * 2) + 1;
+
+            let blankIndices = [];
+            while (blankIndices.length < blanksCount) {
+                let r = Math.floor(Math.random() * word.length);
+                if (!blankIndices.includes(r)) {
+                    blankIndices.push(r);
+                }
+            }
+
+            let firstInput = null;
+
+            for (let i = 0; i < word.length; i++) {
+                if (blankIndices.includes(i)) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.className = 'letter-box';
+                    input.dataset.answer = word[i].toLowerCase();
+
+                    if (!firstInput) firstInput = input;
+
+                    input.addEventListener('input', function() {
+                        this.classList.remove('correct', 'incorrect');
+                        if (this.value.length === 1) {
+                            const allInputs = Array.from(container.querySelectorAll('.letter-box'));
+                            const myIndex = allInputs.indexOf(this);
+                            if (myIndex < allInputs.length - 1) {
+                                allInputs[myIndex + 1].focus();
+                            }
+                        }
+                    });
+
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            if (!checkBtn.classList.contains('hidden-screen')) {
+                                checkAnswer();
+                            } else {
+                                nextWord();
+                            }
+                        }
+                    });
+
+                    container.appendChild(input);
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'letter-static';
+                    span.innerText = word[i];
+                    container.appendChild(span);
+                }
+            }
+
+            setTimeout(() => {
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+
+        function checkAnswer() {
+            const inputs = document.querySelectorAll('#word-container .letter-box');
+            const hintBtn = document.getElementById('hint-btn');
+            let correctCount = 0;
+
+            inputs.forEach(input => {
+                const answer = input.dataset.answer;
+                const userAnswer = input.value.trim().toLowerCase();
+
+                input.classList.remove('correct', 'incorrect');
+
+                if (userAnswer === answer) {
+                    input.classList.add('correct');
+                    correctCount++;
+                } else {
+                    input.classList.add('incorrect');
+                }
+            });
+
+            const resultDiv = document.getElementById('result-message');
+
+            if (correctCount === inputs.length) {
+                resultDiv.innerText = "🎉 Świetnie!";
+                resultDiv.className = "text-center text-4xl font-bold my-4 h-10 text-green-600";
+
+                document.getElementById('word-container').classList.add('animate-bounce-custom');
+                document.getElementById('word-container').style.borderColor = '#22c55e';
+
+                document.getElementById('check-btn').classList.add('hidden-screen');
+                document.getElementById('next-btn').classList.remove('hidden-screen');
+                hintBtn.classList.add('hidden-screen');
+
+                document.getElementById('next-btn').focus();
+            } else {
+                totalMistakes++;
+                resultDiv.innerText = "💪 Spróbuj poprawić błędy!";
+                resultDiv.className = "text-center text-3xl font-bold my-4 h-10 text-orange-500";
+                document.getElementById('word-container').style.borderColor = '#93c5fd';
+                hintBtn.classList.remove('hidden-screen');
+            }
+        }
+
+        function showHint() {
+            const inputs = Array.from(document.querySelectorAll('#word-container .letter-box'));
+            const resultDiv = document.getElementById('result-message');
+            const hintBtn = document.getElementById('hint-btn');
+
+            const targetInput = inputs.find(input => input.value.trim().toLowerCase() !== input.dataset.answer);
+
+            if (!targetInput) {
+                hintBtn.classList.add('hidden-screen');
+                resultDiv.innerText = "✅ Wszystkie litery już są! Kliknij Sprawdź.";
+                resultDiv.className = "text-center text-2xl font-bold my-4 h-10 text-green-600";
+                return;
+            }
+
+            totalHintsUsed++;
+            targetInput.value = targetInput.dataset.answer;
+            targetInput.readOnly = true;
+            targetInput.classList.remove('incorrect', 'correct');
+            targetInput.classList.add('hinted');
+
+            const nextWrongInput = inputs.find(input => input.value.trim().toLowerCase() !== input.dataset.answer);
+
+            if (nextWrongInput) {
+                nextWrongInput.focus();
+            } else {
+                hintBtn.classList.add('hidden-screen');
+            }
+
+            resultDiv.innerText = "💡 Podpowiedź: jedna litera została odkryta!";
+            resultDiv.className = "text-center text-2xl font-bold my-4 h-10 text-yellow-600";
+        }
+
+        function nextWord() {
+            document.getElementById('word-container').style.borderColor = '#93c5fd';
+            currentIndex++;
+            if (currentIndex < 10) {
+                showWord();
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            const summaryMessage = document.getElementById('summary-message');
+            document.getElementById('summary-errors').innerText = totalMistakes;
+            document.getElementById('summary-hints').innerText = totalHintsUsed;
+
+            if (totalMistakes === 0 && totalHintsUsed === 0) {
+                summaryMessage.innerText = 'Perfekcyjnie! Udało się bez żadnego błędu i bez podpowiedzi!';
+            } else if (totalMistakes === 0) {
+                summaryMessage.innerText = `Super! Bez błędów, a podpowiedzi użyto ${totalHintsUsed} razy.`;
+            } else if (totalHintsUsed === 0) {
+                summaryMessage.innerText = `Brawo! Było ${totalMistakes} błędów, ale wszystko udało się poprawić bez podpowiedzi.`;
+            } else {
+                summaryMessage.innerText = `Brawo! Po drodze było ${totalMistakes} błędów i użyto ${totalHintsUsed} podpowiedzi.`;
+            }
+
+            document.getElementById('game-screen').classList.add('hidden-screen');
+            document.getElementById('summary-screen').classList.remove('hidden-screen');
+            document.getElementById('progress-text').style.display = 'none';
+        }
+
+        window.onload = function() {
+            renderVocabularyList();
+            showWelcomeScreen();
+        };
+    </script>
+</body>
+</html>
