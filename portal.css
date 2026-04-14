@@ -1,0 +1,204 @@
+:root {
+  color-scheme: light;
+  --portal-bg: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  --portal-surface: rgba(255, 255, 255, 0.92);
+  --portal-border: rgba(191, 219, 254, 0.95);
+  --portal-text: #0f172a;
+  --portal-muted: #475569;
+  --portal-primary: #2563eb;
+  --portal-primary-dark: #1d4ed8;
+  --portal-primary-soft: #dbeafe;
+  --portal-shadow: 0 30px 80px rgba(37, 99, 235, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--portal-text);
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.32), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(191, 219, 254, 0.8), transparent 28%),
+    var(--portal-bg);
+}
+
+.portal-shell {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-card {
+  width: min(100%, 980px);
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-border);
+  box-shadow: var(--portal-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.portal-hero {
+  padding: 36px 40px 30px;
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  color: #ffffff;
+}
+
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.portal-title {
+  margin: 18px 0 12px;
+  font-size: clamp(2.3rem, 4vw, 3.3rem);
+  line-height: 1.1;
+}
+
+.portal-text {
+  max-width: 640px;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.portal-content {
+  padding: 32px 40px 40px;
+}
+
+.portal-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.portal-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  background: #ffffff;
+  color: var(--portal-primary);
+  border: 1px solid #bfdbfe;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.portal-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+  background: #f8fbff;
+}
+
+.portal-section-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--portal-muted);
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.portal-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border-radius: 26px;
+  text-decoration: none;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.portal-link-card:hover {
+  transform: translateY(-4px);
+  border-color: #93c5fd;
+  box-shadow: 0 24px 48px rgba(37, 99, 235, 0.14);
+}
+
+.portal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: var(--portal-primary-soft);
+}
+
+.portal-card-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.portal-card-text {
+  margin: 0;
+  color: var(--portal-muted);
+  line-height: 1.65;
+}
+
+.portal-card-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--portal-primary);
+  font-weight: 800;
+}
+
+@media (max-width: 720px) {
+  .portal-shell {
+    padding: 16px;
+  }
+
+  .portal-card {
+    border-radius: 26px;
+  }
+
+  .portal-hero,
+  .portal-content {
+    padding: 24px;
+  }
+
+  .portal-topbar {
+    align-items: stretch;
+  }
+
+  .portal-back {
+    width: 100%;
+  }
+}

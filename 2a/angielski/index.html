@@ -98,46 +98,92 @@
         .animate-bounce-custom {
             animation: bounce 0.5s ease;
         }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #1d4ed8;
+            background: rgba(255, 255, 255, 0.92);
+            border: 2px solid #bfdbfe;
+            box-shadow: 0 12px 26px rgba(37, 99, 235, 0.16);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.2);
+        }
+
+        @media (max-width: 640px) {
+            .nav-link {
+                width: 100%;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen py-8 px-4 flex flex-col items-center justify-center">
+<body class="min-h-screen py-8 px-4">
 
-    <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
-        <div class="bg-blue-400 text-white text-center py-6 px-4 relative">
-            <h1 class="text-4xl font-bold mb-2">⭐ Angielski - Unit 5 ⭐</h1>
-            <div id="progress-text" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
-                1 / 10
-            </div>
-        </div>
+    <div class="max-w-5xl mx-auto w-full min-h-[calc(100vh-4rem)] flex flex-col">
+        <nav class="nav-bar" aria-label="Nawigacja">
+            <a class="nav-link" href="../../index.html">🏠 Strona główna</a>
+            <a class="nav-link" href="../index.html">← Klasa 2a</a>
+        </nav>
 
-        <div class="p-6 md:p-10 bg-blue-50 relative min-h-[400px] flex flex-col justify-center">
-            <div id="game-screen" class="flex flex-col h-full w-full">
-                <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
-                    <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
+                <div class="bg-blue-400 text-white text-center py-6 px-4 relative">
+                    <h1 class="text-4xl font-bold mb-2">⭐ Angielski - Unit 5 ⭐</h1>
+                    <div id="progress-text" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
+                        1 / 10
+                    </div>
                 </div>
 
-                <div id="word-container" class="word-row">
+                <div class="p-6 md:p-10 bg-blue-50 relative min-h-[400px] flex flex-col justify-center">
+                    <div id="game-screen" class="flex flex-col h-full w-full">
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                            <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+                        </div>
+
+                        <div id="word-container" class="word-row">
+                        </div>
+
+                        <div id="result-message" class="text-center text-3xl font-bold my-4 h-10"></div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-auto pt-4">
+                            <button id="check-btn" onclick="checkAnswer()" class="btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
+                                ✔️ Sprawdź
+                            </button>
+                            <button id="next-btn" onclick="nextWord()" class="btn bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-blue-600 hidden-screen">
+                                ➡️ Następne
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="summary-screen" class="hidden-screen flex flex-col items-center justify-center text-center h-full space-y-6">
+                        <div class="text-7xl">🏆</div>
+                        <h2 class="text-5xl font-bold text-blue-600">Koniec Gry!</h2>
+                        <p class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
+                        <button onclick="initGame()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
+                            🎲 Zagraj ponownie
+                        </button>
+                    </div>
                 </div>
-
-                <div id="result-message" class="text-center text-3xl font-bold my-4 h-10"></div>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-auto pt-4">
-                    <button id="check-btn" onclick="checkAnswer()" class="btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
-                        ✔️ Sprawdź
-                    </button>
-                    <button id="next-btn" onclick="nextWord()" class="btn bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-blue-600 hidden-screen">
-                        ➡️ Następne
-                    </button>
-                </div>
-            </div>
-
-            <div id="summary-screen" class="hidden-screen flex-col items-center justify-center text-center h-full space-y-6">
-                <div class="text-7xl">🏆</div>
-                <h2 class="text-5xl font-bold text-blue-600">Koniec Gry!</h2>
-                <p class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
-                <button onclick="initGame()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
-                    🎲 Zagraj ponownie
-                </button>
             </div>
         </div>
     </div>
