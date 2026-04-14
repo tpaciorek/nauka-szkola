@@ -115,6 +115,61 @@
             line-height: 1.1;
         }
 
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .summary-stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 16px;
+            border: 3px solid #bfdbfe;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+        }
+
+        .summary-stat-card-errors {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .summary-stat-card-hints {
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .summary-stat-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .summary-stat-card-errors .summary-stat-label {
+            color: #b91c1c;
+        }
+
+        .summary-stat-card-hints .summary-stat-label {
+            color: #b45309;
+        }
+
+        .summary-stat-value {
+            font-size: 2.6rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .summary-stat-card-errors .summary-stat-value {
+            color: #dc2626;
+        }
+
+        .summary-stat-card-hints .summary-stat-value {
+            color: #d97706;
+        }
+
         .nav-bar {
             display: flex;
             justify-content: space-between;
@@ -152,6 +207,14 @@
             }
 
             .summary-title {
+                font-size: 2.2rem;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-stat-value {
                 font-size: 2.2rem;
             }
 
@@ -275,7 +338,20 @@
                     <div id="summary-screen" class="hidden-screen flex flex-col items-center justify-center text-center h-full space-y-6">
                         <div class="text-7xl">🏆</div>
                         <h2 class="summary-title font-bold text-blue-600">Koniec Gry!</h2>
-                        <p class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
+                        <p id="summary-message" class="text-2xl text-gray-700">Wspaniała robota! Znasz już świetnie słówka!</p>
+
+                        <div class="summary-stats">
+                            <div class="summary-stat-card summary-stat-card-errors">
+                                <span class="summary-stat-label">Błędy</span>
+                                <span id="summary-errors" class="summary-stat-value">0</span>
+                            </div>
+
+                            <div class="summary-stat-card summary-stat-card-hints">
+                                <span class="summary-stat-label">Podpowiedzi</span>
+                                <span id="summary-hints" class="summary-stat-value">0</span>
+                            </div>
+                        </div>
+
                         <button onclick="initGame()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
                             🎲 Zagraj ponownie
                         </button>
@@ -293,11 +369,15 @@
 
         let currentQuizWords = [];
         let currentIndex = 0;
+        let totalMistakes = 0;
+        let totalHintsUsed = 0;
 
         function initGame() {
             const shuffledWords = [...vocabulary].sort(() => 0.5 - Math.random());
             currentQuizWords = shuffledWords.slice(0, 10);
             currentIndex = 0;
+            totalMistakes = 0;
+            totalHintsUsed = 0;
 
             document.getElementById('summary-screen').classList.add('hidden-screen');
             document.getElementById('game-screen').classList.remove('hidden-screen');
@@ -416,6 +496,7 @@
 
                 document.getElementById('next-btn').focus();
             } else {
+                totalMistakes++;
                 resultDiv.innerText = "💪 Spróbuj poprawić błędy!";
                 resultDiv.className = "text-center text-3xl font-bold my-4 h-10 text-orange-500";
                 document.getElementById('word-container').style.borderColor = '#93c5fd';
@@ -437,6 +518,7 @@
                 return;
             }
 
+            totalHintsUsed++;
             targetInput.value = targetInput.dataset.answer;
             targetInput.readOnly = true;
             targetInput.classList.remove('incorrect', 'correct');
@@ -465,6 +547,20 @@
         }
 
         function showSummary() {
+            const summaryMessage = document.getElementById('summary-message');
+            document.getElementById('summary-errors').innerText = totalMistakes;
+            document.getElementById('summary-hints').innerText = totalHintsUsed;
+
+            if (totalMistakes === 0 && totalHintsUsed === 0) {
+                summaryMessage.innerText = 'Perfekcyjnie! Udało się bez żadnego błędu i bez podpowiedzi!';
+            } else if (totalMistakes === 0) {
+                summaryMessage.innerText = `Super! Bez błędów, a podpowiedzi użyto ${totalHintsUsed} razy.`;
+            } else if (totalHintsUsed === 0) {
+                summaryMessage.innerText = `Brawo! Było ${totalMistakes} błędów, ale wszystko udało się poprawić bez podpowiedzi.`;
+            } else {
+                summaryMessage.innerText = `Brawo! Po drodze było ${totalMistakes} błędów i użyto ${totalHintsUsed} podpowiedzi.`;
+            }
+
             document.getElementById('game-screen').classList.add('hidden-screen');
             document.getElementById('summary-screen').classList.remove('hidden-screen');
             document.getElementById('progress-text').style.display = 'none';
