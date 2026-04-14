@@ -170,6 +170,71 @@
             color: #d97706;
         }
 
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome-box {
+            background: white;
+            border-radius: 24px;
+            border: 3px dashed #93c5fd;
+            padding: 24px;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+        }
+
+        .welcome-heading {
+            font-size: 2rem;
+            color: #1d4ed8;
+            margin-bottom: 10px;
+            line-height: 1.15;
+        }
+
+        .welcome-text {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #374151;
+        }
+
+        .instructions-list {
+            margin: 16px 0 0;
+            padding-left: 1.25rem;
+            color: #1f2937;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .instructions-list li + li {
+            margin-top: 8px;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+
+        .word-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: #dbeafe;
+            border: 2px solid #93c5fd;
+            color: #1e40af;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12);
+        }
+
+        .start-btn {
+            align-self: center;
+        }
+
         .nav-bar {
             display: flex;
             justify-content: space-between;
@@ -216,6 +281,24 @@
 
             .summary-stat-value {
                 font-size: 2.2rem;
+            }
+
+            .welcome-box {
+                padding: 18px;
+            }
+
+            .welcome-heading {
+                font-size: 1.6rem;
+            }
+
+            .welcome-text,
+            .instructions-list {
+                font-size: 1rem;
+            }
+
+            .word-pill {
+                font-size: 1rem;
+                padding: 8px 12px;
             }
 
             .word-row {
@@ -306,13 +389,43 @@
             <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-400">
                 <div class="bg-blue-400 text-white text-center py-6 px-4 relative">
                     <h1 class="game-title font-bold mb-2">⭐ Angielski - Unit 5 ⭐</h1>
-                    <div id="progress-text" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
+                    <div id="progress-text" style="display: none;" class="absolute top-4 right-4 bg-white text-blue-500 font-bold px-3 py-1 rounded-full text-lg shadow-sm border-2 border-blue-200">
                         1 / 10
                     </div>
                 </div>
 
                 <div class="p-6 md:p-10 bg-blue-50 relative min-h-[400px] flex flex-col justify-center">
-                    <div id="game-screen" class="flex flex-col h-full w-full">
+                    <div id="welcome-screen" class="welcome-screen h-full w-full">
+                        <div class="welcome-box text-center">
+                            <div class="text-6xl mb-4">👋</div>
+                            <h2 class="welcome-heading font-bold">Welcome! Zanim zaczniesz, poznaj słówka</h2>
+                            <p class="welcome-text">
+                                W tej grze trzeba uzupełnić brakujące litery w angielskich wyrazach z Unit 5.
+                                Najpierw przeczytaj słówka, potem kliknij start i spróbuj wpisać brakujące literki.
+                            </p>
+                        </div>
+
+                        <div class="welcome-box">
+                            <h3 class="text-2xl font-bold text-blue-700 text-center mb-2">📚 Słówka do nauki</h3>
+                            <div id="vocabulary-list" class="word-bank"></div>
+                        </div>
+
+                        <div class="welcome-box">
+                            <h3 class="text-2xl font-bold text-blue-700 text-center mb-2">📝 Jak wykonać zadanie?</h3>
+                            <ol class="instructions-list">
+                                <li>Przeczytaj słowo i wpisz brakującą literę lub litery.</li>
+                                <li>Kliknij <strong>Sprawdź</strong>, aby zobaczyć, czy odpowiedź jest dobra.</li>
+                                <li>Jeśli się pomylisz, możesz użyć przycisku <strong>💡 Podpowiedź</strong>.</li>
+                                <li>Na końcu zobaczysz podsumowanie błędów i użytych podpowiedzi.</li>
+                            </ol>
+                        </div>
+
+                        <button onclick="initGame()" class="start-btn btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
+                            ▶️ Start
+                        </button>
+                    </div>
+
+                    <div id="game-screen" class="hidden-screen flex flex-col h-full w-full">
                         <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
                             <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
                         </div>
@@ -352,7 +465,7 @@
                             </div>
                         </div>
 
-                        <button onclick="initGame()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
+                        <button onclick="showWelcomeScreen()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 mt-8">
                             🎲 Zagraj ponownie
                         </button>
                     </div>
@@ -372,6 +485,21 @@
         let totalMistakes = 0;
         let totalHintsUsed = 0;
 
+        function renderVocabularyList() {
+            const vocabularyList = document.getElementById('vocabulary-list');
+            vocabularyList.innerHTML = vocabulary
+                .map(word => `<span class="word-pill">${word}</span>`)
+                .join('');
+        }
+
+        function showWelcomeScreen() {
+            document.getElementById('welcome-screen').classList.remove('hidden-screen');
+            document.getElementById('game-screen').classList.add('hidden-screen');
+            document.getElementById('summary-screen').classList.add('hidden-screen');
+            document.getElementById('progress-text').style.display = 'none';
+            document.getElementById('word-container').style.borderColor = '#93c5fd';
+        }
+
         function initGame() {
             const shuffledWords = [...vocabulary].sort(() => 0.5 - Math.random());
             currentQuizWords = shuffledWords.slice(0, 10);
@@ -379,6 +507,7 @@
             totalMistakes = 0;
             totalHintsUsed = 0;
 
+            document.getElementById('welcome-screen').classList.add('hidden-screen');
             document.getElementById('summary-screen').classList.add('hidden-screen');
             document.getElementById('game-screen').classList.remove('hidden-screen');
             document.getElementById('progress-text').style.display = 'block';
@@ -566,7 +695,10 @@
             document.getElementById('progress-text').style.display = 'none';
         }
 
-        window.onload = initGame;
+        window.onload = function() {
+            renderVocabularyList();
+            showWelcomeScreen();
+        };
     </script>
 </body>
 </html>
