@@ -76,6 +76,13 @@
             box-shadow: 3px 3px 0px #dc2626 !important;
         }
 
+        .hinted {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+            box-shadow: 3px 3px 0px #d97706;
+        }
+
         .btn {
             box-shadow: 0 5px 0px rgba(0,0,0,0.2);
             transition: all 0.1s;
@@ -200,7 +207,8 @@
             }
 
             #check-btn,
-            #next-btn {
+            #next-btn,
+            #hint-btn {
                 font-size: 1.65rem !important;
                 padding: 0.9rem 1.6rem !important;
             }
@@ -255,6 +263,9 @@
                             <button id="check-btn" onclick="checkAnswer()" class="btn bg-green-500 hover:bg-green-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-green-600">
                                 ✔️ Sprawdź
                             </button>
+                            <button id="hint-btn" onclick="showHint()" class="btn bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-4 px-10 rounded-full text-3xl border-2 border-yellow-500 hidden-screen">
+                                💡 Podpowiedź
+                            </button>
                             <button id="next-btn" onclick="nextWord()" class="btn bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full text-3xl border-2 border-blue-600 hidden-screen">
                                 ➡️ Następne
                             </button>
@@ -300,11 +311,13 @@
             const resultDiv = document.getElementById('result-message');
             const checkBtn = document.getElementById('check-btn');
             const nextBtn = document.getElementById('next-btn');
+            const hintBtn = document.getElementById('hint-btn');
 
             container.innerHTML = '';
             resultDiv.innerText = '';
             checkBtn.classList.remove('hidden-screen');
             nextBtn.classList.add('hidden-screen');
+            hintBtn.classList.add('hidden-screen');
             container.classList.remove('correct', 'animate-bounce-custom');
 
             const progressNum = currentIndex + 1;
@@ -371,6 +384,7 @@
 
         function checkAnswer() {
             const inputs = document.querySelectorAll('#word-container .letter-box');
+            const hintBtn = document.getElementById('hint-btn');
             let correctCount = 0;
 
             inputs.forEach(input => {
@@ -398,13 +412,46 @@
 
                 document.getElementById('check-btn').classList.add('hidden-screen');
                 document.getElementById('next-btn').classList.remove('hidden-screen');
+                hintBtn.classList.add('hidden-screen');
 
                 document.getElementById('next-btn').focus();
             } else {
                 resultDiv.innerText = "💪 Spróbuj poprawić błędy!";
                 resultDiv.className = "text-center text-3xl font-bold my-4 h-10 text-orange-500";
                 document.getElementById('word-container').style.borderColor = '#93c5fd';
+                hintBtn.classList.remove('hidden-screen');
             }
+        }
+
+        function showHint() {
+            const inputs = Array.from(document.querySelectorAll('#word-container .letter-box'));
+            const resultDiv = document.getElementById('result-message');
+            const hintBtn = document.getElementById('hint-btn');
+
+            const targetInput = inputs.find(input => input.value.trim().toLowerCase() !== input.dataset.answer);
+
+            if (!targetInput) {
+                hintBtn.classList.add('hidden-screen');
+                resultDiv.innerText = "✅ Wszystkie litery już są! Kliknij Sprawdź.";
+                resultDiv.className = "text-center text-2xl font-bold my-4 h-10 text-green-600";
+                return;
+            }
+
+            targetInput.value = targetInput.dataset.answer;
+            targetInput.readOnly = true;
+            targetInput.classList.remove('incorrect', 'correct');
+            targetInput.classList.add('hinted');
+
+            const nextWrongInput = inputs.find(input => input.value.trim().toLowerCase() !== input.dataset.answer);
+
+            if (nextWrongInput) {
+                nextWrongInput.focus();
+            } else {
+                hintBtn.classList.add('hidden-screen');
+            }
+
+            resultDiv.innerText = "💡 Podpowiedź: jedna litera została odkryta!";
+            resultDiv.className = "text-center text-2xl font-bold my-4 h-10 text-yellow-600";
         }
 
         function nextWord() {
