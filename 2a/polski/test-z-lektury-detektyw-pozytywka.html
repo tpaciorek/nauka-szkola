@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test z lektury - Detektyw Pozytywka - Klasa 2a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(rgba(244, 114, 182, 0.14) 1px, transparent 1px);
+            background-size: 18px 18px;
+        }
+
+        .page-shell {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 800;
+            color: #be185d;
+            background: rgba(255, 255, 255, 0.94);
+            border: 2px solid #fbcfe8;
+            box-shadow: 0 12px 26px rgba(236, 72, 153, 0.14);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 16px 32px rgba(236, 72, 153, 0.2);
+        }
+
+        .nav-link.active {
+            background: #fdf2f8;
+            border-color: #f472b6;
+        }
+
+        @media (max-width: 640px) {
+            .nav-link {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-6 text-slate-800">
+
+    <div class="page-shell">
+        <nav class="nav-bar" aria-label="Nawigacja">
+            <a class="nav-link" href="../../index.html">🏠 Strona główna</a>
+            <a class="nav-link" href="../index.html">← Klasa 2a</a>
+            <a class="nav-link" href="./index.html">📖 Polski</a>
+            <a class="nav-link" href="./sprawdzian-ortograficzny.html">📝 Ortografia</a>
+            <a class="nav-link active" href="./test-z-lektury-detektyw-pozytywka.html">🔎 Test z lektury</a>
+        </nav>
+
+        <header class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white p-6 shadow-md rounded-3xl mb-8 max-w-5xl mx-auto flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center text-3xl">🔎</div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold">Detektyw Pozytywka — test z lektury</h1>
+                <p class="text-pink-100 text-sm md:text-base mt-1">
+                    Klasa 2a • odpowiedz na 10 losowych pytań i sprawdź, jak dobrze pamiętasz przygody detektywa z poddasza.
+                </p>
+            </div>
+        </header>
+
+        <main id="app" class="max-w-3xl mx-auto"></main>
+    </div>
+
+    <script>
+        const allQuestions = [
+            { q: "Jak nazywała się agencja detektywistyczna Detektywa Pozytywki?", options: ["Różowe Okulary", "Czarnowidz", "Lupa i Ślad", "Bystre Oko"], a: "Różowe Okulary" },
+            { q: "Jaką jedyną broń posiadał w swojej agencji Detektyw Pozytywka?", options: ["Kaktus", "Pistolet na wodę", "Lupę", "Gaz pieprzowy"], a: "Kaktus" },
+            { q: "Na jaki kolor pomalowane były drzwi do agencji Różowe Okulary?", options: ["Na różowo", "Na czarno", "Na biało", "Na niebiesko"], a: "Na różowo" },
+            { q: "Gdzie mieściła się agencja Detektywa Pozytywki?", options: ["Na poddaszu", "W piwnicy", "Na parterze", "W osobnym budynku"], a: "Na poddaszu" },
+            { q: "Kto założył konkurencyjną agencję Czarnowidz?", options: ["Pan Martwiak", "Dozorca Mietek", "Pani Majewska", "Pan Dominik"], a: "Pan Martwiak" },
+            { q: "Gdzie znajdowała się agencja detektywistyczna pana Martwiaka?", options: ["W piwnicy", "Na poddaszu", "Na dachu", "Na parterze"], a: "W piwnicy" },
+            { q: "Co zgubiła mała Zuzia w pierwszej zagadce?", options: ["Skarpetki w delfiny", "Rękawiczki w paski", "Czapkę z pomponem", "Złoty wisiorek"], a: "Skarpetki w delfiny" },
+            { q: "Od kogo Zuzia dostała swoje ulubione skarpetki?", options: ["Od babci", "Od mamy", "Od Detektywa Pozytywki", "Od brata"], a: "Od babci" },
+            { q: "Gdzie odnalazły się zaginione skarpetki Zuzi?", options: ["W suszarni na poddaszu", "W piaskownicy", "U pana Martwiaka", "W szafie w jej pokoju"], a: "W suszarni na poddaszu" },
+            { q: "O kradzieży jakiej rzeczy poinformowała Pozytywkę mała Asia?", options: ["Piasku z piaskownicy", "Rowery z podwórka", "Wazonu z kwiatami", "Cukierków ze sklepu"], a: "Piasku z piaskownicy" },
+            { q: "Kto zabrał piasek z podwórkowej piaskownicy?", options: ["Pan Martwiak", "Pan Mietek", "Dominik", "Zuzia"], a: "Pan Martwiak" },
+            { q: "Do czego panu Martwiakowi był potrzebny skradziony piasek?", options: ["Do zaprawy murarskiej na remont biura", "Do posypania śliskiego chodnika", "Chciał zbudować zamek z piasku", "Do zasypania dziury w drodze"], a: "Do zaprawy murarskiej na remont biura" },
+            { q: "Co uległo zniszczeniu na balkonie pani Majewskiej?", options: ["Wazon z chryzantemami", "Stare krzesło", "Zabytkowy zegar", "Szyba w oknie"], a: "Wazon z chryzantemami" },
+            { q: "Kto lub co zniszczyło wazon pani Majewskiej?", options: ["Pierwszy jesienny mróz", "Chuligani z podwórka", "Pan Martwiak", "Dominik grający w piłkę"], a: "Pierwszy jesienny mróz" },
+            { q: "Dlaczego mróz rozsadził wazon?", options: ["Bo woda zamarzając zwiększa objętość", "Bo wazon skurczył się z zimna", "Bo lód jest bardzo ciężki", "Bo wiatr przewrócił wazon"], a: "Bo woda zamarzając zwiększa objętość" },
+            { q: "Co robił Detektyw Pozytywka, gdy długo nie miał klientów i się nudził?", options: ["Udawał własnego klienta", "Czytał komiksy", "Spał na podłodze", "Podglądał pana Martwiaka"], a: "Udawał własnego klienta" },
+            { q: "Jaki las wyrósł pod oknem klienta Pozytywki w grudniu?", options: ["Las ze świątecznych choinek", "Las dębowy", "Las brzozowy", "Las z suchych gałęzi"], a: "Las ze świątecznych choinek" },
+            { q: "Jak miał na imię dozorca w kamienicy?", options: ["Mietek", "Władek", "Janusz", "Zdzisław"], a: "Mietek" },
+            { q: "O co pan Mietek oskarżał dzieci z kamienicy w czasie odwilży?", options: ["O zrzucanie śniegu na odśnieżone chodniki", "O kradzież jego łopaty do śniegu", "O rzucanie śnieżkami w okna", "O niszczenie ulepionego bałwana"], a: "O zrzucanie śniegu na odśnieżone chodniki" },
+            { q: "Skąd naprawdę brał się śnieg na odśnieżonym przez dozorcę chodniku?", options: ["Spadał z dachu, bo nadchodziła wiosna", "Wiatr nawiewał go z ulicy", "Zrzucał go pan Martwiak", "Zrzucała go pani Majewska"], a: "Spadał z dachu, bo nadchodziła wiosna" },
+            { q: "Jakie meble znajdowały się w małym biurze Pozytywki?", options: ["Stolik i dwa wędkarskie krzesełka", "Duże biurko i skórzany fotel", "Kanapa i szklany stolik", "Szafa i regał na książki"], a: "Stolik i dwa wędkarskie krzesełka" },
+            { q: "Co było namalowane na stoliku w agencji Detektywa Pozytywki?", options: ["Szachownica", "Mapa miasta", "Tarcza strzelnicza", "Kwiaty"], a: "Szachownica" },
+            { q: "O co Dominik oskarżył swoją siostrę Zuzię?", options: ["O zepsucie starego zegarka dziadka", "O zjedzenie jego czekolady", "O porwanie ulubionego latawca", "O wrzucenie piasku do butów"], a: "O zepsucie starego zegarka dziadka" },
+            { q: "Dlaczego stary zegarek nagle przestał działać?", options: ["Trzeba było go po prostu nakręcić", "Zepsuł się po wpadnięciu do kałuży", "Rozładowała się w nim bateria", "Dominik upuścił go na twardą podłogę"], a: "Trzeba było go po prostu nakręcić" },
+            { q: "Na czym Detektyw Pozytywka gotował wodę, gdy zepsuł mu się czajnik?", options: ["Na kaloryferze", "Nad płomieniem ze świeczki", "Na gorącym żelazku", "Na ognisku na podwórku"], a: "Na kaloryferze" },
+            { q: "O co pan Martwiak oskarżył bawiące się dzieci?", options: ["O zachlapanie okien jego agencji błotem", "O kradzież jego nowego roweru", "O wyrwanie kwiatów z klombu", "O rysowanie kredą po jego drzwiach"], a: "O zachlapanie okien jego agencji błotem" },
+            { q: "Jak Pozytywka sprawdził, które z dzieci biegało po kałużach?", options: ["Zmierzył im temperaturę szukając gorączki", "Sprawdził, czy mają brudne buty", "Zapytał panią Majewską", "Znalazł ślady mokrych stóp w agencji"], a: "Zmierzył im temperaturę szukając gorączki" },
+            { q: "Które z dzieci po zabawie w kałużach miało podwyższoną temperaturę (37,5 stopnia)?", options: ["Dominik", "Zuzia", "Asia", "Wszystkie dzieci były zdrowe"], a: "Dominik" },
+            { q: "Czego obawiała się pani Majewska w związku z panem Martwiakiem?", options: ["Że wpuszcza do niej gaz odbierający wzrok", "Że chce ukraść jej oszczędności", "Że hałasuje w nocy wiertarką", "Że podsłuchuje jej rozmowy telefoniczne"], a: "Że wpuszcza do niej gaz odbierający wzrok" },
+            { q: "Co tak naprawdę sprawiło, że w mieszkaniu pani Majewskiej było nagle ciemniej?", options: ["Liście na drzewach, które urosły za oknem", "Zepsuta żarówka w pokoju", "Zabrudzone okna, których dawno nie myła", "Gęsta mgła nad miastem"], a: "Liście na drzewach, które urosły za oknem" },
+            { q: "W jaki sposób, według obaw pani Majewskiej, pan Martwiak próbował ją otruć?", options: ["Częstując ją winogronami", "Dosypując jej truciznę do herbaty", "Rozpylając chemikalia", "Podrzucając jej zepsute jabłka"], a: "Częstując ją winogronami" },
+            { q: "Dlaczego po zjedzeniu winogron dzieci i pani Majewska źle się czuli?", options: ["Ponieważ zjedli nieumyte owoce", "Ponieważ zjedli ich zdecydowanie za dużo", "Ponieważ owoce były spryskane perfumami", "Ponieważ zjedli je razem z pestkami"], a: "Ponieważ zjedli nieumyte owoce" },
+            { q: "Co Detektyw Pozytywka kupił w aptece, aby pomóc na ból brzucha po owocach?", options: ["Węgiel", "Syrop malinowy", "Plastry z opatrunkiem", "Krople do oczu"], a: "Węgiel" },
+            { q: "Co spowodowało gwałtowny katar u Detektywa Pozytywki w ciepły, wiosenny dzień?", options: ["Latający w powietrzu puch z topoli", "Silny wiatr", "Wypicie lodowatej wody", "Siedzenie w przeciągu w biurze"], a: "Latający w powietrzu puch z topoli" },
+            { q: "Kto przestraszył się, że wywołał powrót zimy w środku wiosny?", options: ["Mała Asia", "Zuzia", "Pan Mietek", "Pani Majewska"], a: "Mała Asia" },
+            { q: "Co przypominało gęsto padający śnieg wiosną, który zaniepokoił Asię?", options: ["Puch z topoli", "Białe płatki kwiatów jabłoni", "Kawałki waty z rozdartej poduszki", "Rozsypaną mąkę z okna"], a: "Puch z topoli" },
+            { q: "Kto narzekał, że jakiś złoczyńca nocą zmniejsza mu wszystkie ubrania?", options: ["Dozorca pan Mietek", "Pan Martwiak", "Detektyw Pozytywka", "Dominik"], a: "Dozorca pan Mietek" },
+            { q: "Jaka była prawdziwa przyczyna zmniejszających się ubrań pana Mietka?", options: ["Dozorca po prostu trochę przytył", "Pralnia użyła złego proszku", "Suszył je zbyt długo na gorącym kaloryferze", "Rzeczywiście ktoś mu je podmieniał"], a: "Dozorca po prostu trochę przytył" },
+            { q: "Jakie morskie zwierzęta znajdowały się na zaginionych skarpetkach Zuzi?", options: ["Delfiny", "Łososie", "Rekiny", "Wieloryby"], a: "Delfiny" },
+            { q: "Jaki problem miał chłopiec spotkany przez Pozytywkę na plaży?", options: ["Pękały mu dmuchane zabawki", "Zgubił najładniejszą muszelkę", "Ktoś zburzył mu zamek z piasku", "Piasek parzył go w stopy"], a: "Pękały mu dmuchane zabawki" },
+            { q: "Kto niszczył dmuchane zabawki chłopca na plaży?", options: ["Gorące słońce, przez które rozszerzyło się powietrze", "Pan Martwiak przekłuwał je ostrą igłą", "Mrówki przegryzały cienką gumę", "Ostry piasek i małe kamyki"], a: "Gorące słońce, przez które rozszerzyło się powietrze" },
+            { q: "Jaki pojazd ukradł Detektywowi Pozytywce pan Martwiak w jednej z zagadek?", options: ["Rower", "Hulajnogę", "Deskorolkę", "Samochód"], a: "Rower" },
+            { q: "Czym dzieci bardzo chętnie dokarmiały Detektywa Pozytywkę?", options: ["Czekoladą i cukierkami", "Kanapkami z żółtym serem", "Świeżymi jabłkami z sadu", "Kawałkami gorącej pizzy"], a: "Czekoladą i cukierkami" },
+            { q: "Jakie przydatne urządzenie popsuło się Pozytywce w agencji?", options: ["Czajnik elektryczny", "Mikrofalówka", "Stary toster", "Zabytkowa kawiarka"], a: "Czajnik elektryczny" },
+            { q: "O jakim nierozwiązanym problemie najczęściej myślał Detektyw Pozytywka?", options: ["Kiedy dostanie kolejne zlecenie", "Gdzie schował swój ulubiony kapelusz", "Dlaczego Martwiak ma ładniejsze biuro", "Jak szybko urośnie jego kaktus na oknie"], a: "Kiedy dostanie kolejne zlecenie" },
+            { q: "Na którym piętrze w kamienicy mieszkali Zuzia i Dominik?", options: ["Na trzecim piętrze", "Na parterze", "Na pierwszym piętrze", "W podziemnej piwnicy"], a: "Na trzecim piętrze" },
+            { q: "Jaka wyjątkowa roślina zdobiła skromne biuro Detektywa Pozytywki?", options: ["Kaktus", "Złota paprotka", "Biały storczyk", "Wielki fikus"], a: "Kaktus" },
+            { q: "Czym różniła się broń Detektywa Pozytywki od broni znanych z filmów detektywów?", options: ["Był to kaktus przygotowany na wypadek ataku chuliganów", "Używał starej miotły do odstraszania", "Miał tylko plastikowy pistolet na wodę", "Jego jedyną bronią była wielka lupa"], a: "Był to kaktus przygotowany na wypadek ataku chuliganów" },
+            { q: "Dlaczego awaria czajnika Pozytywki była dla niego sporym kłopotem?", options: ["Bo uwielbiał herbatę i musiał grzać wodę na kaloryferze", "Bo wywołał potężne zwarcie w całej kamienicy", "Bo pan Martwiak wyśmiewał się z jego kłopotów", "Bo gorąca woda zalała mu całą podłogę"], a: "Bo uwielbiał herbatę i musiał grzać wodę na kaloryferze" },
+            { q: "Jak najczęściej dorośli oceniali Detektywa Pozytywkę?", options: ["Często uważali go za nieszkodliwego dziwaka", "Uważali go za największego bohatera miasta", "Bardzo się go bali", "Prosili go o pomoc o wiele częściej niż dzieci"], a: "Często uważali go za nieszkodliwego dziwaka" }
+        ];
+
+        const state = {
+            gameState: 'start',
+            currentQuestions: [],
+            currentIndex: 0,
+            score: 0,
+            selectedAnswer: null
+        };
+
+        const app = document.getElementById('app');
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startQuiz() {
+            const shuffled = shuffleArray(allQuestions).slice(0, 10);
+            state.currentQuestions = shuffled.map((question) => ({
+                ...question,
+                options: shuffleArray(question.options)
+            }));
+            state.currentIndex = 0;
+            state.score = 0;
+            state.selectedAnswer = null;
+            state.gameState = 'playing';
+
+            render();
+            scrollToTop();
+        }
+
+        function handleAnswer(optionIndex) {
+            if (state.selectedAnswer !== null) {
+                return;
+            }
+
+            const question = state.currentQuestions[state.currentIndex];
+            const option = question.options[optionIndex];
+
+            state.selectedAnswer = option;
+            if (option === question.a) {
+                state.score += 1;
+            }
+
+            render();
+        }
+
+        function handleNext() {
+            if (state.currentIndex < state.currentQuestions.length - 1) {
+                state.currentIndex += 1;
+                state.selectedAnswer = null;
+                state.gameState = 'playing';
+            } else {
+                state.gameState = 'end';
+            }
+
+            render();
+            scrollToTop();
+        }
+
+        function getOptionClassName(option) {
+            const base = 'w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 font-semibold text-lg ';
+
+            if (state.selectedAnswer === null) {
+                return `${base}border-slate-200 hover:border-pink-500 hover:bg-pink-50 bg-white text-slate-700 shadow-sm`;
+            }
+
+            const question = state.currentQuestions[state.currentIndex];
+            const isCorrect = option === question.a;
+            const isSelected = option === state.selectedAnswer;
+
+            if (isCorrect) {
+                return `${base}border-green-500 bg-green-50 text-green-700 shadow-sm`;
+            }
+
+            if (isSelected && !isCorrect) {
+                return `${base}border-red-500 bg-red-50 text-red-700 shadow-sm`;
+            }
+
+            return `${base}border-slate-200 bg-slate-50 text-slate-400 opacity-60`;
+        }
+
+        function getResultMessage() {
+            if (state.score === 10) {
+                return 'Prawdziwy detektyw! Pozytywka jest z ciebie dumny.';
+            }
+            if (state.score >= 7) {
+                return 'Świetna robota! Masz bystre oko i bardzo dobrą pamięć do szczegółów lektury.';
+            }
+            if (state.score >= 4) {
+                return 'Całkiem nieźle — jeszcze kilka tropów i dojdziesz do pełnego rozwiązania.';
+            }
+            return 'To dopiero początek śledztwa. Warto jeszcze raz zajrzeć do książki i spróbować ponownie.';
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col mx-auto border border-pink-100" style="min-height: 520px;">
+                    <div class="text-center space-y-6 p-10 flex-grow flex flex-col justify-center">
+                        <div class="flex justify-center mb-2">
+                            <div class="bg-pink-100 p-6 rounded-full shadow-inner text-6xl">🔎</div>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight">Detektyw Pozytywka</h2>
+                        <p class="text-2xl md:text-3xl font-bold text-slate-600">Wielki quiz wiedzy z lektury</p>
+                        <p class="text-lg text-slate-500 max-w-md mx-auto pt-2 leading-relaxed">
+                            Rozwiąż 10 losowo wybranych pytań z puli ${allQuestions.length} zagadek ze świata najsłynniejszego detektywa z poddasza.
+                            Czy masz tak bystre oko jak Pozytywka?
+                        </p>
+                        <div class="max-w-xl mx-auto bg-pink-50 border border-pink-100 rounded-2xl p-5 text-left">
+                            <h3 class="text-xl font-bold text-pink-700 mb-3">Jak grać?</h3>
+                            <ul class="space-y-2 text-slate-600 leading-relaxed">
+                                <li>• Odpowiesz na 10 losowych pytań jednokrotnego wyboru.</li>
+                                <li>• Po zaznaczeniu odpowiedzi od razu zobaczysz, czy była poprawna.</li>
+                                <li>• Na końcu dostaniesz wynik i krótkie podsumowanie śledztwa.</li>
+                            </ul>
+                        </div>
+                        <div class="pt-4">
+                            <button
+                                type="button"
+                                data-action="start"
+                                class="bg-pink-500 text-white px-10 py-5 rounded-full text-2xl font-bold shadow-lg shadow-pink-200 hover:bg-pink-600 hover:-translate-y-1 transition-all duration-200"
+                            >
+                                Rozpocznij śledztwo! 🔎
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlaying() {
+            const question = state.currentQuestions[state.currentIndex];
+            const isCorrect = state.selectedAnswer === question.a;
+            const progress = ((state.currentIndex + 1) / state.currentQuestions.length) * 100;
+
+            app.innerHTML = `
+                <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col mx-auto border border-pink-100" style="min-height: 560px;">
+                    <div class="p-8 flex flex-col h-full flex-grow">
+                        <div class="mb-8">
+                            <div class="flex justify-between items-center mb-3 gap-3 flex-wrap">
+                                <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                                    Pytanie ${state.currentIndex + 1} / ${state.currentQuestions.length}
+                                </span>
+                                <span class="text-sm font-bold text-pink-500 uppercase tracking-wider bg-pink-50 px-3 py-1 rounded-full">
+                                    Punkty: ${state.score}
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                                <div class="bg-pink-500 h-full transition-all duration-500 ease-out" style="width: ${progress}%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 flex-grow">
+                            <h3 class="text-2xl md:text-3xl font-bold leading-tight text-slate-800">
+                                ${escapeHtml(question.q)}
+                            </h3>
+                        </div>
+
+                        <div class="space-y-3 mb-8">
+                            ${question.options.map((option, index) => `
+                                <button
+                                    type="button"
+                                    data-option-index="${index}"
+                                    ${state.selectedAnswer !== null ? 'disabled' : ''}
+                                    class="${getOptionClassName(option)}"
+                                >
+                                    ${escapeHtml(option)}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div class="min-h-[92px] flex items-center justify-between border-t border-slate-100 pt-6">
+                            ${state.selectedAnswer !== null ? `
+                                <div class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-opacity duration-300">
+                                    <div>
+                                        <span class="font-bold text-lg md:text-xl flex items-center gap-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}">
+                                            ${isCorrect ? '✅ Zgadza się!' : '❌ Niestety, to nie to!'}
+                                        </span>
+                                        ${!isCorrect ? `
+                                            <p class="text-slate-500 mt-2 text-sm md:text-base">
+                                                Poprawna odpowiedź: <strong class="text-slate-700">${escapeHtml(question.a)}</strong>
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        data-action="next"
+                                        class="flex items-center gap-2 bg-slate-800 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors shadow-md w-full md:w-auto justify-center"
+                                    >
+                                        ${state.currentIndex < state.currentQuestions.length - 1 ? 'Następne →' : 'Zakończ'}
+                                    </button>
+                                </div>
+                            ` : `
+                                <p class="text-slate-400 text-base md:text-lg font-medium">Wybierz jedną odpowiedź, aby przejść dalej.</p>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEnd() {
+            app.innerHTML = `
+                <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col mx-auto border border-pink-100" style="min-height: 520px;">
+                    <div class="text-center p-10 space-y-6 flex-grow flex flex-col justify-center items-center">
+                        <div class="text-7xl drop-shadow-sm">🏆</div>
+                        <h2 class="text-4xl font-extrabold text-slate-800">Koniec śledztwa!</h2>
+
+                        <div class="py-6 w-full max-w-sm bg-slate-50 rounded-3xl border-2 border-slate-100 shadow-sm">
+                            <div class="text-7xl font-black text-pink-500 mb-2">${state.score} <span class="text-4xl text-slate-400">/ 10</span></div>
+                            <p class="text-xl text-slate-500 font-medium">zdobytych punktów</p>
+                        </div>
+
+                        <p class="text-2xl font-bold text-slate-700 max-w-md pb-2 leading-relaxed">
+                            ${getResultMessage()}
+                        </p>
+
+                        <button
+                            type="button"
+                            data-action="restart"
+                            class="bg-pink-500 text-white px-8 py-4 rounded-full text-xl font-bold shadow-lg shadow-pink-200 hover:bg-pink-600 hover:-translate-y-1 transition-all inline-flex items-center gap-3"
+                        >
+                            <span>🔁</span>
+                            <span>Zagraj jeszcze raz</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            if (state.gameState === 'start') {
+                renderStart();
+                return;
+            }
+
+            if (state.gameState === 'playing') {
+                renderPlaying();
+                return;
+            }
+
+            renderEnd();
+        }
+
+        app.addEventListener('click', (event) => {
+            const optionButton = event.target.closest('[data-option-index]');
+            if (optionButton) {
+                handleAnswer(Number(optionButton.dataset.optionIndex));
+                return;
+            }
+
+            const actionButton = event.target.closest('[data-action]');
+            if (!actionButton) {
+                return;
+            }
+
+            const { action } = actionButton.dataset;
+            if (action === 'start') {
+                startQuiz();
+            } else if (action === 'next' && state.selectedAnswer !== null) {
+                handleNext();
+            } else if (action === 'restart') {
+                startQuiz();
+            }
+        });
+
+        render();
+    </script>
+</body>
+</html>
