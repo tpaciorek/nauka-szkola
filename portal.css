@@ -160,6 +160,21 @@ body {
   background: var(--portal-primary-soft);
 }
 
+.flag {
+  display: inline-block;
+  width: 1.6em;
+  height: 0.8em;
+  vertical-align: -0.1em;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+.flag-big {
+  width: 44px;
+  height: 22px;
+  border-radius: 4px;
+}
+
 .portal-card-title {
   margin: 0;
   font-size: 1.5rem;

@@ -117,6 +117,7 @@ Strona działa pod adresem **https://tpaciorek.github.io/nauka-szkola/** (repo `
 - Nagradzaj: dźwięki WebAudio, konfetti, gwiazdki, postęp widoczny na mapie.
 - Link „← Wróć” do `./index.html` działu.
 - Teksty dla dziecka krótkie, na „Ty”, z emoji.
+- Ikony przedmiotów w menu: matematyka 🧮 (nie ✖️ – wygląda jak „źle”), angielski – obrazek `img/flaga-gb.svg` (`<img class="flag" …>`, w karcie `flag flag-big`). **Nie używaj emoji flag** – Windows pokazuje je jako litery „GB”. 🔤 zostaje wolne dla polskiego.
 
 ## Sprawdzenie przed oddaniem
 
