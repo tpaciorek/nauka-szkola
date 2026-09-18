@@ -81,6 +81,12 @@ Gry zręcznościowe (`arcade: true` w `LEVELS`): 3 serduszka, po ich utracie „
 
 Mechanika: poziom odblokowuje się po zdobyciu ≥1 gwiazdki w poprzednim; gwiazdki wg odsetka błędów (≤10% → 3, ≤30% → 2); błędne słówko wraca na koniec poziomu; po 2 błędach w pisaniu gra pokazuje słowo i każe je **przepisać**; „mastery” 0–5 na słówko (tylko za pisanie) steruje losowaniem – słabsze słówka wypadają częściej; „Szybka powtórka” po odblokowaniu pisania; seria dni 🔥; nagrody dla sowy (okulary, szalik, czapka, korona) za sumę gwiazdek. Postęp w `localStorage`.
 
+## Silnik gry matematycznej – `3a/matematyka/tabliczka-mnozenia.html`
+
+Ta sama Sówka, mapa, gwiazdki, nagrody i gry zręcznościowe, ale z **klawiaturą liczbową** i „faktami” zamiast słówek (`{t, k}` = t × k; 3 × 7 i 7 × 3 to ten sam fakt `fk()`, mastery 0–5 na fakt). Poziomy w `LEVELS` mają `tables` (które tabliczki), typy: `intro` (grupy przedmiotów), `practice` (karta z tabliczką i sztuczką z `TIPS` → wybór → rytm „licz co t” → wpisz wynik → brakujący czynnik), gry `catch`/`balloons`/`fly` (liczby zamiast słów), `minute` (60 s na czas, gwiazdki za wynik, rekord w `state.best`), `boss`. Na mapie siatka 10×10 „Moja tabliczka” pokolorowana wg mastery.
+
+Nowe wyzwania matematyczne (dzielenie, dodawanie z przekroczeniem progu itp.) rób na kopii tego pliku: zmień `LEVELS`, generowanie zadań w `buildTasks`, `facts()`/`distractors()` i podpowiedzi. Błędny wynik → podpowiedź „licz co t” + sztuczka; drugi błąd → pokazuje wynik i każe go wpisać.
+
 ## Wymowa – nagrania lektora, nie syntezator
 
 Użytkownik uznał głos syntezatora (`speechSynthesis`) za słaby („jakby po polsku czytał angielskie słowa”). Dlatego:
