@@ -165,6 +165,49 @@ body {
   font-size: 1.5rem;
 }
 
+.portal-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.portal-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.portal-card-badge--new {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.portal-card-badge--practice {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.portal-card-badge--reading {
+  color: #9d174d;
+  background: #fdf2f8;
+  border-color: #fbcfe8;
+}
+
+.portal-card-date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
 .portal-card-text {
   margin: 0;
   color: var(--portal-muted);
