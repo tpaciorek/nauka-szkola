@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0284c7" />
+  <title>Karolcia – quiz z Sówką Lulu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0c2d48;
+      --muted: #64748b;
+      --primary: #0284c7;
+      --primary-dark: #075985;
+      --primary-soft: #e0f2fe;
+      --line: #bae6fd;
+      --good: #16a34a;
+      --good-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --gold: #facc15;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(125, 211, 252, 0.55), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(147, 197, 253, 0.45), transparent 35%),
+        linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+    button:disabled { cursor: default; }
+
+    #app {
+      max-width: 560px; margin: 0 auto;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* ---------- Górny pasek ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: rgba(240, 249, 255, 0.88);
+      backdrop-filter: blur(10px);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 42px; padding: 8px 14px;
+      border-radius: 999px; border: 2px solid var(--line);
+      background: #fff; font-weight: 900; font-size: 1rem;
+      text-decoration: none; color: var(--ink);
+    }
+    .pill.back { color: var(--primary); }
+    .topbar .spacer { flex: 1; }
+    body.in-level .topbar { display: none; }
+
+    main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
+    body.in-level main { padding-bottom: 0; }
+
+    /* ---------- Sowa ---------- */
+    .owl-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .owl-big { width: 130px; flex: none; animation: bob 3s ease-in-out infinite; }
+    .owl-mini { width: 62px; flex: none; }
+    .jump { animation: jump 0.6s ease; }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+    .bubble {
+      position: relative; flex: 1;
+      background: #fff; border: 2px solid var(--line);
+      border-radius: 20px; padding: 12px 14px;
+      font-weight: 700; line-height: 1.45; font-size: 1rem;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.1);
+    }
+    .bubble::before {
+      content: ''; position: absolute; left: -10px; top: 22px;
+      border: 9px solid transparent; border-right-color: var(--line); border-left: 0;
+    }
+    .bubble::after {
+      content: ''; position: absolute; left: -7px; top: 23px;
+      border: 8px solid transparent; border-right-color: #fff; border-left: 0;
+    }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes pop { 0% { transform: scale(0.94); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ---------- Mapa ---------- */
+    .hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
+    .reward-bar {
+      background: #fff; border: 2px solid var(--line); border-radius: 20px;
+      padding: 12px 14px; font-weight: 800; font-size: 0.95rem;
+    }
+    .bar { height: 12px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #38bdf8, var(--primary)); border-radius: 999px; transition: width 0.6s ease; }
+    .section-title { font-size: 1.3rem; font-weight: 900; margin: 24px 0 10px; }
+    .muted { color: var(--muted); font-weight: 700; margin: -4px 0 12px; font-size: 0.95rem; }
+
+    .path { display: flex; flex-direction: column; align-items: flex-start; }
+    .path-dots { width: 4px; height: 18px; margin: 2px 0 2px 40px; border-left: 4px dotted #7dd3fc; }
+    .node {
+      position: relative;
+      width: 84%; margin-left: calc(var(--off) * 8%);
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; text-align: left;
+      background: #fff; border: 3px solid var(--line); border-radius: 22px;
+      box-shadow: 0 6px 0 #bae6fd;
+      transition: transform 0.12s ease;
+    }
+    .node:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #bae6fd; }
+    .node-icon {
+      width: 52px; height: 52px; flex: none; border-radius: 50%;
+      display: grid; place-items: center; font-size: 1.5rem; font-weight: 900;
+      background: var(--primary-soft);
+    }
+    .node-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .node-num { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .node-name { font-size: 1.05rem; font-weight: 900; }
+    .node-desc { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .node-stars { font-size: 1.1rem; color: var(--gold); letter-spacing: -1px; flex: none; text-shadow: 0 1px 0 #ca8a04; }
+    .node-stars .off { color: #e5e7eb; text-shadow: none; }
+    .node.done { border-color: #7dd3fc; }
+    .node.current { border-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); animation: glow 1.8s ease-in-out infinite; }
+    .node.current .node-icon { background: var(--primary); color: #fff; }
+    .node.locked { opacity: 0.55; background: #f8fafc; box-shadow: 0 6px 0 #e5e7eb; border-color: #e5e7eb; }
+    .node.locked .node-icon { background: #e5e7eb; }
+    @keyframes glow { 0%, 100% { outline: 0 solid rgba(2, 132, 199, 0.25); } 50% { outline: 7px solid rgba(2, 132, 199, 0.15); } }
+    .here {
+      position: absolute; right: 10px; top: -13px;
+      background: var(--gold); color: var(--ink); font-size: 0.75rem; font-weight: 900;
+      padding: 3px 10px; border-radius: 999px; box-shadow: 0 2px 0 #ca8a04;
+    }
+
+    /* kolekcja pamiątek */
+    .coll {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+      background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 12px;
+    }
+    .coll-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 2px; border-radius: 12px;
+    }
+    .coll-icon {
+      width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 1.5rem; background: var(--primary-soft); border: 2px solid var(--line);
+    }
+    .coll-item.locked .coll-icon { background: #f1f5f9; border-color: #e5e7eb; filter: grayscale(1); opacity: 0.55; }
+    .coll-label { font-size: 0.62rem; font-weight: 800; color: var(--muted); text-align: center; line-height: 1.2; }
+    .coll-item.locked .coll-label { opacity: 0.5; }
+
+    .info-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 52px; padding: 10px 16px; margin-top: 14px;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 900; color: var(--primary-dark);
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .info-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+
+    /* ---------- Przyciski ---------- */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 58px; padding: 12px 18px;
+      border: 0; border-radius: 18px;
+      font-size: 1.2rem; font-weight: 900;
+      background: var(--primary); color: #fff;
+      box-shadow: 0 5px 0 var(--primary-dark);
+      transition: transform 0.1s ease;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .btn.soft { background: #fff; color: var(--primary); border: 3px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+    .btn.green { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
+    .btn + .btn { margin-top: 12px; }
+    .link-btn.danger { background: none; border: 0; color: #9ca3af; margin: 28px auto 0; display: block; font-size: 0.85rem; font-weight: 800; text-decoration: underline; padding: 8px; }
+
+    /* ---------- Poziom ---------- */
+    .level { flex: 1; display: flex; flex-direction: column; }
+    .level-top { display: flex; align-items: center; gap: 12px; padding: 12px 0 8px; }
+    .icon-btn {
+      width: 44px; height: 44px; flex: none; border-radius: 50%;
+      border: 2px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--muted);
+    }
+    .progress { flex: 1; height: 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 999px; transition: width 0.4s ease; }
+    .level-badge { font-size: 1.5rem; font-weight: 900; }
+    .guide { display: flex; align-items: flex-start; gap: 12px; margin: 4px 0 12px; }
+    .task { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+    /* recap */
+    .recap-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 10px; }
+    .recap-wrap .owl-big { width: 150px; }
+    .recap-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; font-weight: 700; line-height: 1.55; font-size: 1.05rem;
+    }
+    .recap-title { font-size: 1.25rem; font-weight: 900; margin: 0 0 4px; }
+    .recap-sub { color: var(--muted); font-weight: 800; font-size: 0.9rem; margin: 0 0 10px; }
+    .recap-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* pytanie */
+    .q-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; text-align: center;
+    }
+    .q-num { font-size: 0.82rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .q-text { font-size: 1.2rem; font-weight: 900; line-height: 1.4; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 58px; padding: 12px 16px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1rem; font-weight: 800; line-height: 1.35;
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .quiz-opt:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+    .quiz-opt .letter {
+      flex: none; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 0.9rem; font-weight: 900;
+      background: var(--primary-soft); color: var(--primary-dark);
+    }
+    .quiz-opt.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .quiz-opt.ok .letter { background: var(--good); color: #fff; }
+    .quiz-opt.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.8; }
+    .quiz-opt.bad .letter { background: #fca5a5; color: #fff; }
+    .quiz-opt.dim { opacity: 0.55; }
+    .note {
+      text-align: left; background: #fef9c3; border: 2px solid #fde68a; border-radius: 16px;
+      padding: 10px 12px; font-weight: 700; line-height: 1.45; font-size: 0.95rem;
+    }
+    .feedback-head { font-weight: 900; text-align: center; font-size: 1.05rem; }
+    .feedback-head.ok { color: #166534; }
+    .feedback-head.bad { color: #b91c1c; }
+
+    /* ---------- Wynik ---------- */
+    .result { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 24px; }
+    .result .owl-big { width: 160px; }
+    .result h2 { font-size: 1.9rem; margin: 6px 0 0; }
+    .result-stars { display: flex; gap: 8px; font-size: 3.4rem; line-height: 1; }
+    .rs { color: #e5e7eb; }
+    .rs.on { color: var(--gold); text-shadow: 0 3px 0 #ca8a04; animation: starIn 0.5s ease both; animation-delay: var(--d); }
+    @keyframes starIn { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { transform: scale(1); } }
+    .result p { font-weight: 700; color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .reward-pop {
+      background: #fef9c3; border: 3px solid var(--gold); border-radius: 18px; padding: 12px 18px;
+      font-weight: 900; font-size: 1.1rem; animation: pop 0.5s ease; display: flex; align-items: center; gap: 10px;
+    }
+    .reward-pop .ic { font-size: 2rem; }
+    .result-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* ciekawostki */
+    .info-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+    .info-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 22px; padding: 16px;
+    }
+    .info-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .info-card p { margin: 0 0 8px; font-weight: 700; line-height: 1.55; color: #334155; }
+    .info-card p:last-child { margin-bottom: 0; }
+    .info-src { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (min-width: 600px) {
+      .owl-big { width: 150px; }
+      main { padding-left: 20px; padding-right: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a class="pill back" href="./index.html" aria-label="Wróć do polskiego">← Wróć</a>
+      <span class="spacer"></span>
+      <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
+      <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
+      <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
+    </header>
+    <main id="screen"></main>
+  </div>
+
+  <script>
+    /* =====================================================================
+       KAROLCIA – quiz z lektury z Sówką Lulu
+       10 rozdziałów przygody z niebieskim koralikiem, pytania sprawdzające
+       zrozumienie tekstu, pamiątki do zebrania po każdym rozdziale.
+       ===================================================================== */
+    const CONFIG = {
+      storageKey: 'nauka-3a-polski-karolcia-v1',
+      intro: 'Cześć! Jestem <b>Sówka Lulu</b> 🦉. Razem przypomnimy sobie przygody <b>Karolci</b> i jej niebieskiego koralika! Po każdym rozdziale czeka pytanie, gwiazdki i pamiątka do kolekcji. Zaczynamy?'
+    };
+
+    const LEVELS = [
+      {
+        id: 'l1', icon: '📖', name: 'Kim jest Karolcia?', desc: '„Dzień dobry!” • „Nowina”',
+        recap: 'Poznajemy <b>Karolcię</b> – dziewczynkę, która ma 8 lat i 8 miesięcy, jasne włosy związane w kitkę i zielonkawe, kocie oczy. Mieszka z mamą, tatą i ciotką Agatą. Pewnego dnia tatuś przynosi wielką nowinę: rodzina przeprowadza się do nowego mieszkania z balkonem!',
+        reward: { icon: '🎀', name: 'wstążka do kitki Karolci' },
+        questions: [
+          { q: 'Ile lat (i miesięcy) miała Karolcia na początku książki?', options: ['7 lat', '8 lat i 8 miesięcy', '9 lat i pół', '10 lat'], a: '8 lat i 8 miesięcy', note: 'Autorka bardzo dokładnie podaje wiek Karolci – to ważne, bo w książce minie trochę czasu.' },
+          { q: 'Jak nazywała się ciotka, która mieszkała z Karolcią i troszczyła się o całą rodzinę?', options: ['Ciotka Zofia', 'Ciotka Agata', 'Ciotka Helena', 'Ciotka Barbara'], a: 'Ciotka Agata', note: 'Ciotka Agata zawsze martwiła się, że domownicy za mało jedzą.' },
+          { q: 'Do jakiej klasy miała pójść Karolcia po wakacjach?', options: ['Do pierwszej', 'Do drugiej', 'Do trzeciej', 'Do czwartej'], a: 'Do trzeciej', note: 'Na świadectwie Karolci było napisane, że przechodzi do klasy trzeciej.' },
+          { q: 'Na jaką ulicę i pod jaki numer przeprowadziła się rodzina Karolci?', options: ['Różana 7', 'Kwiatowa 20', 'Słoneczna 20', 'Kwiatowa 7'], a: 'Kwiatowa 20', note: 'Nowe mieszkanie miało numer 7, ale cały dom stał pod numerem 20 na ulicy Kwiatowej.' },
+          { q: 'Prawda czy fałsz: Karolcia miała brata, z którym się bawiła.', options: ['Prawda', 'Fałsz', 'Miała starszą siostrę', 'Miała dwoje rodzeństwa'], a: 'Fałsz', note: 'Karolcia była jedynaczką – nie miała ani brata, ani siostry.' }
+        ]
+      },
+      {
+        id: 'l2', icon: '🚕', name: 'Latająca taksówka', desc: '„Zaczęło się zwyczajnie”',
+        recap: 'Dzień przeprowadzki okazał się niezwykły! W szparze podłogi, tam gdzie stał dawniej kredens, Karolcia znalazła tajemniczy <b>niebieski koralik</b>. A taksówka, którą jechała z ciotką Agatą, nagle wzbiła się w powietrze i poleciała nad miastem!',
+        reward: { icon: '🚕', name: 'latająca taksówka' },
+        questions: [
+          { q: 'Co Karolcia znalazła w szparze podłogi w dniu przeprowadzki?', options: ['Złotą monetę', 'Niebieski koralik', 'Srebrny pierścionek', 'Kolorowy guzik'], a: 'Niebieski koralik', note: 'Koralik leżał tam schowany od bardzo dawna – jak się później okazało, uciekał przed pewną czarownicą.' },
+          { q: 'Dlaczego taksówka, którą jechały Karolcia i ciotka Agata, nagle wzbiła się w powietrze?', options: ['Bo silnik się zepsuł', 'Bo kierowca i Karolcia zażyczyli sobie, żeby mogła latać', 'Bo wiał bardzo silny wiatr', 'Bo jechali po moście'], a: 'Bo kierowca i Karolcia zażyczyli sobie, żeby mogła latać', note: 'To był pierwszy dowód mocy koralika – wystarczyło życzenie, choć nikt jeszcze nie wiedział, że koralik naprawdę słucha.' },
+          { q: 'Po co taksówka zatrzymała się przy wielkim domu towarowym?', options: ['Bo skończyła się benzyna', 'Ciotka Agata chciała kupić kapelusz z fiołkami', 'Trzeba było kupić bułki', 'Karolcia zgubiła buty'], a: 'Ciotka Agata chciała kupić kapelusz z fiołkami', note: 'Ciotka Agata wyszła stamtąd w śmiesznym kapeluszu, zupełnie nie wiedząc, skąd się on wziął.' },
+          { q: 'Kim naprawdę była tajemnicza sprzedająca w domu towarowym, która chciała dostać koralik od Karolci?', options: ['Sąsiadką z ulicy Kwiatowej', 'Filomeną, złą czarownicą', 'Mamą Piotra', 'Koleżanką ciotki Agaty'], a: 'Filomeną, złą czarownicą', note: 'Kierowca taksówki od razu ją rozpoznał i pomógł Karolci uciec.' },
+          { q: 'Prawda czy fałsz: kierowca taksówki wyznał, że kiedyś on też miał podobny niebieski koralik.', options: ['Prawda', 'Fałsz', 'To był koralik ciotki Agaty', 'Kierowca nic nie wiedział o koraliku'], a: 'Prawda', note: 'Kierowca opowiedział, że gdy był małym chłopcem, Filomena też chciała odebrać mu jego koralik.' }
+        ]
+      },
+      {
+        id: 'l3', icon: '🐱', name: 'Nowi sąsiedzi i gadający koralik', desc: '„Trochę o sąsiadach i o deszczowym dniu”',
+        recap: 'Na ulicy Kwiatowej Karolcia poznaje nowych sąsiadów – w tym <b>Piotra</b>, który zostanie jej najlepszym przyjacielem – i dostaje kotkę imieniem <b>Gracja</b>. Pewnego deszczowego dnia, myjąc znaleziony koralik w łazience, odkrywa coś niezwykłego: koralik potrafi mówić i spełniać życzenia!',
+        reward: { icon: '🐱', name: 'kotka Gracja' },
+        questions: [
+          { q: 'Jak miał na imię chłopiec mieszkający piętro wyżej, który zaprzyjaźnił się z Karolcią?', options: ['Leszek', 'Piotr', 'Waldek', 'Robert'], a: 'Piotr', note: 'Piotr był pół roku starszy od Karolci, lubił geografię i czytanie.' },
+          { q: 'Do której klasy chodził Piotr?', options: ['Do drugiej', 'Do trzeciej', 'Do czwartej', 'Do piątej'], a: 'Do czwartej', note: 'Piotr był starszy od Karolci, więc chodził już do klasy czwartej.' },
+          { q: 'Jak nazywała się nowa kotka, którą dostała rodzina Karolci?', options: ['Mruczka', 'Gracja', 'Filutka', 'Puszka'], a: 'Gracja', note: 'Gracja lubiła obserwować z okna psa dozorczyni, który nazywał się Nero.' },
+          { q: 'Co się stało, gdy Karolcia umyła znaleziony koralik mydłem w łazience?', options: ['Koralik zniknął', 'Koralik zaczął mówić', 'Koralik zamienił się w kamień', 'Nic się nie stało'], a: 'Koralik zaczął mówić', note: 'Koralik przyznał, że jest wdzięczny – to właśnie Karolcia wydobyła go ze szpary w podłodze.' },
+          { q: 'Do czego – jak sam wyjaśnił – służy niebieski koralik?', options: ['Świeci w ciemności', 'Spełnia życzenia osoby, która go trzyma w dłoni', 'Leczy choroby', 'Pomaga w nauce tabliczki mnożenia'], a: 'Spełnia życzenia osoby, która go trzyma w dłoni', note: 'To właśnie dlatego zła Filomena tak bardzo chciała go odzyskać.' }
+        ]
+      },
+      {
+        id: 'l4', icon: '🐔', name: 'Pierwsze niebezpieczne życzenia', desc: '„Co było dalej” • „Gdzie jest koralik?”',
+        recap: 'Karolcia szybko przekonuje się, że życzenia trzeba wypowiadać bardzo ostrożnie! Na stole w kuchni pojawia się żywa kura, a jedno nieprzemyślane zdanie zamienia małą dziewczynkę w <b>dorosłą kobietę</b>, której nawet własna mama nie poznaje.',
+        reward: { icon: '🐔', name: 'zaczarowana kura' },
+        questions: [
+          { q: 'Jakie zwierzę nagle pojawiło się w kuchni, gdy Karolcia (trzymając koralik) pomyślała, żeby ciotka nie musiała jechać po zakupy w deszczu?', options: ['Pies', 'Żywa kura', 'Kotek', 'Papuga'], a: 'Żywa kura', note: 'Ciotka Agata bardzo się zdziwiła, skąd na stole wzięła się gdacząca kura.' },
+          { q: 'Co się stało, gdy Karolcia powiedziała do mamy: „Chciałabym jak najprędzej być dorosła, aby ci pomagać”?', options: ['Nic się nie stało', 'Natychmiast zamieniła się w dorosłą kobietę', 'Zasnęła', 'Koralik zniknął na zawsze'], a: 'Natychmiast zamieniła się w dorosłą kobietę', note: 'To było jedno z najbardziej kłopotliwych życzeń w całej książce!' },
+          { q: 'Dlaczego zamiana w dorosłą osobę była dla Karolci wielkim kłopotem?', options: ['Bo nie umiała chodzić na wysokich obcasach', 'Bo zgubiła koralik i mama jej nie poznawała', 'Bo musiała iść do pracy', 'Bo zapomniała, jak ma na imię'], a: 'Bo zgubiła koralik i mama jej nie poznawała', note: 'Bez koralika przy sobie Karolcia nie mogła poprosić o powrót do bycia małą dziewczynką.' },
+          { q: 'Gdzie Karolcia w końcu odnalazła zgubiony koralik?', options: ['Na podwórku', 'W kieszeni ciotki Agaty', 'W przedpokoju, tam gdzie się zamieniła', 'W łazience'], a: 'W przedpokoju, tam gdzie się zamieniła', note: 'Koralik leżał blisko ściany – Karolcia zdążyła go złapać, zanim wróciła ciotka Agata.' },
+          { q: 'Jak zareagowała Karolcia, gdy w końcu znów stała się małą dziewczynką?', options: ['Ucieszyła się, że jest mała, i wcale nie chciała być dorosła', 'Zdenerwowała się', 'Chciała od razu spróbować jeszcze raz', 'Zapomniała o całej sprawie'], a: 'Ucieszyła się, że jest mała, i wcale nie chciała być dorosła', note: 'Bycie dorosłą wcale nie okazało się takie proste, jak się wydawało!' }
+        ]
+      },
+      {
+        id: 'l5', icon: '🧁', name: 'Ciastka bez końca i zakład o globus', desc: '„O ciociu Agato!” • „Autobus i inne rzeczy”',
+        recap: 'Ciotka Agata marzy głośno o cieście z kremem – i cały pokój zapełnia się tacami słodkości, a do tego zjawia się tajemnicza gościni! Następnego dnia Karolcia pomaga zapracowanej mamie, a potem zakłada się z Piotrem o jego ukochany <b>globus</b>.',
+        reward: { icon: '🧁', name: 'ciastko z kremem' },
+        questions: [
+          { q: 'Co powiedziała ciotka Agata, że nagle cały pokój zapełnił się tacami ciastek z kremem?', options: ['Że jest głodna jak wilk', 'Że chętnie zjadłaby całą tacę ciastek z kremem', 'Że lubi pierniki', 'Że chce zrobić zakupy'], a: 'Że chętnie zjadłaby całą tacę ciastek z kremem', note: 'Ciotka nawet nie wiedziała, że trzyma wtedy w ręce koralik Karolci!' },
+          { q: 'Kto pojawił się wśród niespodziewanych gości zwabionych zapachem ciastek i próbował odzyskać koralik?', options: ['Piotr', 'Filomena w dziwacznym kapeluszu', 'Mama Karolci', 'Listonosz'], a: 'Filomena w dziwacznym kapeluszu', note: 'Karolcia w ostatniej chwili wyrwała jej koralik i życzyła sobie, żeby wszyscy goście zniknęli.' },
+          { q: 'O co Karolcia poprosiła koralik następnego dnia rano, żeby pomóc śpieszącej się do pracy mamie?', options: ['O parasol', 'O pusty, nowy autobus dla mamy', 'O taksówkę', 'O rower'], a: 'O pusty, nowy autobus dla mamy', note: 'Mama mogła spokojnie usiąść przy oknie, zamiast tłoczyć się w deszczu na przystanku.' },
+          { q: 'Kto naprawdę dał niegrzecznemu chłopakowi na przystanku „nauczkę”, gdy Piotr powiedział, że chciałby to zrobić?', options: ['Piotr', 'Mama Karolci', 'Sama (przeniesiona tam na chwilę) Karolcia', 'Kierowca autobusu'], a: 'Sama (przeniesiona tam na chwilę) Karolcia', note: 'Niebacznie powtórzone życzenie Piotra też się spełniło – Karolcia znalazła się nagle na dole, przy przystanku.' },
+          { q: 'O jaki swój największy skarb założył się Piotr, twierdząc że Karolcia nie potrafi stać się niewidzialna?', options: ['O rower', 'O znaczek z Australii', 'O swój globus', 'O kolekcję samochodzików'], a: 'O swój globus', note: 'Piotr szybko przegrał ten zakład – i wcale tego nie żałował!' }
+        ]
+      },
+      {
+        id: 'l6', icon: '👻', name: 'Niewidzialni w mieście', desc: '„Hura! Niewidzialni! Hura! Latamy!” • „Lepsze i gorsze pomysły”',
+        recap: 'Karolcia i Piotr są niewidzialni! Latają nad miastem trzymając się za ręce, dają nauczkę niegrzecznemu Waldkowi, ratują chłopca wychylającego się z okna, a w wielkim domu towarowym robią prawdziwe zamieszanie – tańczące buty i chodząca lalka!',
+        reward: { icon: '👻', name: 'niewidzialny płaszczyk' },
+        questions: [
+          { q: 'Komu i za co Piotr i Karolcia (niewidzialni) dali „nauczkę”, wpychając go do kałuży?', options: ['Leszkowi, bo się przewrócił', 'Waldkowi, bo znęcał się nad młodszymi dziećmi', 'Panu listonoszowi', 'Nikomu, tylko się bawili'], a: 'Waldkowi, bo znęcał się nad młodszymi dziećmi', note: 'Waldek popychał Agasię i Janię – nikt go potem nie żałował.' },
+          { q: 'Kto pomógł uwolnić Karolcię, gdy zaczepiła się sukienką o antenę wysoko nad miastem?', options: ['Dwa gawrony', 'Kotka Gracja', 'Piotr sam sobie poradził', 'Filomena'], a: 'Dwa gawrony', note: 'Gawrony kilkoma uderzeniami dziobów odczepiły sukienkę Karolci.' },
+          { q: 'Co gawrony wyjaśniły Karolci na temat niewidzialności?', options: ['Że jest niewidzialna tylko w nocy', 'Że zwierzęta widzą ją mimo wszystko, choć ludzie nie', 'Że wkrótce zniknie na zawsze', 'Że musi wrócić do domu przed zmrokiem'], a: 'Że zwierzęta widzą ją mimo wszystko, choć ludzie nie', note: 'Gawrony ostrzegły też, żeby nie używać koralika lekkomyślnie.' },
+          { q: 'Jakiego żartu użyli Piotr i Karolcia, by nauczyć grzeczności niemiłą sprzedawczynię w dziale obuwia?', options: ['Poskarżyli się kierownikowi', 'Sprawili, że buty same zatańczyły i „zażądały” grzeczności', 'Schowali wszystkie pudełka', 'Nic nie zrobili'], a: 'Sprawili, że buty same zatańczyły i „zażądały” grzeczności', note: 'Wszyscy klienci pomyśleli, że to jakaś reklama!' },
+          { q: 'Co zrobili Piotr i Karolcia, gdy zauważyli chłopca kradnącego jedwabny szalik?', options: ['Zawołali ochronę', 'Wyciągnęli mu szalik z kieszeni na oczach wszystkich', 'Udali, że nic nie widzieli', 'Kupili mu inny szalik'], a: 'Wyciągnęli mu szalik z kieszeni na oczach wszystkich', note: 'Złodziejaszek uciekł jak najszybciej, a szalik wrócił na ladę.' }
+        ]
+      },
+      {
+        id: 'l7', icon: '🍪', name: 'Piernikowy domek Baby Jagi', desc: '„Co się działo dalej w piernikowym domku” • „W domu dzieją się dziwne rzeczy”',
+        recap: 'W dziale zabawek stoi domek Baby Jagi. Gdy Karolcia zażyczyła sobie, żeby stał się prawdziwy – tak się właśnie stało! Poznajemy magiczne piernikowe serduszka w czekoladzie, a potem znów uciekamy przed Filomeną, która chce zabrać koralik.',
+        reward: { icon: '🍪', name: 'piernikowe serduszko' },
+        questions: [
+          { q: 'O co poprosiła Karolcia, patrząc na (niby drewniany) domek Baby Jagi w dziale zabawek?', options: ['Żeby dostać go w prezencie', 'Żeby stał się prawdziwy, z prawdziwą Babą Jagą', 'Żeby zniknął', 'Żeby był większy'], a: 'Żeby stał się prawdziwy, z prawdziwą Babą Jagą', note: 'Życzenie się spełniło – nawet papierowe kwiaty zaczęły naprawdę pachnieć!' },
+          { q: 'Jaką magiczną właściwość miały piernikowe serduszka w czekoladzie upieczone przez Babę Jagę?', options: ['Dawały siłę do biegania', 'Sprawiały, że ludzie stawali się lepsi i milsi dla innych', 'Leczyły przeziębienie', 'Sprawiały, że dzieci rosły'], a: 'Sprawiały, że ludzie stawali się lepsi i milsi dla innych', note: 'Nawet dorośli, którzy zjedli piernik, zaczynali myśleć przede wszystkim o sprawach dzieci.' },
+          { q: 'Kim okazała się kobieta w dziwacznym kapeluszu z piórami, która zażądała koralika zamiast piernika?', options: ['Babą Jagą', 'Filomeną', 'Mamą Piotra', 'Sprzedawczynią z działu obuwia'], a: 'Filomeną', note: 'Filomena wciąż nie dawała za wygraną w pogoni za koralikiem.' },
+          { q: 'Co zdradziło kryjówkę niewidzialnych Piotra i Karolci przed Filomeną w tłumie?', options: ['Ich cienie', 'Widoczny, błyszczący koralik na szyi Karolci', 'Śmiech Piotra', 'Ślady na podłodze'], a: 'Widoczny, błyszczący koralik na szyi Karolci', note: 'Sam koralik nie był niewidzialny, więc Filomena mogła go dostrzec.' },
+          { q: 'Gdzie Karolcia w końcu schowała koralik, żeby był bezpieczny w drodze do domu?', options: ['Do swojego buta', 'Do kieszeni płaszcza swojej mamy', 'Do kieszeni Piotra', 'Do koszyka ciotki Agaty'], a: 'Do kieszeni płaszcza swojej mamy', note: 'To wywołało zupełnie nowy kłopot – trzeba było odzyskać koralik z kieszeni mamy!' }
+        ]
+      },
+      {
+        id: 'l8', icon: '🦁', name: 'Kamienne lwy ożywają', desc: '„Uwaga, bo co będzie dalej?” • „Czerwony samochód po raz pierwszy” • „Kamienne lwy!”',
+        recap: 'Koralik jest coraz bledszy – każde życzenie go osłabia! A tymczasem ulubiony ogród dzieci ma zostać zamknięty i zamieniony w restaurację. Piotr i Karolcia postanawiają iść prosto do <b>Prezydenta Miasta</b> – pomagają im w tym dwa ożywione kamienne lwy!',
+        reward: { icon: '🦁', name: 'kamienny lew' },
+        questions: [
+          { q: 'Co Karolcia zauważyła w kolorze koralika następnego dnia po przygodach w domu towarowym?', options: ['Że zrobił się jaśniejszy i większy', 'Że zrobił się bledszy', 'Że zmienił kolor na zielony', 'Nic się nie zmieniło'], a: 'Że zrobił się bledszy', note: 'Koralik sam wyjaśnił, że każde spełnione życzenie go osłabia.' },
+          { q: 'Jaka smutna wiadomość wisiała na tablicy przy bramie ulubionego ogrodu dzieci?', options: ['Że ogród zostanie powiększony', 'Że ogród zostanie zamknięty, a na jego miejscu powstanie restauracja', 'Że huśtawki są zepsute', 'Że ogród zmieni nazwę'], a: 'Że ogród zostanie zamknięty, a na jego miejscu powstanie restauracja', note: 'Zamknięcie miało nastąpić już następnego dnia – trzeba było działać szybko!' },
+          { q: 'Do kogo postanowili pójść Piotr i Karolcia, żeby uratować ogród?', options: ['Do dozorcy', 'Do samego Prezydenta Miasta', 'Do ciotki Agaty', 'Do nauczycielki'], a: 'Do samego Prezydenta Miasta', note: 'Tylko on mógł wydać zarządzenie, które ocaliłoby ogród.' },
+          { q: 'Kto pomógł dzieciom dostać się do środka Ratusza, mimo zamkniętej bramy?', options: ['Strażnik przy bramie', 'Dwa kamienne lwy, które ożyły', 'Kierowca autobusu', 'Ciotka Agata'], a: 'Dwa kamienne lwy, które ożyły', note: 'Lwy okazały się bardzo łagodne i chętnie pomogły – uwielbiały się poruszać po tylu latach nieruchomego stania.' },
+          { q: 'Czym niechcący pobawił się Piotr na podwórzu Ratusza, wywołując popłoch kierowcy?', options: ['Fontanną', 'Czerwonym autem samego Prezydenta', 'Dzwonem', 'Hulajnogą strażnika'], a: 'Czerwonym autem samego Prezydenta', note: 'Kierowca był przekonany, że auto samo ruszyło – a to niewidzialny Piotr nacisnął starter!' }
+        ]
+      },
+      {
+        id: 'l9', icon: '👑', name: 'Wizyta u Prezydenta Miasta', desc: '„Panie Prezydencie Miasta!” • „Rzeczy chyba jeszcze dziwniejsze”',
+        recap: 'W gabinecie Prezydenta Miasta czeka wielka niespodzianka – jego sekretarką jest sama <b>Filomena</b>! Dzieci muszą sprytnie pomóc Prezydentowi wymknąć się z Ratusza. A on sam odkrywa, jak to jest choć przez chwilę być niewidzialnym!',
+        reward: { icon: '🎩', name: 'kapelusz Prezydenta' },
+        questions: [
+          { q: 'Kim okazała się być sekretarka samego Prezydenta Miasta?', options: ['Ciotka Agata', 'Filomena', 'Mama Piotra', 'Nikt jej nie znał'], a: 'Filomena', note: 'To był dla dzieci ogromny szok – wcale nie spodziewały się spotkać jej właśnie tam.' },
+          { q: 'Czego zapragnął sam Prezydent Miasta, gdy poznał moc koralika?', options: ['Żeby mieć więcej pieniędzy', 'Żeby chociaż na chwilę stać się niewidzialny', 'Żeby zostać dzieckiem', 'Żeby mieć nowe auto'], a: 'Żeby chociaż na chwilę stać się niewidzialny', note: 'Marzył o tym jeszcze jako mały chłopiec i bardzo się ucieszył, że w końcu mu się to spełniło.' },
+          { q: 'Dlaczego Prezydent nie mógł po prostu normalnie wyjść z gabinetu?', options: ['Bo drzwi były zamknięte na klucz', 'Bo Filomena kazałaby mu wcześniej podpisać mnóstwo dokumentów', 'Bo bał się deszczu', 'Bo czekał na telefon'], a: 'Bo Filomena kazałaby mu wcześniej podpisać mnóstwo dokumentów', note: 'Filomena pilnowała Prezydenta na każdym kroku, więc trzeba było działać niepostrzeżenie.' },
+          { q: 'Jak dzieci pomogły Prezydentowi niepostrzeżenie wymknąć się z gabinetu?', options: ['Zgasiły światło', 'Rozrzuciły papiery Filomeny, żeby ją rozproszyć', 'Zamknęły Filomenę w szafie', 'Poprosiły ją o pozwolenie'], a: 'Rozrzuciły papiery Filomeny, żeby ją rozproszyć', note: 'Filomena była tak zajęta zbieraniem papierów, że nie zauważyła ucieczki.' },
+          { q: 'Czym ostatecznie pojechali z Ratusza do ogrodu?', options: ['Autobusem', 'Czerwonym autem, które prowadził sam Prezydent', 'Na kamiennych lwach', 'Pieszo'], a: 'Czerwonym autem, które prowadził sam Prezydent', note: 'Szofer nie mógł przecież jechać z niewidzialnym pasażerem, więc Prezydent sam usiadł za kierownicą.' }
+        ]
+      },
+      {
+        id: 'l10', icon: '💙', name: 'Pościg, ZOO i pożegnanie koralika', desc: '„Stop! Zatrzymać wóz!” • „Nareszcie w ogrodzie!” • „Żegnaj, koraliku!”',
+        recap: 'Zaczyna się wielki pościg! Filomena łapie kamienne lwy i wywozi je do ZOO, ale Karolcia, Piotr i Prezydent ruszają na ratunek – nawet na wielbłądach! Na koniec Karolcia musi podjąć najważniejszą decyzję: na co wykorzystać ostatnie, już bardzo blade życzenie koralika?',
+        reward: { icon: '💙', name: 'niebieski koralik (na pamiątkę)' },
+        questions: [
+          { q: 'Dokąd Filomena kazała zawieźć schwytane w sieć kamienne lwy?', options: ['Do cyrku', 'Do Ogrodu Zoologicznego', 'Z powrotem do Ratusza', 'Do domu towarowego'], a: 'Do Ogrodu Zoologicznego', note: 'Na szczęście dzieci i Prezydent od razu ruszyli tam z odsieczą.' },
+          { q: 'Na czym pojechali Piotr, Karolcia i Prezydent, żeby dogonić i uratować lwy w ZOO?', options: ['Na rowerach', 'Na wielbłądach', 'Na słoniach', 'Pieszo'], a: 'Na wielbłądach', note: 'Wielbłądy akurat spacerowały luzem po ogrodzie zoologicznym – to był szybki sposób na dotarcie do lwów.' },
+          { q: 'Kto pomógł otworzyć klatkę i zamknąć w niej Filomenę zamiast lwów?', options: ['Słonie', 'Małpki kapucynki', 'Dyrektor ZOO', 'Foki'], a: 'Małpki kapucynki', note: 'Słonie i foki tylko odciągnęły uwagę dozorców, a to małpki otworzyły klatkę.' },
+          { q: 'Jaki (celowo błędny ortograficznie) napis zostawił Piotr na tabliczce przy klatce z Filomeną?', options: ['„zła pani”', '„dziwne zwieżę”', '„niebezpieczna czarownica”', '„nie karmić”'], a: '„dziwne zwieżę”', note: 'Piotr napisał „zwieżę” zamiast „zwierzę” – to poprawnie pisze się przez „rz”!' },
+          { q: 'O co Karolcia poprosiła w swoim ostatnim, najważniejszym życzeniu?', options: ['O nową lalkę', 'Żeby spełniły się marzenia wszystkich mieszkańców ich ulicy', 'Żeby koralik nigdy nie zbladł', 'O wakacje nad morzem'], a: 'Żeby spełniły się marzenia wszystkich mieszkańców ich ulicy', note: 'Karolcia zrezygnowała z własnych zachcianek na rzecz czegoś dużo ważniejszego – i ulica dostała nawet nową nazwę: „Szczęśliwy Zaułek”.' },
+          { q: 'Co się stało z koralikiem na samym końcu opowieści?', options: ['Karolcia schowała go na zawsze do pudełka', 'Zniknął, zamieniając się w kroplę na dłoni Karolci', 'Oddała go Piotrowi', 'Zabrała go ze sobą Filomena'], a: 'Zniknął, zamieniając się w kroplę na dłoni Karolci', note: 'Po ostatnim, wielkim życzeniu koralik stracił już całą swoją moc i barwę – i po prostu zniknął.' }
+        ]
+      }
+    ];
+
+    const MAX_STARS = LEVELS.length * 3;
+    const REWARDS = [
+      { frac: 0.15, id: 'glasses', name: 'okulary', icon: '👓' },
+      { frac: 0.35, id: 'scarf', name: 'szalik', icon: '🧣' },
+      { frac: 0.6, id: 'hat', name: 'czapka mądrości', icon: '🎓' },
+      { frac: 0.85, id: 'crown', name: 'złota korona', icon: '👑' }
+    ].map(r => ({ ...r, at: Math.max(1, Math.round(r.frac * MAX_STARS)) }));
+    const PRAISE = ['Super!', 'Brawo!', 'Hoot hoot! Świetnie!', 'Ekstra!', 'Tak jest! 🎉', 'Jesteś mistrzynią lektury!', 'Wow, pięknie!', 'Doskonale!'];
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const screen = $('#screen');
+
+    /* ---------- Stan i zapis ---------- */
+    function defaultState() { return { stars: {}, collected: {}, streak: { last: null, count: 0 }, sfx: true }; }
+    function loadState() {
+      try {
+        const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        if (s) return Object.assign(defaultState(), s);
+      } catch (e) {}
+      return defaultState();
+    }
+    function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); } catch (e) {} }
+    const state = loadState();
+
+    const totalStars = () => LEVELS.reduce((s, l) => s + (state.stars[l.id] || 0), 0);
+    const accessories = () => REWARDS.filter(r => totalStars() >= r.at).map(r => r.id);
+    const unlocked = i => i === 0 || !!state.stars[LEVELS[i - 1].id];
+
+    function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); }
+    function bumpStreak() {
+      const t = dayStr(new Date()), s = state.streak;
+      if (s.last === t) return;
+      s.count = s.last === yesterdayStr() ? s.count + 1 : 1;
+      s.last = t;
+    }
+    const currentStreak = () => state.streak.last === dayStr(new Date()) || state.streak.last === yesterdayStr() ? state.streak.count : 0;
+
+    /* ---------- Narzędzia ---------- */
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+
+    /* ---------- Dźwięki ---------- */
+    let actx = null;
+    function tone(freqs, dur = 0.1, type = 'sine', vol = 0.15) {
+      if (!state.sfx) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        freqs.forEach((f, i) => {
+          const o = actx.createOscillator(), g = actx.createGain(), st = t0 + i * dur;
+          o.type = type; o.frequency.value = f;
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(vol, st + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur * 1.6);
+          o.connect(g).connect(actx.destination);
+          o.start(st); o.stop(st + dur * 1.7);
+        });
+      } catch (e) {}
+    }
+    const sfx = {
+      good: () => tone([660, 990], 0.09),
+      bad: () => tone([240, 180], 0.12, 'triangle'),
+      tap: () => tone([520], 0.04, 'sine', 0.07),
+      win: () => tone([523, 659, 784, 1047], 0.12)
+    };
+
+    /* ---------- Sówka Lulu ---------- */
+    function owlSVG(mood) {
+      const acc = accessories();
+      const eyes = mood === 'happy'
+        ? `<path d="M31 64 q13 -13 26 0 M63 64 q13 -13 26 0" stroke="#1e1b4b" stroke-width="5" fill="none" stroke-linecap="round"/>`
+        : `<circle cx="44" cy="62" r="14" fill="#fff"/><circle cx="76" cy="62" r="14" fill="#fff"/>
+           <circle cx="46" cy="63" r="7" fill="#1e1b4b"/><circle cx="78" cy="63" r="7" fill="#1e1b4b"/>
+           <circle cx="48.5" cy="60" r="2.3" fill="#fff"/><circle cx="80.5" cy="60" r="2.3" fill="#fff"/>
+           ${mood === 'sad' ? '<path d="M32 44 l20 5 M88 44 l-20 5" stroke="#4c1d95" stroke-width="4" stroke-linecap="round"/>' : ''}`;
+      const scarf = acc.includes('scarf')
+        ? `<rect x="24" y="84" width="72" height="12" rx="6" fill="#ef4444"/><rect x="70" y="90" width="12" height="28" rx="4" fill="#dc2626"/>
+           <path d="M70 104 h12 M70 110 h12" stroke="#fca5a5" stroke-width="2"/>` : '';
+      const glasses = acc.includes('glasses')
+        ? `<circle cx="44" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <circle cx="76" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <path d="M58 60 q2 -3 4 0" stroke="#1e1b4b" stroke-width="3.5" fill="none"/>` : '';
+      const crown = acc.includes('crown')
+        ? `<polygon points="36,40 37,12 49,27 60,5 71,27 83,12 84,40" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" stroke-linejoin="round"/>
+           <circle cx="60" cy="30" r="4" fill="#ef4444"/><circle cx="45" cy="33" r="3" fill="#3b82f6"/><circle cx="75" cy="33" r="3" fill="#22c55e"/>` : '';
+      const hat = acc.includes('hat') && !acc.includes('crown')
+        ? `<path d="M44 34 v10 q16 7 32 0 v-10z" fill="#374151"/>
+           <polygon points="26,30 60,16 94,30 60,44" fill="#1f2937"/>
+           <path d="M60 30 L90 33 V48" stroke="#facc15" stroke-width="3" fill="none"/><circle cx="90" cy="50" r="4" fill="#facc15"/>` : '';
+      return `<svg class="owl-svg" viewBox="0 0 120 135" aria-hidden="true">
+        <ellipse cx="60" cy="131" rx="34" ry="4" fill="rgba(12,45,72,0.12)"/>
+        <polygon points="26,46 19,14 47,32" fill="#0369a1"/>
+        <polygon points="94,46 101,14 73,32" fill="#0369a1"/>
+        <ellipse cx="60" cy="80" rx="42" ry="46" fill="#0ea5e9"/>
+        <ellipse cx="21" cy="92" rx="11" ry="24" fill="#0369a1" transform="rotate(14 21 92)"/>
+        <ellipse cx="99" cy="92" rx="11" ry="24" fill="#0369a1" transform="rotate(-14 99 92)"/>
+        <ellipse cx="60" cy="98" rx="26" ry="27" fill="#e0f2fe"/>
+        <path d="M48 96 q5 5 10 0 M62 96 q5 5 10 0 M55 107 q5 5 10 0" stroke="#7dd3fc" stroke-width="2.5" fill="none"/>
+        ${eyes}
+        <polygon points="54,73 66,73 60,84" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" stroke-linejoin="round"/>
+        <ellipse cx="47" cy="126" rx="8" ry="4.5" fill="#f59e0b"/><ellipse cx="73" cy="126" rx="8" ry="4.5" fill="#f59e0b"/>
+        ${scarf}${glasses}${hat}${crown}
+      </svg>`;
+    }
+
+    function owlSay(html, mood) {
+      const b = $('#bubble');
+      if (b) { b.innerHTML = html; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+      const o = $('#owl');
+      if (o) {
+        o.innerHTML = owlSVG(mood);
+        o.classList.remove('jump', 'shake'); void o.offsetWidth;
+        if (mood === 'happy') o.classList.add('jump');
+        if (mood === 'sad') o.classList.add('shake');
+      }
+    }
+
+    function confetti() {
+      const colors = ['#0284c7', '#facc15', '#22c55e', '#ec4899', '#38bdf8', '#f97316'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+
+    /* ---------- Górny pasek ---------- */
+    function updateTopbar() {
+      $('#starCount').textContent = totalStars();
+      $('#streakCount').textContent = currentStreak();
+      $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+    }
+    $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
+
+    /* =====================================================================
+       MAPA
+       ===================================================================== */
+    function renderMap() {
+      document.body.classList.remove('in-level');
+      updateTopbar();
+      const tot = totalStars();
+      const next = REWARDS.find(r => tot < r.at);
+      const prevAt = [...REWARDS].reverse().find(r => tot >= r.at)?.at || 0;
+      const pct = next ? Math.round((tot - prevAt) / (next.at - prevAt) * 100) : 100;
+      const cur = LEVELS.findIndex((l, i) => unlocked(i) && !state.stars[l.id]);
+
+      let greet;
+      if (tot === 0) greet = CONFIG.intro;
+      else if (tot === MAX_STARS) greet = 'Hoot hoot! Znasz już całą <b>Karolcię</b> na wylot! 🏆 Zebrałaś/eś wszystkie pamiątki. Możesz wracać do ulubionych rozdziałów, kiedy tylko masz ochotę.';
+      else if (cur >= 0) greet = `Witaj z powrotem! Dziś czeka na Ciebie <b>rozdział ${cur + 1}: ${LEVELS[cur].name}</b>. Dasz radę! 💪`;
+      else greet = 'Wszystkie rozdziały odblokowane! Zagraj jeszcze raz tam, gdzie brakuje Ci gwiazdek ⭐.';
+
+      const node = (l, i) => {
+        const s = state.stars[l.id] || 0, un = unlocked(i);
+        const cls = (!un ? 'locked' : i === cur ? 'current' : s ? 'done' : '');
+        return `<button class="node ${cls}" data-level="${i}" ${un ? '' : 'disabled'} style="--off:${[0, 1, 2, 1][i % 4]}">
+          <span class="node-icon">${un ? l.icon : '🔒'}</span>
+          <span class="node-body"><span class="node-num">Rozdział ${i + 1}</span>
+            <span class="node-name">${l.name}</span><span class="node-desc">${l.desc}</span></span>
+          <span class="node-stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></span>
+          ${i === cur ? '<span class="here">🦉 Tu jesteś!</span>' : ''}
+        </button>`;
+      };
+
+      const collGrid = LEVELS.map(l => {
+        const got = !!state.collected[l.id];
+        return `<div class="coll-item ${got ? '' : 'locked'}" title="${l.reward.name}">
+          <div class="coll-icon">${got ? l.reward.icon : '❔'}</div>
+          <div class="coll-label">${got ? l.reward.name : '???'}</div>
+        </div>`;
+      }).join('');
+
+      screen.innerHTML = `
+        <section class="hero">
+          <div class="owl-big">${owlSVG(tot === MAX_STARS ? 'happy' : '')}</div>
+          <div class="bubble">${greet}</div>
+        </section>
+        <div class="reward-bar">
+          ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
+          <div class="bar"><div style="width:${pct}%"></div></div>
+        </div>
+        <h2 class="section-title">🗺️ Mapa przygody</h2>
+        <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
+        <h2 class="section-title">💎 Kolekcja pamiątek z Karolcinych przygód</h2>
+        <p class="muted">Za każdy ukończony rozdział dostajesz jedną pamiątkę. Zebrano ${Object.keys(state.collected).length} z ${LEVELS.length}.</p>
+        <div class="coll">${collGrid}</div>
+        <button class="info-btn" id="infoBtn">📚 Ciekawostki o książce i autorce</button>
+        <button class="link-btn danger" id="resetBtn">Zacznij od nowa (dla rodzica)</button>`;
+
+      screen.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => startLevel(+b.dataset.level)));
+      $('#infoBtn').addEventListener('click', renderInfo);
+      $('#resetBtn').addEventListener('click', () => {
+        if (confirm('Usunąć wszystkie gwiazdki i pamiątki w tej grze?')) {
+          try { localStorage.removeItem(CONFIG.storageKey); } catch (e) {}
+          location.reload();
+        }
+      });
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       CIEKAWOSTKI O KSIĄŻCE
+       ===================================================================== */
+    function renderInfo() {
+      screen.innerHTML = `
+        <div class="info-wrap">
+          <section class="hero">
+            <div class="owl-mini">${owlSVG('happy')}</div>
+            <div class="bubble">Zebrałam kilka ciekawostek o „Karolci” i jej autorce – może zaskoczysz nimi rodziców! 😉</div>
+          </section>
+
+          <div class="info-card">
+            <h3>✍️ O autorce</h3>
+            <p><b>Maria Krüger</b> (1904–1999) była polską pisarką dla dzieci, a z zawodu – ekonomistką. Zadebiutowała już w 1928 roku w piśmie „Płomyczek”. W czasie wojny brała udział w Powstaniu Warszawskim.</p>
+          </div>
+
+          <div class="info-card">
+            <h3>📘 O książce</h3>
+            <p>„Karolcia” ukazała się w <b>1959 roku</b> w wydawnictwie „Nasza Księgarnia”. Ilustracje do niej narysowała <b>Halina Bielińska</b>.</p>
+            <p>Książkę przetłumaczono na kilka języków, a w Polsce od lat jest lekturą szkolną dla najmłodszych klas.</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🔮 Czy wiesz, że...?</h3>
+            <p>Przygody Karolci mają <b>kontynuacje</b>! W książce „Witaj, Karolciu!” (1970) pojawia się zaczarowany <b>niebieski ołówek</b>, a w 2009 roku ukazała się „Karolcia na wakacjach” napisana przez innego autora – Krzysztofa Zięcika.</p>
+            <p>W 1995 roku powstał spektakl Teatru Telewizji na podstawie książki, a w 2001 roku próbowano nakręcić pełnometrażowy film – niestety nigdy go nie dokończono.</p>
+          </div>
+
+          <button class="btn" id="backMapBtn">← Wróć do mapy</button>
+        </div>`;
+      $('#backMapBtn').addEventListener('click', renderMap);
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       ROZDZIAŁ: recap + pytania
+       ===================================================================== */
+    let session = null;
+
+    function startLevel(idx) {
+      const lvl = LEVELS[idx];
+      session = { idx, lvl, qIndex: -1, correct: 0, questions: shuffle(lvl.questions).map(q => ({ ...q, opts: shuffle(q.options) })) };
+      document.body.classList.add('in-level');
+      renderRecap();
+    }
+
+    function renderRecap() {
+      screen.innerHTML = `
+        <div class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          <div class="recap-wrap">
+            <div class="owl-big">${owlSVG('happy')}</div>
+            <div class="recap-card">
+              <p class="recap-title">Rozdział ${session.idx + 1}: ${session.lvl.name}</p>
+              <p class="recap-sub">${session.lvl.desc}</p>
+              ${session.lvl.recap}
+            </div>
+            <div class="recap-actions">
+              <button class="btn" id="startQuizBtn">Zaczynamy pytania! →</button>
+            </div>
+          </div>
+        </div>`;
+      $('#quitBtn').addEventListener('click', renderMap);
+      $('#startQuizBtn').addEventListener('click', () => { session.qIndex = 0; renderLevelShell(); nextQuestion(); });
+      window.scrollTo(0, 0);
+    }
+
+    function renderLevelShell() {
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <div class="progress"><div class="progress-fill" id="progFill"></div></div>
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          <div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">Uważnie przeczytaj pytanie i wybierz odpowiedź.</div></div>
+          <div class="task" id="task"></div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', () => {
+        if (confirm('Przerwać rozdział? Gwiazdki i pamiątkę dostaniesz dopiero, gdy odpowiesz na wszystkie pytania.')) renderMap();
+      });
+      window.scrollTo(0, 0);
+    }
+
+    function nextQuestion() {
+      if (session.qIndex >= session.questions.length) return finishLevel();
+      $('#progFill').style.width = (session.qIndex / session.questions.length * 100) + '%';
+      renderQuestion(session.questions[session.qIndex]);
+    }
+
+    function renderQuestion(q) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const task = $('#task');
+      task.innerHTML = `
+        <div class="q-card">
+          <div class="q-num">Pytanie ${session.qIndex + 1} z ${session.questions.length}</div>
+          <div class="q-text">${q.q}</div>
+        </div>
+        <div class="quiz-opts" id="opts">
+          ${q.opts.map((o, i) => `<button class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span><span>${o}</span></button>`).join('')}
+        </div>
+        <div id="feedbackWrap"></div>`;
+      owlSay('Uważnie przeczytaj pytanie i wybierz odpowiedź.');
+
+      let answered = false;
+      task.querySelectorAll('.quiz-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          const chosen = q.opts[+btn.dataset.i];
+          const isOk = chosen === q.a;
+          task.querySelectorAll('.quiz-opt').forEach(b => {
+            b.disabled = true;
+            const txt = b.querySelector('span:last-child').textContent;
+            if (txt === q.a) b.classList.add('ok');
+            else if (b === btn) b.classList.add('bad');
+            else b.classList.add('dim');
+          });
+          if (isOk) { session.correct++; sfx.good(); owlSay(pick(PRAISE), 'happy'); }
+          else { sfx.bad(); owlSay('Prawie! Zerknij na poprawną odpowiedź poniżej 💪', 'sad'); }
+
+          $('#feedbackWrap').innerHTML = `
+            <div class="feedback-head ${isOk ? 'ok' : 'bad'}">${isOk ? '✅ Zgadza się!' : '❌ Tym razem nie trafiono'}</div>
+            <div class="note">💡 ${q.note}</div>
+            <button class="btn ${isOk ? 'green' : ''}" id="nextQBtn">${session.qIndex < session.questions.length - 1 ? 'Dalej →' : 'Zobacz wynik →'}</button>`;
+          $('#nextQBtn').addEventListener('click', () => { session.qIndex++; nextQuestion(); });
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function finishLevel() {
+      const total = session.questions.length;
+      const ratio = session.correct / total;
+      const stars = ratio === 1 ? 3 : ratio >= 0.7 ? 2 : 1;
+      const prevStars = state.stars[session.lvl.id] || 0;
+      state.stars[session.lvl.id] = Math.max(prevStars, stars);
+      const firstTime = !state.collected[session.lvl.id];
+      state.collected[session.lvl.id] = true;
+      bumpStreak();
+      save();
+
+      document.body.classList.add('in-level');
+      screen.innerHTML = `
+        <section class="result">
+          <div class="owl-big">${owlSVG(stars >= 2 ? 'happy' : '')}</div>
+          <h2>${stars === 3 ? 'Rewelacja!' : stars === 2 ? 'Bardzo dobrze!' : 'Dobra robota!'}</h2>
+          <p>Odpowiedziałaś/eś poprawnie na ${session.correct} z ${total} pytań.</p>
+          <div class="result-stars">
+            ${[0, 1, 2].map(i => `<span class="rs ${i < stars ? 'on' : ''}" style="--d:${i * 0.15}s">★</span>`).join('')}
+          </div>
+          ${firstTime ? `<div class="reward-pop"><span class="ic">${session.lvl.reward.icon}</span><span>Nowa pamiątka: <b>${session.lvl.reward.name}</b>!</span></div>` : `<p>Pamiątkę za ten rozdział masz już w kolekcji 💎</p>`}
+          <div class="result-actions">
+            <button class="btn" id="toMapBtn">Powrót do mapy</button>
+            <button class="btn soft" id="againBtn">🔁 Zagraj ten rozdział jeszcze raz</button>
+          </div>
+        </section>`;
+      $('#toMapBtn').addEventListener('click', renderMap);
+      $('#againBtn').addEventListener('click', () => startLevel(session.idx));
+      sfx.win();
+      if (stars >= 2) confetti();
+      window.scrollTo(0, 0);
+    }
+
+    renderMap();
+  </script>
+</body>
+</html>
