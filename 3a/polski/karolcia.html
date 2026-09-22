@@ -424,8 +424,17 @@
           { q: 'O co Karolcia poprosiła w swoim ostatnim, najważniejszym życzeniu?', options: ['O nową lalkę', 'Żeby spełniły się marzenia wszystkich mieszkańców ich ulicy', 'Żeby koralik nigdy nie zbladł', 'O wakacje nad morzem'], a: 'Żeby spełniły się marzenia wszystkich mieszkańców ich ulicy', note: 'Karolcia zrezygnowała z własnych zachcianek na rzecz czegoś dużo ważniejszego – i ulica dostała nawet nową nazwę: „Szczęśliwy Zaułek”.' },
           { q: 'Co się stało z koralikiem na samym końcu opowieści?', options: ['Karolcia schowała go na zawsze do pudełka', 'Zniknął, zamieniając się w kroplę na dłoni Karolci', 'Oddała go Piotrowi', 'Zabrała go ze sobą Filomena'], a: 'Zniknął, zamieniając się w kroplę na dłoni Karolci', note: 'Po ostatnim, wielkim życzeniu koralik stracił już całą swoją moc i barwę – i po prostu zniknął.' }
         ]
+      },
+      {
+        id: 'l11', icon: '🏆', name: 'Wielki quiz o Karolci', desc: 'Losowe pytania z całej książki', final: true,
+        recap: 'To już finał! Za każdym razem, gdy tu wracasz, Sówka losuje <b>12 pytań z całej książki</b> – ze wszystkich dziesięciu rozdziałów. Nigdy nie wiesz, co trafi, więc trzeba pamiętać całą przygodę Karolci i jej niebieskiego koralika!',
+        reward: { icon: '📜', name: 'dyplom znawcy/znawczyni Karolci' },
+        questions: []
       }
     ];
+
+    const FINAL_QUESTION_COUNT = 12;
+    const ALL_QUESTIONS = LEVELS.filter(l => !l.final).flatMap(l => l.questions);
 
     const MAX_STARS = LEVELS.length * 3;
     const REWARDS = [
@@ -582,7 +591,9 @@
       let greet;
       if (tot === 0) greet = CONFIG.intro;
       else if (tot === MAX_STARS) greet = 'Hoot hoot! Znasz już całą <b>Karolcię</b> na wylot! 🏆 Zebrałaś/eś wszystkie pamiątki. Możesz wracać do ulubionych rozdziałów, kiedy tylko masz ochotę.';
-      else if (cur >= 0) greet = `Witaj z powrotem! Dziś czeka na Ciebie <b>rozdział ${cur + 1}: ${LEVELS[cur].name}</b>. Dasz radę! 💪`;
+      else if (cur >= 0) greet = LEVELS[cur].final
+        ? `Witaj z powrotem! Zostaje już tylko <b>${LEVELS[cur].name}</b> – wielki finał ze wszystkich rozdziałów! Dasz radę! 💪`
+        : `Witaj z powrotem! Dziś czeka na Ciebie <b>rozdział ${cur + 1}: ${LEVELS[cur].name}</b>. Dasz radę! 💪`;
       else greet = 'Wszystkie rozdziały odblokowane! Zagraj jeszcze raz tam, gdzie brakuje Ci gwiazdek ⭐.';
 
       const node = (l, i) => {
@@ -590,7 +601,7 @@
         const cls = (!un ? 'locked' : i === cur ? 'current' : s ? 'done' : '');
         return `<button class="node ${cls}" data-level="${i}" ${un ? '' : 'disabled'} style="--off:${[0, 1, 2, 1][i % 4]}">
           <span class="node-icon">${un ? l.icon : '🔒'}</span>
-          <span class="node-body"><span class="node-num">Rozdział ${i + 1}</span>
+          <span class="node-body"><span class="node-num">${l.final ? 'Finał' : `Rozdział ${i + 1}`}</span>
             <span class="node-name">${l.name}</span><span class="node-desc">${l.desc}</span></span>
           <span class="node-stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></span>
           ${i === cur ? '<span class="here">🦉 Tu jesteś!</span>' : ''}
@@ -672,9 +683,14 @@
        ===================================================================== */
     let session = null;
 
+    function buildQuestions(lvl) {
+      const pool = lvl.final ? shuffle(ALL_QUESTIONS).slice(0, FINAL_QUESTION_COUNT) : shuffle(lvl.questions);
+      return pool.map(q => ({ ...q, opts: shuffle(q.options) }));
+    }
+
     function startLevel(idx) {
       const lvl = LEVELS[idx];
-      session = { idx, lvl, qIndex: -1, correct: 0, questions: shuffle(lvl.questions).map(q => ({ ...q, opts: shuffle(q.options) })) };
+      session = { idx, lvl, qIndex: -1, correct: 0, questions: buildQuestions(lvl) };
       document.body.classList.add('in-level');
       renderRecap();
     }
@@ -689,7 +705,7 @@
           <div class="recap-wrap">
             <div class="owl-big">${owlSVG('happy')}</div>
             <div class="recap-card">
-              <p class="recap-title">Rozdział ${session.idx + 1}: ${session.lvl.name}</p>
+              <p class="recap-title">${session.lvl.final ? '' : `Rozdział ${session.idx + 1}: `}${session.lvl.name}</p>
               <p class="recap-sub">${session.lvl.desc}</p>
               ${session.lvl.recap}
             </div>
