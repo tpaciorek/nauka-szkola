@@ -112,9 +112,9 @@
 
   const app = document.getElementById('app');
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  let order, i, score, wrong;
+  let order, i, score, wrong, log;
 
-  function start() { order = shuffle(Q.map((_, k) => k)); i = 0; score = 0; wrong = []; show(); }
+  function start() { order = shuffle(Q.map((_, k) => k)); i = 0; score = 0; wrong = []; log = []; show(); }
 
   function show() {
     const [q, opts, ok] = Q[order[i]];
@@ -134,6 +134,7 @@
       if (done) return; done = true;
       const k = +btn.dataset.k, good = items[k].good;
       app.querySelectorAll('.opt').forEach((b, n) => { if (items[n].good) b.classList.add('ok'); });
+      log.push({ k: order[i], mine: items[k].t, good });
       if (good) { score++; msg('Brawo! 🎉', 'var(--good)'); }
       else { btn.classList.add('no'); wrong.push([order[i], items[k].t]); msg('Prawie! Zielona odpowiedź jest dobra 💪', 'var(--bad)'); }
       const n = document.getElementById('next'); n.hidden = false;
@@ -150,7 +151,7 @@
       <div class="card center"><div class="big">${pct >= 90 ? '🏆' : pct >= 60 ? '🌟' : '📖'}</div>
         <p class="q">Wynik: ${score} z ${Q.length}</p>
         <p>${pct >= 90 ? 'Wspaniale, znasz Karolcię na wylot!' : pct >= 60 ? 'Bardzo dobrze! Jeszcze trochę i będzie mistrzostwo.' : 'Dobry początek! Przeczytaj jeszcze raz i spróbuj znowu.'}</p></div>
-      ${wrong.length ? `<div class="card"><b>Do powtórki:</b><ul>${wrong.map(([k, mine]) => `<li><b>${Q[k][0]}</b><br>❌ Twoja odpowiedź: <span style="color:var(--bad)">${mine}</span><br>✅ Poprawna: <b style="color:var(--good)">${Q[k][1][Q[k][2]]}</b><br>💡 <i>${WHY[k]}</i></li>`).join('')}</ul></div>` : ''}
+      <div class="card"><b>Twoje odpowiedzi:</b><ol style="padding-left:22px">${log.map(r => `<li style="margin:14px 0">${r.good ? '✅' : '❌'} <b>${Q[r.k][0]}</b><br>Twoja odpowiedź: <span style="color:${r.good ? 'var(--good)' : 'var(--bad)'}">${r.mine}</span>${r.good ? '' : `<br>✅ Poprawna: <b style="color:var(--good)">${Q[r.k][1][Q[r.k][2]]}</b>`}<br>💡 <i>${WHY[r.k]}</i></li>`).join('')}</ol></div>
       <button class="go" id="again">Jeszcze raz 🔁</button>`;
     document.getElementById('again').onclick = start;
   }
