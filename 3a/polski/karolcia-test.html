@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0284c7" />
+  <meta name="robots" content="noindex" />
+  <title>Karolcia – test z lektury</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#0c2d48; --muted:#64748b; --primary:#0284c7; --soft:#e0f2fe; --line:#bae6fd; --good:#16a34a; --good-soft:#dcfce7; --bad:#dc2626; --bad-soft:#fee2e2; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { font-family: 'Nunito', system-ui, sans-serif; color: var(--ink); background: linear-gradient(180deg,#f0f9ff,#e0f2fe); background-attachment: fixed; -webkit-tap-highlight-color: transparent; }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+    #app { max-width: 560px; margin: 0 auto; min-height: 100dvh; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
+    .back { color: var(--primary); font-weight: 800; text-decoration: none; }
+    .bar { height: 12px; background: #fff; border: 2px solid var(--line); border-radius: 99px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--primary); transition: width .3s; }
+    .count { font-weight: 800; color: var(--muted); font-size: .95rem; }
+    .card { background: #fff; border: 2px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 0 6px 18px rgba(2,132,199,.12); }
+    .q { font-size: 1.25rem; font-weight: 900; line-height: 1.3; margin: 0 0 14px; }
+    .opt { display: flex; gap: 10px; align-items: center; width: 100%; min-height: 56px; margin-top: 10px; padding: 10px 14px; text-align: left; font-size: 1.05rem; font-weight: 800; background: var(--soft); border: 3px solid var(--line); border-radius: 16px; }
+    .opt b { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--primary); }
+    .opt.ok { background: var(--good-soft); border-color: var(--good); }
+    .opt.no { background: var(--bad-soft); border-color: var(--bad); }
+    .msg { min-height: 1.6em; margin-top: 12px; font-weight: 900; font-size: 1.1rem; }
+    .go { width: 100%; min-height: 56px; border: 0; border-radius: 16px; background: var(--primary); color: #fff; font-size: 1.15rem; font-weight: 900; }
+    .big { font-size: 3.5rem; text-align: center; }
+    .center { text-align: center; }
+    ul { padding-left: 20px; } li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+  // [pytanie, [a, b, c], indeks poprawnej odpowiedzi] – klucz: 1b 2c 3b 4a 5b 6b 7b 8b 9a 10b 11c 12a 13c 14a 15c 16c 17c 18c 19a 20b 21a 22c 23c 24a 25c 26a 27c 28b 29c 30a 31c 32c 33c 34b
+  const Q = [
+    ['Kto jest autorem książki „Karolcia”?', ['Jan Brzechwa', 'Maria Kruger', 'Tom Grimm'], 1],
+    ['Książka opowiada o:', ['piesku i kotku', 'przygodach 3-letniej Karolci i o rok młodszego Piotra', 'przygodach 8-letniej Karolci i o rok starszego Piotra'], 2],
+    ['Czy Karolcia miała rodzeństwo?', ['Tak, miała brata', 'Nie, była jedynaczką', 'Tak, miała siostrę'], 1],
+    ['Nowe mieszkanie znajdowało się na:', ['ulicy Kwiatowej', 'ulicy Morskiej', 'ulicy Szerokiej'], 0],
+    ['Gdzie Karolcia znalazła koralik?', ['na chodniku przed domem', 'w szparze drewnianej podłogi w starym mieszkaniu', 'na dywanie'], 1],
+    ['Pierwszy „czar” koralika to:', ['latający dywan', 'latająca taksówka', 'latający smok'], 1],
+    ['Najbardziej chytra z czarownic w książce pt. „Karolcia” to:', ['Baba Jaga', 'Filemona', 'Florencja'], 1],
+    ['Co kupiła ciotka Agata dla siebie w Domu Towarowym?', ['korale', 'kapelusz z żywymi fiołkami', 'szalik'], 1],
+    ['Koralik stał się kiedyś:', ['bańką mydlaną', 'dużą piłką', 'kamieniem'], 0],
+    ['Mama nie poznała Karolci, gdy:', ['przebrała się za staruszkę', 'zamieniła się w dorosłą panią', 'ubrała maskę'], 1],
+    ['Do obowiązków Karolci należało:', ['zmywanie naczyń', 'podlewanie kwiatów', 'przynoszenie ze sklepu bułek na śniadanie'], 2],
+    ['Karolcia rozmawiała pierwszy raz z koralikiem:', ['gdy myła ręce', 'gdy go znalazła', 'gdy poszła spać'], 0],
+    ['Karolcia wyczarowała kiedyś dla ciotki Agaty:', ['kaczkę na obiad', 'indyka na obiad', 'kurę na obiad'], 2],
+    ['Ciotka Agata mając koralik w ręku wyczarowała:', ['wiele tac z ciastkami z kremem', 'kilka tortów', 'górę owoców'], 0],
+    ['Piotrek, aby uwierzyć, że Karolcia ma „zaczarowany” koralik zażądał, by:', ['zjadła 100 pączków', 'fruwała w pokoju', 'stała się niewidzialna i podniosła krzesło do góry'], 2],
+    ['Karolcia i Piotrek sprawili, że buty w Domu Towarowym same tańczyły:', ['aby zachęcić ludzi do zakupów', 'bo chcieli je kupić', 'bo sprzedawczyni nie była grzeczna dla kupujących'], 2],
+    ['W dziale zabawek wiele osób chciało kupić „chodzące” lalki, gdyż:', ['Karolcia zamieniła się w lalkę', 'Piotrek ponakręcał lalki', 'Karolcia i Piotrek byli niewidzialni i poruszali lalkami'], 2],
+    ['Czym poczęstowała Baba Jaga Karolcię i Piotrka?', ['czekoladą', 'lukrowanymi pierniczkami', 'czekoladowymi pierniczkami w kształcie serc'], 2],
+    ['Ten kto zjadł piernikowe serduszko w czekoladzie:', ['stawał się lepszy', 'stawał się złośliwy', 'stawał się niewidzialny'], 0],
+    ['Gdzie Karolcia schowała bezpiecznie koralik w Domu Towarowym przed Filomeną?', ['w torebce mamy', 'w kieszeni płaszcza mamy', 'w kieszeni płaszcza taty'], 1],
+    ['Gdyby Filomena dostała w swoje ręce koralik, mogłaby:', ['zrobić dużo złego na świecie', 'wiele dobrych rzeczy', 'wyczarować smakołyki'], 0],
+    ['Skąd tatuś dowiedział się o niezwykłych rzeczach, które działy się w Domu Towarowym?', ['od sąsiada', 'z telewizji', 'z popołudniowej gazety'], 2],
+    ['Każde życzenie, które spełniał koralik osłabiało go tak, że:', ['malał, kurczył się', 'powiększał się', 'tracił kolor, bladł'], 2],
+    ['W jakiej sprawie Karolcia i Piotrek wybrali się do Prezydenta Miasta?', ['w sprawie ratowania ogrodu dla wszystkich dzieci', 'w sprawie ratowania zwierząt', 'w sprawie budowy placu zabaw dla wszystkich dzieci'], 0],
+    ['Kto pomógł dostać się Karolci i Piotrkowi do Prezydenta Miasta?', ['sekretarka', 'woźny', 'kamienne lwy'], 2],
+    ['Początkowo zamiast do gabinetu Prezydenta Miasta Karolcia i Piotrek trafili:', ['do muzeum miejskiego', 'do baru', 'do biblioteki'], 0],
+    ['Sekretarką Prezydenta Miasta była:', ['mama Karolci', 'sąsiadka Piotrka', 'Filomena'], 2],
+    ['Jak Karolcia i Piotrek udowodnili panu Prezydentowi Miasta, że są niewidzialni?', ['zabrali mu kapelusz', 'zapalili mu papierosa i go uszczypnęli', 'zaparzyli mu kawę'], 1],
+    ['Kto był w klatce w ZOO z napisem „Dziwne zwierzę”?', ['orangutan', 'jednorożec', 'Filomena'], 2],
+    ['Kto pomógł uwolnić dwa lwy z klatki z ZOO?', ['wszystkie zwierzęta z ZOO', '„dziwne zwierzę”', 'dyrektor ZOO'], 0],
+    ['Kto zabronił urzędnikowi zamknąć na klucz ogród dla dzieci z całej dzielnicy?', ['tatuś Karolci', 'tatuś Piotrka', 'Prezydent Miasta'], 2],
+    ['Co zostało w ogrodzie dla dzieci na pamiątkę wspólnych przygód?', ['wesołe miasteczko i Gabinet Krzywych Luster', 'ławeczka', 'zaczarowane lwy i zaczarowany samochód Prezydenta Miasta'], 0],
+    ['Ostatnie życzenie do koraliczka to:', ['słodycze dla wszystkich dzieci z ulicy Kwiatowej', 'duża chodząca lalka dla Karolci', 'aby spełniło się życzenie każdego człowieka, który mieszka na ulicy Kwiatowej'], 2],
+    ['Tabliczka z napisem ulica Kwiatowa zmieniona została na:', ['ulicę Karolci', 'Szczęśliwy Zaułek', 'Krainę Uśmiechu'], 1],
+  ];
+
+  const app = document.getElementById('app');
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  let order, i, score, wrong;
+
+  function start() { order = shuffle(Q.map((_, k) => k)); i = 0; score = 0; wrong = []; show(); }
+
+  function show() {
+    const [q, opts, ok] = Q[order[i]];
+    const items = shuffle(opts.map((t, k) => ({ t, good: k === ok })));
+    app.innerHTML = `
+      <a class="back" href="./index.html">← Wróć</a>
+      <div class="count">Pytanie ${i + 1} z ${Q.length}</div>
+      <div class="bar"><i style="width:${i / Q.length * 100}%"></i></div>
+      <div class="card">
+        <p class="q">${q}</p>
+        ${items.map((o, k) => `<button class="opt" data-k="${k}"><b>${'ABC'[k]}</b><span>${o.t}</span></button>`).join('')}
+        <div class="msg" id="msg"></div>
+      </div>
+      <button class="go" id="next" hidden>Dalej →</button>`;
+    let done = false;
+    app.querySelectorAll('.opt').forEach(btn => btn.onclick = () => {
+      if (done) return; done = true;
+      const k = +btn.dataset.k, good = items[k].good;
+      app.querySelectorAll('.opt').forEach((b, n) => { if (items[n].good) b.classList.add('ok'); });
+      if (good) { score++; msg('Brawo! 🎉', 'var(--good)'); }
+      else { btn.classList.add('no'); wrong.push(order[i]); msg('Prawie! Zielona odpowiedź jest dobra 💪', 'var(--bad)'); }
+      const n = document.getElementById('next'); n.hidden = false;
+      n.textContent = i + 1 < Q.length ? 'Dalej →' : 'Zobacz wynik 🏆';
+      n.onclick = () => { i++; i < Q.length ? show() : result(); window.scrollTo(0, 0); };
+    });
+  }
+  function msg(t, c) { const m = document.getElementById('msg'); m.textContent = t; m.style.color = c; }
+
+  function result() {
+    const pct = Math.round(score / Q.length * 100);
+    app.innerHTML = `
+      <a class="back" href="./index.html">← Wróć</a>
+      <div class="card center"><div class="big">${pct >= 90 ? '🏆' : pct >= 60 ? '🌟' : '📖'}</div>
+        <p class="q">Wynik: ${score} z ${Q.length}</p>
+        <p>${pct >= 90 ? 'Wspaniale, znasz Karolcię na wylot!' : pct >= 60 ? 'Bardzo dobrze! Jeszcze trochę i będzie mistrzostwo.' : 'Dobry początek! Przeczytaj jeszcze raz i spróbuj znowu.'}</p></div>
+      ${wrong.length ? `<div class="card"><b>Do powtórki:</b><ul>${wrong.map(k => `<li>${Q[k][0]}<br><b style="color:var(--good)">${Q[k][1][Q[k][2]]}</b></li>`).join('')}</ul></div>` : ''}
+      <button class="go" id="again">Jeszcze raz 🔁</button>`;
+    document.getElementById('again').onclick = start;
+  }
+  start();
+</script>
+</body>
+</html>
