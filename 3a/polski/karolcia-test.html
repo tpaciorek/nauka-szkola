@@ -73,6 +73,43 @@
     ['Tabliczka z napisem ulica Kwiatowa zmieniona została na:', ['ulicę Karolci', 'Szczęśliwy Zaułek', 'Krainę Uśmiechu'], 1],
   ];
 
+  const WHY = [
+    'Książkę „Karolcia” napisała Maria Kruger. Jan Brzechwa pisał wiersze, a Tom Grimm nie jest autorem tej lektury.',
+    'Karolcia ma 8 lat, a jej kolega Piotrek jest o rok od niej starszy.',
+    'Karolcia była jedynaczką – towarzyszył jej tylko kolega Piotrek.',
+    'Rodzina przeprowadziła się do nowego mieszkania przy ulicy Kwiatowej – tej samej, którą dzieci uratowały na końcu.',
+    'Koralik tkwił w szparze drewnianej podłogi w starym mieszkaniu i tam Karolcia go znalazła.',
+    'Pierwszym czarem koralika była latająca taksówka – od tego zaczęły się cudowne przygody.',
+    'Najbardziej chytrą czarownicą jest Filomena (w teście Filemona) – to ona chce zdobyć koralik dla siebie.',
+    'Ciotka Agata kupiła sobie kapelusz z żywymi fiołkami – to był początek zamieszania w Domu Towarowym.',
+    'Koralik zamienił się kiedyś w bańkę mydlaną, a nie w piłkę czy kamień.',
+    'Mama nie poznała Karolci, bo dziewczynka za sprawą koralika zamieniła się w dorosłą panią.',
+    'Do obowiązków Karolci należało przynoszenie ze sklepu bułek na śniadanie – dlatego szła do sklepu.',
+    'Koralik odezwał się do Karolci pierwszy raz, gdy myła ręce – wtedy odkryła, że jest zaczarowany.',
+    'Karolcia wyczarowała dla ciotki Agaty kurę na obiad.',
+    'Ciotka Agata z koralikiem w ręku wyczarowała wiele tac z ciastkami z kremem.',
+    'Piotrek nie wierzył w czary, więc zażądał dowodu: Karolcia miała stać się niewidzialna i podnieść krzesło – krzesło unoszące się samo w powietrzu dowodzi niewidzialności.',
+    'Buty w Domu Towarowym tańczyły, bo sprzedawczyni nie była grzeczna dla kupujących – to była nauczka dla niej.',
+    'Ludzie chcieli kupić „chodzące” lalki, bo nie widzieli Karolci i Piotrka – niewidzialni poruszali lalkami.',
+    'Baba Jaga poczęstowała dzieci czekoladowymi pierniczkami w kształcie serc.',
+    'Kto zjadł piernikowe serduszko w czekoladzie, stawał się lepszy – to był dobry czar.',
+    'Karolcia schowała koralik w kieszeni płaszcza mamy, żeby Filomena go nie znalazła.',
+    'Filomena jest złą, chytrą czarownicą, więc z koralikiem mogłaby zrobić dużo złego na świecie.',
+    'Tatuś dowiedział się o dziwnych zdarzeniach z popołudniowej gazety, która o nich pisała.',
+    'Każde spełnione życzenie osłabiało koralik – tracił kolor i bladł.',
+    'Dzieci poszły do Prezydenta Miasta w sprawie ratowania ogrodu dla wszystkich dzieci, który miał zostać zamknięty.',
+    'Do Prezydenta Miasta pomogły się dostać kamienne lwy.',
+    'Zamiast do gabinetu Prezydenta Karolcia i Piotrek trafili najpierw do muzeum miejskiego – pomylili drzwi.',
+    'Sekretarką Prezydenta Miasta była Filomena – ta sama czarownica.',
+    'Pan Prezydent zobaczył zapalonego papierosa i poczuł uszczypnięcie, choć nikogo nie widział – więc uwierzył, że dzieci są niewidzialne.',
+    'W klatce z napisem „Dziwne zwierzę” siedziała Filomena.',
+    'Dwa lwy z klatki w ZOO pomogły uwolnić wszystkie zwierzęta z ZOO.',
+    'Prezydent Miasta zabronił urzędnikowi zamknąć ogród – uwierzył dzieciom i chciał go uratować dla wszystkich.',
+    'Na pamiątkę przygód w ogrodzie zostały zaczarowane lwy i zaczarowany samochód Prezydenta Miasta.',
+    'Ostatnie życzenie miało pomóc wszystkim: aby spełniło się życzenie każdego człowieka z ulicy Kwiatowej.',
+    'Tabliczkę z napisem ulica Kwiatowa zmieniono na „Szczęśliwy Zaułek”.',
+  ];
+
   const app = document.getElementById('app');
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   let order, i, score, wrong;
@@ -98,7 +135,7 @@
       const k = +btn.dataset.k, good = items[k].good;
       app.querySelectorAll('.opt').forEach((b, n) => { if (items[n].good) b.classList.add('ok'); });
       if (good) { score++; msg('Brawo! 🎉', 'var(--good)'); }
-      else { btn.classList.add('no'); wrong.push(order[i]); msg('Prawie! Zielona odpowiedź jest dobra 💪', 'var(--bad)'); }
+      else { btn.classList.add('no'); wrong.push([order[i], items[k].t]); msg('Prawie! Zielona odpowiedź jest dobra 💪', 'var(--bad)'); }
       const n = document.getElementById('next'); n.hidden = false;
       n.textContent = i + 1 < Q.length ? 'Dalej →' : 'Zobacz wynik 🏆';
       n.onclick = () => { i++; i < Q.length ? show() : result(); window.scrollTo(0, 0); };
@@ -113,7 +150,7 @@
       <div class="card center"><div class="big">${pct >= 90 ? '🏆' : pct >= 60 ? '🌟' : '📖'}</div>
         <p class="q">Wynik: ${score} z ${Q.length}</p>
         <p>${pct >= 90 ? 'Wspaniale, znasz Karolcię na wylot!' : pct >= 60 ? 'Bardzo dobrze! Jeszcze trochę i będzie mistrzostwo.' : 'Dobry początek! Przeczytaj jeszcze raz i spróbuj znowu.'}</p></div>
-      ${wrong.length ? `<div class="card"><b>Do powtórki:</b><ul>${wrong.map(k => `<li>${Q[k][0]}<br><b style="color:var(--good)">${Q[k][1][Q[k][2]]}</b></li>`).join('')}</ul></div>` : ''}
+      ${wrong.length ? `<div class="card"><b>Do powtórki:</b><ul>${wrong.map(([k, mine]) => `<li><b>${Q[k][0]}</b><br>❌ Twoja odpowiedź: <span style="color:var(--bad)">${mine}</span><br>✅ Poprawna: <b style="color:var(--good)">${Q[k][1][Q[k][2]]}</b><br>💡 <i>${WHY[k]}</i></li>`).join('')}</ul></div>` : ''}
       <button class="go" id="again">Jeszcze raz 🔁</button>`;
     document.getElementById('again').onclick = start;
   }
