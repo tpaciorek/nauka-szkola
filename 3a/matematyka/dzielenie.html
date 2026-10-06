@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#7c3aed" />
-  <title>Tabliczka mnożenia – przygoda z Sówką Lulu</title>
+  <title>Dzielenie do 100 – przygoda z Sówką Lulu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -227,6 +227,9 @@
     /* grupy (wprowadzenie) */
     .array { display: flex; flex-direction: column; gap: 6px; align-items: center; }
     .array-row { display: flex; gap: 4px; padding: 4px 8px; border-radius: 12px; background: #fef9c3; font-size: 1.6rem; line-height: 1; }
+    .plate { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 999px; background: #f1f5f9; font-size: 1.5rem; line-height: 1; }
+    .plate-kid { font-size: 1.8rem; }
+    .pile { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; font-size: 1.5rem; line-height: 1.1; max-width: 300px; }
     .sum { font-size: 1.3rem; font-weight: 900; color: var(--muted); }
 
     /* karta z nauką tabliczki */
@@ -365,44 +368,44 @@
   <script src="../osiagniecia.js"></script>
   <script>
     /* =====================================================================
-       TABLICZKA MNOŻENIA DO 100 – przygoda z Sówką Lulu
-       Kolejność jak w szkole: od najłatwiejszych (×1, ×2, ×10, ×5) do najtrudniejszych (×7, ×8, ×9),
-       między poziomami nauki gry zręcznościowe 🎮.
+       DZIELENIE DO 100 – przygoda z Sówką Lulu (kopia silnika tabliczki mnożenia)
+       „Fakt” {t, k}: (t · k) : t = k, czyli t = dzielnik, k = wynik.
+       Kolejność jak przy mnożeniu: od :1, :2, :10, :5 do :7, :8, :9, między poziomami gry 🎮.
        ===================================================================== */
     const CONFIG = {
-      storageKey: 'nauka-3a-matematyka-tabliczka-v1',
-      intro: 'Cześć! Jestem <b>Sówka Lulu</b> 🦉. Nauczymy się razem <b>tabliczki mnożenia do 100</b> – krok po kroku, od najłatwiejszej. Za każdy poziom dostajesz gwiazdki, a ja nowe ubranka!'
+      storageKey: 'nauka-3a-matematyka-dzielenie-v1',
+      intro: 'Cześć! Jestem <b>Sówka Lulu</b> 🦉. Nauczymy się razem <b>dzielenia do 100</b>. Sekret? Dzielenie to <b>mnożenie od tyłu</b> – jeśli znasz tabliczkę, dasz radę! Za każdy poziom dostajesz gwiazdki, a ja nowe ubranka!'
     };
     const ALL = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     const LEVELS = [
-      { id: 'intro', type: 'intro', icon: '🍎', name: 'Co to jest mnożenie?', desc: 'Grupy i dodawanie' },
-      { id: 't1-2-10', type: 'practice', icon: '×2', name: 'Razy 1, 2 i 10', desc: 'Rozgrzewka', tables: [1, 2, 10] },
+      { id: 'intro', type: 'intro', icon: '🍪', name: 'Co to jest dzielenie?', desc: 'Dzielimy po równo' },
+      { id: 'd1-2-10', type: 'practice', icon: ':2', name: 'Przez 1, 2 i 10', desc: 'Rozgrzewka', tables: [1, 2, 10] },
       { id: 'catch', type: 'catch', icon: '🧺', name: 'Łap wyniki', desc: 'Łap koszykiem dobry wynik', tables: [1, 2, 10], arcade: true },
-      { id: 't5', type: 'practice', icon: '×5', name: 'Razy 5', desc: 'Wynik na 0 albo 5', tables: [5] },
-      { id: 't3', type: 'practice', icon: '×3', name: 'Razy 3', desc: 'Trzy grupy', tables: [3] },
+      { id: 'd5', type: 'practice', icon: ':5', name: 'Przez 5', desc: 'Przez 10 i razy 2', tables: [5] },
+      { id: 'd3', type: 'practice', icon: ':3', name: 'Przez 3', desc: 'Trzy równe części', tables: [3] },
       { id: 'balloons', type: 'balloons', icon: '🎈', name: 'Balonowe wyniki', desc: 'Przebij balon z wynikiem', tables: [2, 3, 5], arcade: true },
-      { id: 't4', type: 'practice', icon: '×4', name: 'Razy 4', desc: 'Podwójne podwojenie', tables: [4] },
-      { id: 't6', type: 'practice', icon: '×6', name: 'Razy 6', desc: 'Razy 5 i jeszcze raz', tables: [6] },
+      { id: 'd4', type: 'practice', icon: ':4', name: 'Przez 4', desc: 'Połowa połowy', tables: [4] },
+      { id: 'd6', type: 'practice', icon: ':6', name: 'Przez 6', desc: 'Przez 2, potem przez 3', tables: [6] },
       { id: 'fly', type: 'fly', icon: '🦉', name: 'Lot Sówki', desc: 'Leć do dobrego wyniku', tables: [3, 4, 6], arcade: true },
-      { id: 't7', type: 'practice', icon: '×7', name: 'Razy 7', desc: 'Najtrudniejsza!', tables: [7] },
-      { id: 't8', type: 'practice', icon: '×8', name: 'Razy 8', desc: 'Trzy podwojenia', tables: [8] },
-      { id: 't9', type: 'practice', icon: '×9', name: 'Razy 9', desc: 'Sztuczka z dziesiątką', tables: [9] },
+      { id: 'd7', type: 'practice', icon: ':7', name: 'Przez 7', desc: 'Najtrudniejsze!', tables: [7] },
+      { id: 'd8', type: 'practice', icon: ':8', name: 'Przez 8', desc: 'Trzy razy połowa', tables: [8] },
+      { id: 'd9', type: 'practice', icon: ':9', name: 'Przez 9', desc: 'Sztuczka z cyfrą', tables: [9] },
       { id: 'minute', type: 'minute', icon: '⏱️', name: 'Minutka', desc: 'Ile zdążysz w minutę?', tables: [2, 3, 4, 5, 6, 7, 8, 9], arcade: true },
-      { id: 'boss', type: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Cała tabliczka do 100', tables: ALL }
+      { id: 'boss', type: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Całe dzielenie do 100', tables: ALL }
     ];
 
     const TIPS = {
-      1: 'Razy 1 to łatwizna – liczba się nie zmienia! <b>7 × 1 = 7</b>.',
-      2: 'Razy 2 to <b>podwojenie</b> – dodaj liczbę do niej samej: 2 × 7 = 7 + 7 = 14.',
-      3: 'Razy 3: podwój i dodaj jeszcze raz. 3 × 6 = 6 + 6 + 6 = 18.',
-      4: 'Razy 4 to <b>podwójne podwojenie</b>: 4 × 7 → podwój 7 = 14 → podwój 14 = 28.',
-      5: 'Razy 5 kończy się zawsze na <b>0 albo 5</b>. To połowa z razy 10: 5 × 8 = 80 : 2 = 40.',
-      6: 'Razy 6 = razy 5 i jeszcze jeden raz: 6 × 7 = 35 + 7 = 42.',
-      7: 'Razy 7 jest najtrudniejsze! Zapamiętaj wierszyk: <b>5, 6, 7, 8 → 56 = 7 × 8</b>. I 7 × 7 = 49.',
-      8: 'Razy 8 to trzy podwojenia: 8 × 3 → 6 → 12 → 24.',
-      9: 'Razy 9 = razy 10 i odejmij raz: 9 × 6 = 60 − 6 = 54. Cyfry wyniku zawsze dają razem 9 (5 + 4)!',
-      10: 'Razy 10 – dopisz <b>zero</b> na końcu! 10 × 7 = 70.'
+      1: 'Przez 1 to łatwizna – liczba się nie zmienia! <b>7 : 1 = 7</b>. A liczba podzielona przez siebie daje 1: 7 : 7 = 1.',
+      2: 'Przez 2 to <b>połowa</b>: 16 : 2 = 8, bo 8 + 8 = 16.',
+      3: 'Przez 3: pomyśl o mnożeniu! 18 : 3 = ?, bo <b>3 × ? = 18</b>. 3 × 6 = 18, więc wynik to 6.',
+      4: 'Przez 4 to <b>połowa połowy</b>: 28 : 4 → połowa 28 = 14 → połowa 14 = 7.',
+      5: 'Przez 5: podziel przez 10 i <b>pomnóż razy 2</b>. 40 : 5 → 40 : 10 = 4 → 4 × 2 = 8.',
+      6: 'Przez 6: najpierw połowa, potem przez 3. 42 : 6 → 42 : 2 = 21 → 21 : 3 = 7.',
+      7: 'Przez 7 jest najtrudniejsze! Wierszyk: <b>5, 6, 7, 8 → 56 : 7 = 8</b>. I 49 : 7 = 7.',
+      8: 'Przez 8 to trzy razy połowa: 48 → 24 → 12 → 6. Czyli 48 : 8 = 6.',
+      9: 'Przez 9: weź <b>pierwszą cyfrę i dodaj 1</b>! 54 : 9 → 5 + 1 = 6. 72 : 9 → 7 + 1 = 8.',
+      10: 'Przez 10 – <b>skreśl zero</b> na końcu! 70 : 10 = 7.'
     };
 
     const MAX_STARS = LEVELS.length * 3;
@@ -433,10 +436,10 @@
     const accessories = () => REWARDS.filter(r => totalStars() >= r.at).map(r => r.id);
     const unlocked = i => i === 0 || LEVELS.slice(i - 1).some(l => state.stars[l.id]);
 
-    // „fakt” = jedno działanie; 3 × 7 i 7 × 3 to ten sam fakt
-    const fk = (a, b) => `${Math.min(a, b)}x${Math.max(a, b)}`;
-    const mastery = (a, b) => state.mastery[fk(a, b)] || 0;
-    function changeMastery(a, b, d) { state.mastery[fk(a, b)] = Math.max(0, Math.min(5, mastery(a, b) + d)); save(); }
+    // „fakt” = jedno działanie (t · k) : t = k; 21 : 3 i 21 : 7 to dwa różne fakty
+    const fk = f => `${f.t * f.k}:${f.t}`;
+    const mastery = f => state.mastery[fk(f)] || 0;
+    function changeMastery(f, d) { state.mastery[fk(f)] = Math.max(0, Math.min(5, mastery(f) + d)); save(); }
 
     function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); }
@@ -453,44 +456,39 @@
     const pick = a => a[Math.floor(Math.random() * a.length)];
     const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 
-    // wszystkie działania z danych „tabliczek” (t × 1 … t × 10), bez powtórzeń
+    // wszystkie działania dzielenia przez liczby z „tables” (t : t … 10t : t)
     function facts(tables) {
-      const seen = new Set(), out = [];
-      for (const t of tables) for (let k = 1; k <= 10; k++) {
-        if (seen.has(fk(t, k))) continue;
-        seen.add(fk(t, k)); out.push({ t, k });
-      }
+      const out = [];
+      for (const t of tables) for (let k = 1; k <= 10; k++) out.push({ t, k });
       return out;
     }
-    // losowa kolejność czynników (3 × 7 albo 7 × 3), ale t zostaje „tabliczką” do podpowiedzi
-    const orient = f => Math.random() < 0.5 ? { ...f, a: f.t, b: f.k } : { ...f, a: f.k, b: f.t };
+    // a = dzielna, b = dzielnik, wynik = k
+    const orient = f => ({ ...f, a: f.t * f.k, b: f.t });
     // losuje n działań, częściej te, których dziecko jeszcze nie umie
     function pickFacts(list, n) {
       const out = []; let pool = list.slice();
       while (out.length < n) {
         if (!pool.length) pool = list.slice();
-        const w = pool.map(f => 6 - mastery(f.t, f.k));
+        const w = pool.map(f => (6 - mastery(f)) * (f.t === 1 ? 0.25 : 1)); // dzielenie przez 1 rzadziej – za łatwe
         let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0;
         while (i < pool.length - 1 && r > w[i]) { r -= w[i]; i++; }
         out.push(orient(pool.splice(i, 1)[0]));
       }
       return out;
     }
-    // „podobne” złe wyniki – typowe pomyłki dzieci
+    // „podobne” złe wyniki dzielenia a : b – typowe pomyłki dzieci
     function distractors(a, b, n) {
-      const c = a * b;
-      const cand = [c + a, c - a, c + b, c - b, c + 1, c - 1, c + 2, c - 2, c + 10, c - 10];
-      const s = String(c);
-      if (s.length === 2 && s[0] !== s[1]) cand.push(+(s[1] + s[0]));
+      const c = a / b;
+      const cand = [c + 1, c - 1, c + 2, c - 2, b, c + 10, a - b, c * 2];
       const out = [...new Set(shuffle(cand))].filter(x => x > 0 && x !== c && x <= 100).slice(0, n);
-      while (out.length < n) { const x = rnd(1, 100); if (x !== c && !out.includes(x)) out.push(x); }
+      while (out.length < n) { const x = rnd(1, 12); if (x !== c && !out.includes(x)) out.push(x); }
       return out;
     }
-    // podpowiedź: licz co t
-    function countHint(t, upTo) {
-      const seq = [];
-      for (let i = 1; i < upTo && i <= 10; i++) seq.push(t * i);
-      return seq.length ? `Licz co ${t}: <span class="hint-seq">${seq.join(', ')}, … ?</span>` : '';
+    // podpowiedź: licz co t aż do dzielnej i policz skoki (+ mnożenie od tyłu)
+    function countHint(t, k) {
+      if (t === 1 || k === 1) return `Pomyśl: <b>${t} × ? = ${t * k}</b>`;
+      const seq = Array.from({ length: k }, (_, i) => t * (i + 1));
+      return `Licz co ${t} aż do ${t * k}: <span class="hint-seq">${seq.join(', ')}</span><br>Ile liczb? Albo pomyśl: <b>${t} × ? = ${t * k}</b>`;
     }
 
     /* ---------- Dźwięki ---------- */
@@ -633,7 +631,7 @@
       const prevAt = [...REWARDS].reverse().find(r => tot >= r.at)?.at || 0;
       const pct = next ? Math.round((tot - prevAt) / (next.at - prevAt) * 100) : 100;
       const cur = LEVELS.findIndex((l, i) => unlocked(i) && !state.stars[l.id]);
-      const known = facts(ALL).filter(f => mastery(f.t, f.k) >= 3).length;
+      const known = facts(ALL).filter(f => mastery(f) >= 3).length;
 
       let greet;
       if (tot === 0) greet = CONFIG.intro;
@@ -654,10 +652,11 @@
         </button>`;
       };
 
-      let grid = '<span class="mt-cell head">×</span>' + ALL.map(n => `<span class="mt-cell head">${n}</span>`).join('');
+      // wiersz = dzielnik t, kolumna = wynik k, w polu dzielna t · k
+      let grid = '<span class="mt-cell head">:</span>' + ALL.map(n => `<span class="mt-cell head">=${n}</span>`).join('');
       for (const a of ALL) {
-        grid += `<span class="mt-cell head">${a}</span>`;
-        for (const b of ALL) { const m = mastery(a, b); grid += `<button class="mt-cell ${m ? 'm' + m : ''}" data-a="${a}" data-b="${b}">${a * b}</button>`; }
+        grid += `<span class="mt-cell head">:${a}</span>`;
+        for (const b of ALL) { const m = mastery({ t: a, k: b }); grid += `<button class="mt-cell ${m ? 'm' + m : ''}" data-a="${a}" data-b="${b}">${a * b}</button>`; }
       }
 
       screen.innerHTML = `
@@ -671,9 +670,9 @@
         </div>
         <h2 class="section-title">🗺️ Mapa przygody</h2>
         <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
-        ${state.stars.t5 ? '<button class="btn soft btn-review" id="reviewBtn">🔁 Szybka powtórka (2 minuty)</button>' : ''}
-        <h2 class="section-title">🟩 Moja tabliczka</h2>
-        <p class="muted">Im bardziej zielone pole, tym lepiej je umiesz. Umiesz już ${known} z 55 działań. Dotknij pola!</p>
+        ${state.stars.d5 ? '<button class="btn soft btn-review" id="reviewBtn">🔁 Szybka powtórka (2 minuty)</button>' : ''}
+        <h2 class="section-title">🟩 Moje dzielenie</h2>
+        <p class="muted">Każde pole to jedno dzielenie: liczba w polu podzielona przez liczbę z lewej daje liczbę z góry. Im bardziej zielone, tym lepiej je umiesz. Umiesz już ${known} ze 100 działań. Dotknij pola!</p>
         <div class="mt" id="mt">${grid}</div>
         <div class="mt-info" id="mtInfo"></div>
         <div class="legend"><span><i style="background:#f1f5f9"></i>jeszcze nie</span><span><i style="background:#fde68a"></i>ćwiczę</span><span><i style="background:#86efac"></i>umiem</span><span><i style="background:#22c55e"></i>mistrz</span></div>
@@ -685,8 +684,8 @@
         const c = e.target.closest('[data-a]'); if (!c) return;
         screen.querySelectorAll('.mt-cell.sel').forEach(x => x.classList.remove('sel'));
         c.classList.add('sel');
-        const a = +c.dataset.a, b = +c.dataset.b, m = mastery(a, b);
-        $('#mtInfo').innerHTML = `${a} × ${b} = <b>${a * b}</b> • ${m >= 5 ? 'mistrz! 🏆' : m >= 3 ? 'umiesz ✓' : m ? 'ćwiczysz 💪' : 'jeszcze przed Tobą'}`;
+        const a = +c.dataset.a, b = +c.dataset.b, m = mastery({ t: a, k: b });
+        $('#mtInfo').innerHTML = `${a * b} : ${a} = <b>${b}</b> • ${m >= 5 ? 'mistrz! 🏆' : m >= 3 ? 'umiesz ✓' : m ? 'ćwiczysz 💪' : 'jeszcze przed Tobą'}`;
       });
       $('#resetBtn').addEventListener('click', () => {
         if (confirm('Usunąć wszystkie gwiazdki i postępy w tej grze?')) {
@@ -709,8 +708,9 @@
     function buildTasks(lvl) {
       switch (lvl.type) {
         case 'intro': {
+          // a = ile talerzy, b = ile na każdy talerz
           const pairs = shuffle([[2, 3], [3, 4], [2, 5], [4, 3], [3, 5], [5, 2], [4, 4], [3, 6]]).slice(0, 6);
-          return pairs.map(([a, b], i) => ({ kind: 'array', a, b, first: i === 0 }));
+          return pairs.map(([a, b], i) => ({ kind: 'share', a, b, first: i === 0 }));
         }
         case 'practice': {
           const fs = facts(lvl.tables);
@@ -775,7 +775,7 @@
     function markMistake(t) {
       session.mistakes++;
       if (!t.f) return;
-      const key = t.kind + fk(t.f.a, t.f.b);
+      const key = t.kind + fk(t.f);
       if (session.requeued.has(key)) return;
       session.requeued.add(key);
       session.tasks.push({ ...t, f: orient(t.f), retry: true });
@@ -784,7 +784,7 @@
     const ANS = '<span class="ans empty" id="ans">?</span>';
 
     // wspólne zadanie „wpisz liczbę” na klawiaturze liczbowej
-    function numericTask(t, el, { promptHTML, answer, hint, reveal, a, b }) {
+    function numericTask(t, el, { promptHTML, answer, hint, reveal, f }) {
       el.innerHTML = `<div class="prompt-card">${promptHTML}</div><div class="feedback" id="fb"></div>${padHTML()}`;
       const st = { value: '', attempts: 0, copy: false, locked: false };
       const ans = $('#ans'), fb = $('#fb');
@@ -798,7 +798,7 @@
         if (+st.value === answer) {
           st.locked = true;
           ans.classList.add('ok'); sfx.good();
-          if (!st.copy && st.attempts === 0 && a) changeMastery(a, b, 1);
+          if (!st.copy && st.attempts === 0 && f) changeMastery(f, 1);
           owlSay(st.copy ? 'Dobrze! Zapamiętaj to 🧠' : pick(PRAISE), 'happy');
           taskDone(1100);
           return;
@@ -807,7 +807,7 @@
         ans.classList.add('bad'); shakeEl(ans);
         if (st.attempts === 1 && !st.copy) {
           markMistake(t);
-          if (a) changeMastery(a, b, -1);
+          if (f) changeMastery(f, -1);
           fb.innerHTML = hint;
           owlSay('Prawie! Spróbuj jeszcze raz 💪', 'sad');
         } else if (!st.copy) {
@@ -823,23 +823,22 @@
     }
 
     const RENDER = {
-      /* --- wprowadzenie: grupy przedmiotów --- */
-      array(t, el) {
-        const { a, b } = t;
-        const emoji = pick(['🍎', '🍓', '⭐', '🐞', '🌸', '🍪', '🧁', '🐟']);
-        const rows = n => n === 1 ? 'rząd' : n < 5 ? 'rzędy' : 'rzędów';
-        const opts = shuffle([a * b, ...distractors(a, b, 3)]);
+      /* --- wprowadzenie: dzielimy po równo na talerze --- */
+      share(t, el) {
+        const { a, b } = t, total = a * b;
+        const emoji = pick(['🍎', '🍓', '🍪', '🧁', '🍬', '🍒', '🥕', '🍩']);
+        const opts = shuffle([b, ...distractors(total, a, 3)]);
         el.innerHTML = `<div class="prompt-card">
-            <div class="array">${Array.from({ length: a }, () => `<div class="array-row">${emoji.repeat(b)}</div>`).join('')}</div>
-            <div class="prompt-sub">${a} ${rows(a)} po ${b}</div>
-            <div class="sum">${Array(a).fill(b).join(' + ')}</div>
-            <div class="eq">${a} <span class="x">×</span> ${b} = ?</div>
+            <div class="prompt-sub">Masz ${total} ${emoji}. Rozdziel je <b>po równo</b> na ${a} ${a > 4 ? 'talerzy' : 'talerze'}.</div>
+            <div class="pile">${emoji.repeat(total)}</div>
+            <div class="array">${Array.from({ length: a }, (_, i) => `<div class="plate"><span class="plate-kid">${['🐻', '🐰', '🐱', '🐶', '🦊'][i]}</span>${emoji.repeat(b)}</div>`).join('')}</div>
+            <div class="eq">${total} <span class="x">:</span> ${a} = ?</div>
           </div>
           <div class="options">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;
         owlSay(t.first
-          ? 'Mnożenie to <b>szybkie dodawanie</b>! Jeśli są 3 rzędy po 4 jabłka, to 4 + 4 + 4 = 3 × 4. Policz i wybierz wynik!'
-          : pick(['Ile ich jest razem? Policz rzędy!', 'Dodaj rzędy albo pomnóż!', 'Ile jest wszystkich?']));
-        chooseHandlers(el, opts, a * b, t, `${a} × ${b} = ${Array(a).fill(b).join(' + ')} = <b>${a * b}</b>`, 'Policz jeszcze raz – dodaj wszystkie rzędy 😉');
+          ? `Dzielenie to <b>dzielenie po równo</b>! Każde zwierzątko dostaje tyle samo. Ile ${emoji} ma każde? Policz na jednym talerzu!`
+          : pick(['Ile dostaje każde zwierzątko?', 'Policz, ile jest na jednym talerzu!', 'Po równo – ile dla każdego?']));
+        chooseHandlers(el, opts, b, t, `${total} : ${a} = <b>${b}</b>, bo ${a} × ${b} = ${total}`, 'Policz, ile jest na <b>jednym</b> talerzu 😉');
       },
 
       /* --- karta z tabliczką i sztuczką --- */
@@ -847,23 +846,23 @@
         const main = t.tables.filter(x => x !== 1 && x !== 10);
         const show = main.length ? main[0] : t.tables[0];
         el.innerHTML = `<div class="prompt-card">
-            <div class="eq" style="font-size:1.6rem">Tabliczka × ${show}</div>
-            <div class="table-list">${ALL.map(k => `<span>${show} × ${k} = <b>${show * k}</b></span>`).join('')}</div>
+            <div class="eq" style="font-size:1.6rem">Dzielenie przez ${show}</div>
+            <div class="table-list">${ALL.map(k => `<span>${show * k} : ${show} = <b>${k}</b></span>`).join('')}</div>
             ${t.tables.map(x => `<div class="tip">💡 ${TIPS[x]}</div>`).join('')}
           </div>
           <button class="btn" id="nextBtn">Zaczynamy! ➜</button>`;
-        owlSay('Popatrz na tabliczkę i przeczytaj sztuczkę. Przeczytaj wyniki na głos!');
+        owlSay('Popatrz: wyniki to 1, 2, 3… aż do 10! Przeczytaj sztuczkę i działania na głos.');
         $('#nextBtn').addEventListener('click', () => { session.pos++; nextTask(); });
       },
 
       /* --- wybór z 4 --- */
       choose(t, el) {
         const { a, b } = t.f;
-        const opts = shuffle([a * b, ...distractors(a, b, 3)]);
-        el.innerHTML = `<div class="prompt-card"><div class="eq">${a} <span class="x">×</span> ${b} = ?</div></div>
+        const opts = shuffle([t.f.k, ...distractors(a, b, 3)]);
+        el.innerHTML = `<div class="prompt-card"><div class="eq">${a} <span class="x">:</span> ${b} = ?</div></div>
           <div class="options">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;
         owlSay(pick(['Wybierz dobry wynik!', 'Ile to jest?', 'Który wynik pasuje?']));
-        chooseHandlers(el, opts, a * b, t, `${a} × ${b} = <b>${a * b}</b>`, countHint(t.f.t, t.f.k) || TIPS[t.f.t]);
+        chooseHandlers(el, opts, t.f.k, t, `${a} : ${b} = <b>${t.f.k}</b>`, countHint(t.f.t, t.f.k));
       },
 
       /* --- rytm: licz co t --- */
@@ -877,17 +876,17 @@
           hint: `Dodaj ${t.t} do liczby przed dziurką: ${nums[hole - 1]} + ${t.t} = ?`,
           reveal: nums.join(', ')
         });
-        owlSay(`Rytm tabliczki! Skaczemy co <b>${t.t}</b>. Wpisz brakującą liczbę.`);
+        owlSay(`Dzielenie przez ${t.t} to skakanie co <b>${t.t}</b>! Wpisz brakującą liczbę.`);
       },
 
       /* --- wpisz wynik --- */
       type(t, el) {
         const { a, b } = t.f;
         numericTask(t, el, {
-          promptHTML: `<div class="eq">${a} <span class="x">×</span> ${b} = ${ANS}</div>`,
-          answer: a * b,
+          promptHTML: `<div class="eq">${a} <span class="x">:</span> ${b} = ${ANS}</div>`,
+          answer: t.f.k,
           hint: `${countHint(t.f.t, t.f.k)}<div class="tip" style="margin-top:8px">💡 ${TIPS[t.f.t]}</div>`,
-          reveal: `${a} × ${b} = ${a * b}`, a, b
+          reveal: `${a} : ${b} = ${t.f.k}`, f: t.f
         });
         owlSay(pick(['Wpisz wynik!', 'Ile to jest? Wpisz na klawiaturze.', 'Twoja kolej!']));
       },
@@ -896,10 +895,10 @@
       missing(t, el) {
         const { a, b } = t.f;
         numericTask(t, el, {
-          promptHTML: `<div class="eq">${a} <span class="x">×</span> ${ANS} = ${a * b}</div><div class="prompt-sub">Przez ile trzeba pomnożyć?</div>`,
+          promptHTML: `<div class="eq">${a} <span class="x">:</span> ${ANS} = ${t.f.k}</div><div class="prompt-sub">Przez ile trzeba podzielić?</div>`,
           answer: b,
-          hint: `Licz co ${a}, aż dojdziesz do ${a * b}: <span class="hint-seq">${Array.from({ length: Math.min(b, 10) }, (_, i) => a * (i + 1)).slice(0, -1).join(', ')}${b > 1 ? ', …' : '…'}</span><br>Ile to skoków?`,
-          reveal: `${a} × ${b} = ${a * b}`, a, b
+          hint: `Pomyśl o mnożeniu: <b>${t.f.k} × ? = ${a}</b>${b > 1 ? `<br>Licz co ${t.f.k}: <span class="hint-seq">${Array.from({ length: b - 1 }, (_, i) => t.f.k * (i + 1)).join(', ')}, …</span>` : ''}`,
+          reveal: `${a} : ${b} = ${t.f.k}`, f: t.f
         });
         owlSay('Zagadka! Której liczby brakuje?');
       }
@@ -972,7 +971,7 @@
     const place = (d, x, y) => { d.style.transform = `translate(${x}px, ${y}px)`; };
     function floatText(arena, x, y, text) { const f = ent(arena, 'float-text', `<span>${text}</span>`); place(f, x, y); setTimeout(() => f.remove(), 900); }
     const clearEnts = arena => arena.querySelectorAll('.ent').forEach(n => n.remove());
-    const qText = f => `${f.a} × ${f.b}`;
+    const qText = f => `${f.a} : ${f.b}`;
     // kolejne działania do gry – najpierw słabsze
     function factStream(tables) { const fs = facts(tables); let q = []; return () => { if (!q.length) q = pickFacts(fs, fs.length); return q.pop(); }; }
 
@@ -1005,7 +1004,7 @@
           arena.onpointerdown = move;
           arena.onpointermove = move;
           function spawn() {
-            const c = target.a * target.b;
+            const c = target.k;
             const want = !drops.some(d => d.v === c) ? Math.random() < 0.75 : Math.random() < 0.2;
             const v = want ? c : pick(distractors(target.a, target.b, 4));
             const e = ent(arena, 'drop', v);
@@ -1032,9 +1031,9 @@
           });
           function caught(d) {
             d.el.remove(); drops.splice(drops.indexOf(d), 1);
-            const c = target.a * target.b;
+            const c = target.k;
             if (d.v === c) {
-              score++; upd(); sfx.good(); changeMastery(target.a, target.b, 1);
+              score++; upd(); sfx.good(); changeMastery(target, 1);
               floatText(arena, px - 20, H - PH - 50, '+1 ⭐');
               bounce(player.firstElementChild);
               if (score >= GOAL) { ctl.stop(); owlSay('Wszystko złapane! ' + pick(PRAISE), 'happy'); taskDone(1500); return; }
@@ -1042,7 +1041,7 @@
               newTarget();
             } else {
               lives--; session.mistakes++; setLives(lives); sfx.bad(); shakeEl(arena);
-              owlSay(`Ups! ${d.v} to zły wynik. ${countHint(target.t, target.k) || TIPS[target.t]}`, 'sad');
+              owlSay(`Ups! ${d.v} to zły wynik. ${countHint(target.t, target.k)}`, 'sad');
               if (lives <= 0) gameOver(arena, ctl, play);
             }
           }
@@ -1070,7 +1069,7 @@
           newTarget();
           function spawn() {
             if (bs.length >= 5) return;
-            const c = target.a * target.b;
+            const c = target.k;
             const v = !bs.some(b => b.v === c) ? c : pick(distractors(target.a, target.b, 4));
             const e = ent(arena, 'balloon', `<div class="bal" style="--c:${pick(COLORS)}">${v}</div>`);
             const b = { el: e, v, x: 6 + Math.random() * (W - 96), y: H + 10, ph: Math.random() * 6, alive: true };
@@ -1090,10 +1089,10 @@
           function hit(b) {
             if (!b.alive || ctl.stopped) return;
             b.alive = false; bs.splice(bs.indexOf(b), 1);
-            const c = target.a * target.b;
+            const c = target.k;
             if (b.v === c) {
               b.el.classList.add('popped'); setTimeout(() => b.el.remove(), 300);
-              score++; upd(); sfx.good(); changeMastery(target.a, target.b, 1);
+              score++; upd(); sfx.good(); changeMastery(target, 1);
               floatText(arena, b.x + 24, b.y + 20, '+1 ⭐');
               if (score >= GOAL) { ctl.stop(); owlSay('Wszystkie balony przebite! ' + pick(PRAISE), 'happy'); taskDone(1500); return; }
               owlSay(`${pick(PRAISE)} ${qText(target)} = <b>${c}</b>`, 'happy');
@@ -1101,7 +1100,7 @@
             } else {
               b.el.classList.add('wrong'); setTimeout(() => b.el.remove(), 450);
               lives--; session.mistakes++; setLives(lives); sfx.bad();
-              owlSay(`${b.v} to nie to. ${countHint(target.t, target.k) || TIPS[target.t]}`, 'sad');
+              owlSay(`${b.v} to nie to. ${countHint(target.t, target.k)}`, 'sad');
               if (lives <= 0) gameOver(arena, ctl, play);
             }
           }
@@ -1134,7 +1133,7 @@
           arena.onpointerdown = move;
           arena.onpointermove = move;
           function spawnCol() {
-            const c = target.a * target.b;
+            const c = target.k;
             const n = score < 4 ? 2 : 3;
             const vals = shuffle([c, ...distractors(target.a, target.b, n - 1)]);
             const lanes = n === 2 ? shuffle([0.25, 0.75]) : [0.18, 0.5, 0.82];
@@ -1160,13 +1159,13 @@
             const c = col; col = null;
             c.balls.forEach(x => { x.el.classList.add(x === b ? (b.ok ? 'got' : 'bad') : 'fade'); setTimeout(() => x.el.remove(), 350); });
             if (b.ok) {
-              score++; sfx.good(); bounce(owl.firstElementChild); changeMastery(target.a, target.b, 1);
+              score++; sfx.good(); bounce(owl.firstElementChild); changeMastery(target, 1);
               owlSay(`${pick(PRAISE)} ${qText(target)} = <b>${b.v}</b>`, 'happy');
               if (score >= GOAL) { draw(); ctl.stop(); taskDone(1500); return; }
               target = next(); draw(); wait = 0.5;
             } else {
               lives--; session.mistakes++; setLives(lives); sfx.bad(); shakeEl(owl.firstElementChild);
-              owlSay(`${b.v} to nie to! ${countHint(target.t, target.k) || TIPS[target.t]}`, 'sad');
+              owlSay(`${b.v} to nie to! ${countHint(target.t, target.k)}`, 'sad');
               wait = 0.6;
               if (lives <= 0) gameOver(arena, ctl, play);
             }
@@ -1181,7 +1180,7 @@
           <div class="minute-score" id="mscore">Wynik: 0</div>
           <div class="prompt-card" style="position:relative" id="mcard"><div class="eq" id="meq"></div></div>
           ${padHTML()}`;
-        owlSay('Minutka! ⏱️ Rozwiąż jak najwięcej działań w <b>60 sekund</b>. Gotowa?');
+        owlSay('Minutka! ⏱️ Rozwiąż jak najwięcej dzieleń w <b>60 sekund</b>. Gotowa?');
         const card = $('#mcard');
         arenaOverlay(card, '⏱️ Minutka', `Masz 60 sekund. 3 gwiazdki za 20 dobrych odpowiedzi!${state.best.minute ? `<br>Twój rekord: <b>${state.best.minute}</b>` : ''}`, 'Start ▶', play);
 
@@ -1191,20 +1190,20 @@
           const eq = $('#meq');
           function ask() { f = next(); value = ''; locked = false; draw(); }
           function draw() {
-            eq.innerHTML = `${f.a} <span class="x">×</span> ${f.b} = <span class="ans ${value ? '' : 'empty'}" id="ans">${value || '?'}</span>`;
+            eq.innerHTML = `${f.a} <span class="x">:</span> ${f.b} = <span class="ans ${value ? '' : 'empty'}" id="ans">${value || '?'}</span>`;
           }
           ask();
           kbHandler = {
             type(ch) {
               if (locked || value.length >= 3) return;
               value += ch;
-              const c = f.a * f.b;
+              const c = f.k;
               if (value.length >= String(c).length) {
                 locked = true;
-                if (+value === c) { score++; sfx.good(); changeMastery(f.a, f.b, 1); $('#mscore').textContent = `Wynik: ${score}`; draw(); $('#ans').classList.add('ok'); setTimeout(ask, 250); }
+                if (+value === c) { score++; sfx.good(); changeMastery(f, 1); $('#mscore').textContent = `Wynik: ${score}`; draw(); $('#ans').classList.add('ok'); setTimeout(ask, 250); }
                 else {
-                  session.mistakes++; sfx.bad(); changeMastery(f.a, f.b, -1); draw(); $('#ans').classList.add('bad');
-                  owlSay(`${f.a} × ${f.b} = <b>${c}</b>. Zapamiętaj! 🧠`, 'sad');
+                  session.mistakes++; sfx.bad(); changeMastery(f, -1); draw(); $('#ans').classList.add('bad');
+                  owlSay(`${f.a} : ${f.b} = <b>${c}</b>. Zapamiętaj! 🧠`, 'sad');
                   setTimeout(ask, 1200);
                 }
               }

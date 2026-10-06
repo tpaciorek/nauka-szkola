@@ -63,6 +63,8 @@
     }
     .pill.back { color: var(--primary); }
     .topbar .spacer { flex: 1; }
+    .topbar .pill { white-space: nowrap; }
+    @media (max-width: 420px) { .topbar { gap: 6px; padding: 10px 10px; } .topbar .pill { padding: 8px 10px; } }
     body.in-level .topbar { display: none; }
 
     main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
@@ -285,6 +287,7 @@
     <header class="topbar">
       <a class="pill back" href="./index.html" aria-label="Wróć do polskiego">← Wróć</a>
       <span class="spacer"></span>
+      <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
       <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
       <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
       <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
@@ -292,6 +295,7 @@
     <main id="screen"></main>
   </div>
 
+  <script src="../osiagniecia.js"></script>
   <script>
     /* =====================================================================
        KAROLCIA – quiz z lektury z Sówką Lulu
@@ -793,6 +797,7 @@
       state.collected[session.lvl.id] = true;
       bumpStreak();
       save();
+      if (window.Odznaki) Odznaki.sprawdz();
 
       document.body.classList.add('in-level');
       screen.innerHTML = `

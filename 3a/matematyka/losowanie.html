@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <title>Losowe zadania – mnożenie i dzielenie z Sówką Lulu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1e1b4b;
+      --muted: #6b7280;
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --primary-soft: #ede9fe;
+      --line: #ddd6fe;
+      --good: #16a34a;
+      --good-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --gold: #facc15;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(196, 181, 253, 0.55), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(165, 180, 252, 0.5), transparent 35%),
+        linear-gradient(180deg, #f5f3ff 0%, #e0e7ff 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+
+    #app { max-width: 560px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+    .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(245, 243, 255, 0.88); backdrop-filter: blur(10px); }
+    .pill { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 1rem; text-decoration: none; color: var(--ink); }
+    .pill.back { color: var(--primary); }
+    .topbar .spacer { flex: 1; }
+    .topbar .pill { white-space: nowrap; }
+    @media (max-width: 420px) { .topbar { gap: 6px; padding: 10px 10px; } .topbar .pill { padding: 8px 10px; } }
+    body.in-level .topbar { display: none; }
+    main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
+    body.in-level main { padding-bottom: 0; }
+
+    .owl-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .owl-big { width: 120px; flex: none; animation: bob 3s ease-in-out infinite; }
+    .owl-mini { width: 62px; flex: none; }
+    .jump { animation: jump 0.6s ease; }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+    .bubble { position: relative; flex: 1; background: #fff; border: 2px solid var(--line); border-radius: 20px; padding: 12px 14px; font-weight: 700; line-height: 1.4; font-size: 1rem; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.1); }
+    .bubble::before { content: ''; position: absolute; left: -10px; top: 22px; border: 9px solid transparent; border-right-color: var(--line); border-left: 0; }
+    .bubble::after { content: ''; position: absolute; left: -7px; top: 23px; border: 8px solid transparent; border-right-color: #fff; border-left: 0; }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes pop { 0% { transform: scale(0.94); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+    .hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 8px; }
+    .section-title { font-size: 1.15rem; font-weight: 900; margin: 18px 0 8px; }
+    .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .choices.four { grid-template-columns: repeat(4, 1fr); }
+    .choice {
+      min-height: 64px; padding: 8px 6px; border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.05rem; font-weight: 900; line-height: 1.15; box-shadow: 0 5px 0 var(--line);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .choice .big { font-size: 1.6rem; }
+    .choice.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); box-shadow: 0 5px 0 var(--primary-dark); }
+    .choice:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+    .best { text-align: center; font-weight: 800; color: var(--muted); margin: 14px 0 10px; min-height: 1.4em; }
+    .stats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+    .stat { background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 6px 12px; font-weight: 800; font-size: 0.9rem; }
+
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 58px; padding: 12px 18px; border: 0; border-radius: 18px; font-size: 1.2rem; font-weight: 900; background: var(--primary); color: #fff; box-shadow: 0 5px 0 var(--primary-dark); text-decoration: none; }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .btn.soft { background: #fff; color: var(--primary); border: 3px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+    .btn.green { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
+    .btn + .btn { margin-top: 12px; }
+
+    .level { flex: 1; display: flex; flex-direction: column; }
+    .level-top { display: flex; align-items: center; gap: 12px; padding: 12px 0 8px; }
+    .icon-btn { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 2px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--muted); }
+    .progress { flex: 1; height: 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 999px; transition: width 0.4s ease; }
+    .level-badge { font-weight: 900; font-size: 1.1rem; min-width: 52px; text-align: right; }
+    .guide { display: flex; align-items: flex-start; gap: 12px; margin: 4px 0 12px; }
+    .task { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .prompt-card { background: #fff; border: 3px solid var(--line); border-radius: 24px; padding: 18px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .eq { font-size: 2.5rem; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .eq .x { color: var(--primary); }
+    .ans { display: inline-grid; place-items: center; min-width: 84px; height: 64px; padding: 0 10px; border-radius: 16px; border: 3px solid var(--primary); background: #faf5ff; color: var(--ink); }
+    .ans.empty { color: #c4b5fd; }
+    .ans.ok { border-color: var(--good); background: var(--good-soft); color: #166534; }
+    .ans.bad { border-color: var(--bad); background: var(--bad-soft); color: #b91c1c; }
+    .prompt-sub { font-size: 1rem; font-weight: 700; color: var(--muted); }
+    .feedback { font-weight: 700; text-align: center; line-height: 1.45; }
+    .feedback:empty { display: none; }
+    .hint-seq { font-size: 1.1rem; font-weight: 900; color: var(--primary-dark); }
+    .reveal { display: inline-block; font-size: 1.8rem; font-weight: 900; background: #fff; border: 3px dashed var(--line); border-radius: 18px; padding: 4px 14px; }
+
+    .kb { position: sticky; bottom: 0; margin: auto -16px 0; background: #e0e7ff; border-top: 2px solid #c7d2fe; border-radius: 20px 20px 0 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; user-select: none; -webkit-user-select: none; }
+    .k { height: 56px; padding: 0; border: 0; border-radius: 14px; background: #fff; font-size: 1.7rem; font-weight: 900; box-shadow: 0 4px 0 #a5b4fc; }
+    .k:active, .k.pressed { transform: translateY(3px); box-shadow: 0 1px 0 #a5b4fc; background: #c7d2fe; }
+    .k.back { background: #c7d2fe; font-size: 1.4rem; }
+    .k.enter { background: #22c55e; color: #fff; box-shadow: 0 4px 0 #15803d; font-size: 1.15rem; }
+
+    .result { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 20px; }
+    .result h2 { font-size: 2rem; margin: 4px 0 0; }
+    .score-big { font-size: 3rem; font-weight: 900; color: var(--primary-dark); line-height: 1; }
+    .result-stars { display: flex; gap: 8px; font-size: 3rem; line-height: 1; }
+    .rs { color: #e5e7eb; }
+    .rs.on { color: var(--gold); text-shadow: 0 3px 0 #ca8a04; animation: starIn 0.5s ease both; animation-delay: var(--d); }
+    @keyframes starIn { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { transform: scale(1); } }
+    .result p { font-weight: 700; color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .summary { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
+    .sum-item { background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 6px 8px; font-weight: 800; font-size: 1rem; }
+    .sum-item.ok { border-color: #bbf7d0; background: #f0fdf4; }
+    .sum-item.bad { border-color: #fecaca; background: #fef2f2; }
+    .result-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    @media (min-width: 600px) {
+      main { padding-left: 20px; padding-right: 20px; }
+      .kb { margin-left: -20px; margin-right: -20px; border-radius: 20px; margin-bottom: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a class="pill back" href="./index.html" aria-label="Wróć do matematyki">← Wróć</a>
+      <span class="spacer"></span>
+      <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
+      <span class="pill" title="Rozwiązane rundy">🎲 <span id="roundCount">0</span></span>
+      <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
+    </header>
+    <main id="screen"></main>
+  </div>
+
+  <script src="../osiagniecia.js"></script>
+  <script>
+    /* =====================================================================
+       LOSOWE ZADANIA – 10 losowych działań z mnożenia i/lub dzielenia
+       w wybranym zakresie (do 20, 30, 50, 100). Opcjonalnie „z okienkiem”.
+       ===================================================================== */
+    const CONFIG = { storageKey: 'nauka-3a-matematyka-losowanie-v1', count: 10 };
+    const OPS = [
+      { id: 'mul', icon: '×', name: 'Mnożenie' },
+      { id: 'div', icon: ':', name: 'Dzielenie' },
+      { id: 'mix', icon: '× :', name: 'Oba' }
+    ];
+    const RANGES = [20, 30, 50, 100];
+    const PRAISE = ['Super!', 'Brawo!', 'Hoot hoot! Świetnie!', 'Ekstra!', 'Tak jest! 🎉', 'Jesteś mistrzem!', 'Wow, pięknie!', 'Doskonale!'];
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const screen = $('#screen');
+
+    /* ---------- Stan ---------- */
+    function defaultState() {
+      return { sfx: true, rounds: 0, perfect: 0, correct: 0, best: {}, perfectKeys: {}, streak: { last: null, count: 0 }, last: { op: 'mix', range: 50, gaps: false } };
+    }
+    function loadState() {
+      try { const s = JSON.parse(localStorage.getItem(CONFIG.storageKey)); if (s) return Object.assign(defaultState(), s); } catch (e) {}
+      return defaultState();
+    }
+    function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); } catch (e) {} }
+    const state = loadState();
+
+    function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function bumpStreak() {
+      const t = dayStr(new Date()), y = new Date(); y.setDate(y.getDate() - 1);
+      if (state.streak.last === t) return;
+      state.streak.count = state.streak.last === dayStr(y) ? state.streak.count + 1 : 1;
+      state.streak.last = t;
+    }
+
+    /* ---------- Narzędzia ---------- */
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    const settingKey = s => `${s.op}-${s.range}${s.gaps ? '-o' : ''}`;
+
+    // losuje 10 różnych działań: a × b ≤ zakres albo (t · k) : t, czynniki 1–10, rzadko z jedynką
+    function makeTasks(s) {
+      const pool = [];
+      for (let a = 1; a <= 10; a++) for (let b = 1; b <= 10; b++) {
+        if (a * b > s.range) continue;
+        const w = a === 1 || b === 1 ? 0.15 : a === 10 || b === 10 ? 0.5 : 1;
+        if (s.op !== 'div') pool.push({ op: 'mul', a, b, w });
+        if (s.op !== 'mul') pool.push({ op: 'div', a: a * b, b: a, c: b, w });
+      }
+      const out = [];
+      while (out.length < CONFIG.count && pool.length) {
+        let r = Math.random() * pool.reduce((x, p) => x + p.w, 0), i = 0;
+        while (i < pool.length - 1 && r > pool[i].w) { r -= pool[i].w; i++; }
+        out.push(pool.splice(i, 1)[0]);
+      }
+      return shuffle(out).map((t, i) => {
+        if (t.op === 'mul') t.c = t.a * t.b;
+        // z okienkiem: co trzecie działanie ma lukę zamiast wyniku
+        t.gap = s.gaps && i % 3 === 1 ? 'b' : 'c';
+        return t;
+      });
+    }
+    const sym = t => t.op === 'mul' ? '×' : ':';
+    const full = t => `${t.a} ${sym(t)} ${t.b} = ${t.c}`;
+    const answer = t => t.gap === 'b' ? t.b : t.c;
+    function hintFor(t) {
+      if (t.op === 'mul') {
+        const n = Math.min(t.a, t.b), m = Math.max(t.a, t.b);
+        if (t.gap === 'b') return `Licz co ${t.a}, aż dojdziesz do ${t.c}. Ile skoków?`;
+        if (n === 1) return `Razy 1 – liczba się nie zmienia!`;
+        const seq = Array.from({ length: n - 1 }, (_, i) => m * (i + 1));
+        return `Licz co ${m}: <span class="hint-seq">${seq.join(', ')}, … ?</span>`;
+      }
+      if (t.gap === 'b') return `Pomyśl o mnożeniu: <b>${t.c} × ? = ${t.a}</b>`;
+      return `Pomyśl o mnożeniu: <b>${t.b} × ? = ${t.a}</b>`;
+    }
+
+    /* ---------- Dźwięki ---------- */
+    let actx = null;
+    function tone(freqs, dur = 0.1, type = 'sine', vol = 0.15) {
+      if (!state.sfx) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        freqs.forEach((f, i) => {
+          const o = actx.createOscillator(), g = actx.createGain(), st = t0 + i * dur;
+          o.type = type; o.frequency.value = f;
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(vol, st + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur * 1.6);
+          o.connect(g).connect(actx.destination);
+          o.start(st); o.stop(st + dur * 1.7);
+        });
+      } catch (e) {}
+    }
+    const sfx = { good: () => tone([660, 990], 0.09), bad: () => tone([240, 180], 0.12, 'triangle'), tap: () => tone([520], 0.04, 'sine', 0.07), win: () => tone([523, 659, 784, 1047], 0.12) };
+
+    /* ---------- Sówka ---------- */
+    function owlSVG(mood) {
+      const eyes = mood === 'happy'
+        ? `<path d="M31 64 q13 -13 26 0 M63 64 q13 -13 26 0" stroke="#1e1b4b" stroke-width="5" fill="none" stroke-linecap="round"/>`
+        : `<circle cx="44" cy="62" r="14" fill="#fff"/><circle cx="76" cy="62" r="14" fill="#fff"/>
+           <circle cx="46" cy="63" r="7" fill="#1e1b4b"/><circle cx="78" cy="63" r="7" fill="#1e1b4b"/>
+           <circle cx="48.5" cy="60" r="2.3" fill="#fff"/><circle cx="80.5" cy="60" r="2.3" fill="#fff"/>
+           ${mood === 'sad' ? '<path d="M32 44 l20 5 M88 44 l-20 5" stroke="#4c1d95" stroke-width="4" stroke-linecap="round"/>' : ''}`;
+      return `<svg class="owl-svg" viewBox="0 0 120 135" aria-hidden="true">
+        <ellipse cx="60" cy="131" rx="34" ry="4" fill="rgba(30,27,75,0.12)"/>
+        <polygon points="26,46 19,14 47,32" fill="#6d28d9"/><polygon points="94,46 101,14 73,32" fill="#6d28d9"/>
+        <ellipse cx="60" cy="80" rx="42" ry="46" fill="#8b5cf6"/>
+        <ellipse cx="21" cy="92" rx="11" ry="24" fill="#6d28d9" transform="rotate(14 21 92)"/>
+        <ellipse cx="99" cy="92" rx="11" ry="24" fill="#6d28d9" transform="rotate(-14 99 92)"/>
+        <ellipse cx="60" cy="98" rx="26" ry="27" fill="#ede9fe"/>
+        <path d="M48 96 q5 5 10 0 M62 96 q5 5 10 0 M55 107 q5 5 10 0" stroke="#c4b5fd" stroke-width="2.5" fill="none"/>
+        ${eyes}
+        <polygon points="54,73 66,73 60,84" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" stroke-linejoin="round"/>
+        <ellipse cx="47" cy="126" rx="8" ry="4.5" fill="#f59e0b"/><ellipse cx="73" cy="126" rx="8" ry="4.5" fill="#f59e0b"/>
+        <g transform="translate(78 92) rotate(-12)"><rect x="0" y="0" width="22" height="22" rx="5" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/>
+          <circle cx="6" cy="6" r="2.2" fill="#7c3aed"/><circle cx="16" cy="16" r="2.2" fill="#7c3aed"/><circle cx="11" cy="11" r="2.2" fill="#7c3aed"/></g>
+      </svg>`;
+    }
+    function owlSay(html, mood) {
+      const b = $('#bubble');
+      if (b) { b.innerHTML = html; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+      const o = $('#owl');
+      if (o) {
+        o.innerHTML = owlSVG(mood);
+        o.classList.remove('jump', 'shake'); void o.offsetWidth;
+        if (mood === 'happy') o.classList.add('jump');
+        if (mood === 'sad') o.classList.add('shake');
+      }
+    }
+    function shakeEl(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+    function confetti() {
+      const colors = ['#7c3aed', '#facc15', '#22c55e', '#ec4899', '#38bdf8', '#f97316'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+
+    /* ---------- Klawiatura liczbowa ---------- */
+    let kbHandler = null;
+    function padHTML() {
+      const d = n => `<button class="k" data-k="${n}">${n}</button>`;
+      return `<div class="kb">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d).join('')}
+        <button class="k back" data-k="back" aria-label="Usuń">⌫</button>${d(0)}<button class="k enter" data-k="enter">Sprawdź ✓</button></div>`;
+    }
+    function handleKey(k) {
+      if (!kbHandler) return;
+      if (k === 'back') kbHandler.back();
+      else if (k === 'enter') kbHandler.enter();
+      else { kbHandler.type(k); sfx.tap(); }
+      if (kbHandler && kbHandler.refresh) kbHandler.refresh();
+    }
+    document.addEventListener('keydown', e => {
+      if (!kbHandler || e.ctrlKey || e.metaKey || e.altKey) return;
+      let k = null;
+      if (/^[0-9]$/.test(e.key)) k = e.key;
+      else if (e.key === 'Backspace') k = 'back';
+      else if (e.key === 'Enter') k = 'enter';
+      if (!k) return;
+      e.preventDefault();
+      const btn = $(`.k[data-k="${k}"]`);
+      if (btn) { btn.classList.add('pressed'); setTimeout(() => btn.classList.remove('pressed'), 120); }
+      handleKey(k);
+    });
+    document.addEventListener('click', e => { const key = e.target.closest('.k'); if (key) handleKey(key.dataset.k); });
+
+    function updateTopbar() {
+      $('#roundCount').textContent = state.rounds;
+      $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+    }
+    $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
+
+    /* =====================================================================
+       USTAWIENIA
+       ===================================================================== */
+    function renderMenu() {
+      kbHandler = null;
+      document.body.classList.remove('in-level');
+      updateTopbar();
+      const s = state.last;
+      const bestTxt = () => {
+        const b = state.best[settingKey(s)];
+        return b != null ? `🏆 Twój najlepszy wynik w tym losowaniu: <b>${b}/10</b>` : 'Tego losowania jeszcze nie było – spróbuj! 🍀';
+      };
+      screen.innerHTML = `
+        <section class="hero">
+          <div class="owl-big">${owlSVG()}</div>
+          <div class="bubble">Losujemy <b>10 zadań</b>! 🎲 Wybierz, co ćwiczymy i do ilu liczymy. Za każdym razem będą inne działania.</div>
+        </section>
+        <h2 class="section-title">1. Co ćwiczymy?</h2>
+        <div class="choices" id="ops">${OPS.map(o => `<button class="choice ${s.op === o.id ? 'on' : ''}" data-op="${o.id}"><span class="big">${o.icon}</span>${o.name}</button>`).join('')}</div>
+        <h2 class="section-title">2. Do ilu?</h2>
+        <div class="choices four" id="ranges">${RANGES.map(r => `<button class="choice ${s.range === r ? 'on' : ''}" data-range="${r}"><span class="big">${r}</span></button>`).join('')}</div>
+        <h2 class="section-title">3. Rodzaj zadań</h2>
+        <div class="choices" style="grid-template-columns:1fr 1fr" id="gaps">
+          <button class="choice ${!s.gaps ? 'on' : ''}" data-gaps="0"><span class="big">= ?</span>Policz wynik</button>
+          <button class="choice ${s.gaps ? 'on' : ''}" data-gaps="1"><span class="big">□</span>Też z okienkiem</button>
+        </div>
+        <div class="best" id="best">${bestTxt()}</div>
+        <button class="btn green" id="go">Losuj 10 zadań 🎲</button>
+        <div class="stats">
+          <span class="stat">🎲 Rundy: ${state.rounds}</span>
+          <span class="stat">🎯 Bez błędu: ${state.perfect}</span>
+          <span class="stat">✅ Dobre odpowiedzi: ${state.correct}</span>
+        </div>`;
+      const sync = () => {
+        screen.querySelectorAll('[data-op]').forEach(b => b.classList.toggle('on', b.dataset.op === s.op));
+        screen.querySelectorAll('[data-range]').forEach(b => b.classList.toggle('on', +b.dataset.range === s.range));
+        screen.querySelectorAll('[data-gaps]').forEach(b => b.classList.toggle('on', !!+b.dataset.gaps === s.gaps));
+        $('#best').innerHTML = bestTxt();
+        save();
+      };
+      screen.querySelectorAll('[data-op]').forEach(b => b.addEventListener('click', () => { s.op = b.dataset.op; sfx.tap(); sync(); }));
+      screen.querySelectorAll('[data-range]').forEach(b => b.addEventListener('click', () => { s.range = +b.dataset.range; sfx.tap(); sync(); }));
+      screen.querySelectorAll('[data-gaps]').forEach(b => b.addEventListener('click', () => { s.gaps = !!+b.dataset.gaps; sfx.tap(); sync(); }));
+      $('#go').addEventListener('click', startRound);
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       RUNDA
+       ===================================================================== */
+    let round = null;
+    function startRound() {
+      const s = { ...state.last };
+      round = { s, tasks: makeTasks(s), pos: 0, results: [] };
+      document.body.classList.add('in-level');
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do wyboru">✕</button>
+            <div class="progress"><div class="progress-fill" id="progFill"></div></div>
+            <div class="level-badge" id="counter"></div>
+          </div>
+          <div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble"></div></div>
+          <div class="task" id="task"></div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', () => {
+        if (round.pos === 0 || confirm('Przerwać losowanie? Wynik się nie zapisze.')) { round = null; renderMenu(); }
+      });
+      window.scrollTo(0, 0);
+      nextTask();
+    }
+
+    function nextTask() {
+      if (round.pos >= round.tasks.length) return finishRound();
+      $('#progFill').style.width = (round.pos / round.tasks.length * 100) + '%';
+      $('#counter').textContent = `${round.pos + 1}/${round.tasks.length}`;
+      const t = round.tasks[round.pos];
+      const ANS = '<span class="ans empty" id="ans">?</span>';
+      const left = t.gap === 'b' ? `${t.a} <span class="x">${sym(t)}</span> ${ANS} = ${t.c}` : `${t.a} <span class="x">${sym(t)}</span> ${t.b} = ${ANS}`;
+      $('#task').innerHTML = `<div class="prompt-card"><div class="eq">${left}</div>${t.gap === 'b' ? `<div class="prompt-sub">Jakiej liczby brakuje w okienku?</div>` : ''}</div>
+        <div class="feedback" id="fb"></div>${padHTML()}`;
+      owlSay(round.pos === 0 ? 'Zaczynamy! Wpisz wynik i naciśnij <b>Sprawdź</b>.' : pick(['Następne!', 'Dawaj dalej!', 'Ile to jest?', 'Twoja kolej!', 'Dasz radę! 💪']));
+      const st = { value: '', attempts: 0, copy: false, locked: false };
+      const ans = $('#ans'), fb = $('#fb'), good = answer(t);
+      kbHandler = {
+        type(ch) { if (!st.locked && st.value.length < 3) st.value = (st.value === '0' ? '' : st.value) + ch; },
+        back() { if (!st.locked) st.value = st.value.slice(0, -1); },
+        enter() { if (!st.locked && st.value) check(); },
+        refresh() { ans.textContent = st.value || '?'; ans.classList.toggle('empty', !st.value); ans.classList.remove('bad'); }
+      };
+      function check() {
+        if (+st.value === good) {
+          st.locked = true; kbHandler = null;
+          ans.classList.add('ok'); sfx.good();
+          if (st.attempts === 0) state.correct++;
+          round.results.push({ t, ok: st.attempts === 0 });
+          owlSay(st.copy ? 'Dobrze! Zapamiętaj to 🧠' : pick(PRAISE), 'happy');
+          setTimeout(() => { round.pos++; nextTask(); }, 1000);
+          return;
+        }
+        st.attempts++; sfx.bad();
+        ans.classList.add('bad'); shakeEl(ans);
+        if (st.attempts === 1) {
+          fb.innerHTML = hintFor(t);
+          owlSay('Prawie! Spróbuj jeszcze raz 💪', 'sad');
+        } else if (!st.copy) {
+          st.copy = true;
+          fb.innerHTML = `<div class="reveal">${full(t)}</div>`;
+          owlSay('Nic nie szkodzi! Popatrz i <b>wpisz</b> – tak zapamiętasz.', 'sad');
+        } else owlSay(`Wpisz: <b>${good}</b>`, 'sad');
+        st.value = '';
+        setTimeout(() => { if (kbHandler && !st.locked) { ans.textContent = '?'; ans.classList.add('empty'); ans.classList.remove('bad'); } }, 600);
+      }
+    }
+
+    function finishRound() {
+      kbHandler = null;
+      const { s, results } = round;
+      const score = results.filter(r => r.ok).length;
+      const stars = score >= 9 ? 3 : score >= 7 ? 2 : 1;
+      const key = settingKey(s);
+      const prevBest = state.best[key];
+      state.best[key] = Math.max(prevBest || 0, score);
+      state.rounds++;
+      if (score === 10) { state.perfect++; state.perfectKeys[`${s.op}-${s.range}`] = true; }
+      bumpStreak(); save();
+      if (window.Odznaki) Odznaki.sprawdz();
+      const record = prevBest != null && score > prevBest;
+      const title = score === 10 ? 'Bez pudła! 🎯' : score >= 8 ? 'Świetnie!' : score >= 5 ? 'Dobra robota!' : 'Udało się!';
+      const msg = score === 10 ? 'Zero błędów! Hoot hoot! 🦉' : 'Na czerwono działania do powtórki – przeczytaj je na głos!';
+      screen.innerHTML = `
+        <section class="result">
+          <div class="owl-big">${owlSVG('happy')}</div>
+          <h2>${title}</h2>
+          <div class="score-big">${score}/10</div>
+          <div class="result-stars">${[0, 1, 2].map(i => `<span class="rs ${i < stars ? 'on' : ''}" style="--d:${0.2 + i * 0.3}s">★</span>`).join('')}</div>
+          <p>${record ? '🏆 Nowy rekord! ' : ''}${msg}</p>
+          <div class="summary">${results.map(r => `<div class="sum-item ${r.ok ? 'ok' : 'bad'}">${r.ok ? '✅' : '❌'} ${full(r.t)}</div>`).join('')}</div>
+          <div class="result-actions">
+            <button class="btn green" id="again">Losuj nowe 10 🎲</button>
+            <button class="btn soft" id="toMenu">Zmień ustawienia ⚙️</button>
+          </div>
+        </section>`;
+      sfx.win();
+      if (score >= 8) confetti();
+      $('#again').addEventListener('click', startRound);
+      $('#toMenu').addEventListener('click', renderMenu);
+      window.scrollTo(0, 0);
+    }
+
+    renderMenu();
+  </script>
+</body>
+</html>

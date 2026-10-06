@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <title>Moje odznaki – klasa 3a</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: light; --ink: #1e1b4b; --muted: #6b7280; --primary: #7c3aed; --primary-dark: #5b21b6; --primary-soft: #ede9fe; --line: #ddd6fe; --gold: #facc15; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif; color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(253, 224, 71, 0.35), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(165, 180, 252, 0.5), transparent 35%),
+        linear-gradient(180deg, #f5f3ff 0%, #e0e7ff 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #app { max-width: 640px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
+    .topbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 1rem; text-decoration: none; color: var(--primary); }
+    .hero { text-align: center; padding: 8px 0 4px; }
+    .trophy { font-size: 4.2rem; line-height: 1; animation: bob 3s ease-in-out infinite; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    h1 { font-size: 1.8rem; margin: 6px 0 2px; }
+    .count { font-weight: 800; color: var(--muted); }
+    .count b { color: var(--primary-dark); font-size: 1.2rem; }
+    .bar { height: 14px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; margin: 10px auto 0; max-width: 360px; }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #fde047, #f59e0b); border-radius: 999px; transition: width 0.8s ease; }
+    h2 { font-size: 1.2rem; font-weight: 900; margin: 24px 0 10px; display: flex; align-items: center; gap: 8px; }
+    h2 .n { margin-left: auto; font-size: 0.9rem; color: var(--muted); font-weight: 800; }
+    h2 img { width: 26px; height: 18px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1); }
+    h2 a { margin-left: auto; font-size: 0.85rem; font-weight: 900; color: var(--primary); text-decoration: none; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    @media (min-width: 520px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    .badge {
+      position: relative; background: #fff; border: 3px solid #e5e7eb; border-radius: 18px;
+      padding: 10px 6px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .badge .ic {
+      width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; font-weight: 900; color: var(--primary-dark);
+      background: #f1f5f9; filter: grayscale(1); opacity: 0.45;
+    }
+    .badge .nm { font-weight: 900; font-size: 0.82rem; line-height: 1.2; }
+    .badge .st { font-size: 1rem; letter-spacing: -1px; color: var(--gold); text-shadow: 0 1px 0 #ca8a04; }
+    .badge .st .off { color: #e5e7eb; text-shadow: none; }
+    .badge .pt { font-size: 0.75rem; font-weight: 800; color: var(--muted); }
+    .badge.got { border-color: var(--gold); background: linear-gradient(180deg, #fffbeb, #fff); box-shadow: 0 4px 0 #fde68a; }
+    .badge.got .ic { filter: none; opacity: 1; background: radial-gradient(circle at 35% 30%, #fff7cc, #fde047); box-shadow: 0 3px 0 #ca8a04; }
+    .master { flex-direction: row; text-align: left; gap: 12px; padding: 10px 14px; margin-bottom: 8px; }
+    .master .ic { width: 60px; height: 60px; font-size: 2rem; flex: none; }
+    .master .nm { font-size: 1.05rem; }
+    .master .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .master .pr { height: 10px; border-radius: 999px; background: #f1f5f9; overflow: hidden; }
+    .master .pr > div { height: 100%; background: linear-gradient(90deg, #fde047, #f59e0b); border-radius: 999px; }
+    .badge.new { animation: pop 0.6s ease both; animation-delay: var(--d); }
+    .badge.new::after {
+      content: 'NOWA!'; position: absolute; top: -10px; right: -6px; background: #ec4899; color: #fff;
+      font-size: 0.65rem; font-weight: 900; padding: 3px 7px; border-radius: 999px; transform: rotate(8deg);
+    }
+    @keyframes pop { 0% { transform: scale(0.6); } 70% { transform: scale(1.08); } 100% { transform: scale(1); } }
+    .note { text-align: center; color: var(--muted); font-weight: 700; font-size: 0.85rem; margin-top: 26px; line-height: 1.4; }
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="topbar"><a class="pill" href="./index.html">← Wróć do klasy 3a</a></div>
+    <section class="hero">
+      <div class="trophy">🏆</div>
+      <h1>Moje odznaki</h1>
+      <div class="count" id="count"></div>
+      <div class="bar"><div id="bar" style="width:0"></div></div>
+    </section>
+    <div id="list"></div>
+    <p class="note">Odznakę dostajesz za <b>3 gwiazdki</b> w poziomie albo <b>10 na 10</b> w losowaniu.<br>Zbierz wszystkie z jednej gry, a dostaniesz odznakę mistrza 🏆.<br>Postępy zapisują się na tym telefonie.</p>
+  </div>
+
+  <script src="./osiagniecia.js"></script>
+  <script>
+    const nowe = Odznaki.sprawdz(true).map(o => o.id);
+    const lista = Odznaki.stan();
+    const ile = lista.filter(o => o.ma).length;
+    document.getElementById('count').innerHTML = `Masz <b>${ile}</b> z ${lista.length} odznak`;
+    requestAnimationFrame(() => { document.getElementById('bar').style.width = (ile / lista.length * 100) + '%'; });
+
+    let d = 0;
+    const nowaCls = o => nowe.includes(o.id) ? `new" style="--d:${d++ * 0.12}s` : '';
+    const ocena = o => o.rodzaj === 'wynik'
+      ? `<div class="pt">${o.ile ? `rekord ${o.ile}/10` : 'jeszcze nie'}</div>`
+      : `<div class="st">${'★'.repeat(o.ile)}<span class="off">${'★'.repeat(3 - o.ile)}</span></div>`;
+    document.getElementById('list').innerHTML = Odznaki.GRY.map(g => {
+      const os = lista.filter(o => o.gra === g);
+      const m = os.find(o => o.rodzaj === 'mistrz'), poz = os.filter(o => o !== m);
+      const tytul = g.flaga ? `<img src="../img/flaga-gb.svg" alt="" /> ${g.grupa}` : g.grupa;
+      return `<h2>${tytul}<a href="./${g.href}">Zagraj →</a></h2>
+        <div class="badge master ${m.ma ? 'got' : ''} ${nowaCls(m)}">
+          <div class="ic">${m.icon}</div>
+          <div class="txt"><div class="nm">${m.name}</div><div class="pt">${m.ma ? 'Wszystkie odznaki z tej gry! 🎉' : `Odznaki: ${m.ile} z ${m.z}`}</div>
+            <div class="pr"><div style="width:${m.ile / m.z * 100}%"></div></div></div>
+        </div>
+        <div class="grid">${poz.map(o => `<div class="badge ${o.ma ? 'got' : ''} ${nowaCls(o)}">
+            <div class="ic">${o.icon}</div><div class="nm">${o.name}</div>${ocena(o)}
+          </div>`).join('')}</div>`;
+    }).join('');
+
+    if (nowe.length) {
+      const colors = ['#7c3aed', '#facc15', '#22c55e', '#ec4899', '#38bdf8', '#f97316'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[i % colors.length];
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+  </script>
+</body>
+</html>

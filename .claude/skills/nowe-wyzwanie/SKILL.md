@@ -87,6 +87,17 @@ Ta sama Sówka, mapa, gwiazdki, nagrody i gry zręcznościowe, ale z **klawiatur
 
 Nowe wyzwania matematyczne (dzielenie, dodawanie z przekroczeniem progu itp.) rób na kopii tego pliku: zmień `LEVELS`, generowanie zadań w `buildTasks`, `facts()`/`distractors()` i podpowiedzi. Błędny wynik → podpowiedź „licz co t” + sztuczka; drugi błąd → pokazuje wynik i każe go wpisać.
 
+Kopie silnika: `3a/matematyka/dzielenie.html` (fakt `{t, k}` = (t·k) : t = k, klucz mastery `"dzielna:dzielnik"`, wprowadzenie „dzielimy po równo na talerze”) oraz prostsze `3a/matematyka/losowanie.html` (wybór działania × / : / oba, zakresu 20/30/50/100 i „z okienkiem”, zawsze 10 losowych zadań, bez mapy).
+
+## Odznaki klasy 3a – `3a/osiagniecia.js` + `3a/osiagniecia.html`
+
+Wspólne dla wszystkich gier z 3a. Użytkownik chce odznak **tylko za maksymalny wynik** (nie za dni z rzędu ani sumy gwiazdek): jedna odznaka za 3 ⭐ w każdym poziomie, w losowaniu za 10/10 dla danego działania i zakresu, plus odznaka mistrza gry za komplet. Liczone z postępów gier w localStorage (`stars`, `perfectKeys`); strona `3a/osiagniecia.html` (karta „Moje odznaki” w `3a/index.html`) pokazuje je pogrupowane według gier, z gwiazdkami przy każdym poziomie. Każda nowa gra w 3a:
+
+1. `<script src="../osiagniecia.js"></script>` przed głównym skryptem.
+2. W pasku górnym pigułka `<a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>`.
+3. W `finishLevel()` po `save()`: `if (window.Odznaki) Odznaki.sprawdz();` – pokazuje dymek „Nowa odznaka!”.
+4. W `osiagniecia.js` dopisz grę do `GRY`: `key` (storageKey), `href`, `mistrz` i `poziomy: [[id, ikona, nazwa], …]` – te same id co w `LEVELS` gry.
+
 ## Wymowa – nagrania lektora, nie syntezator
 
 Użytkownik uznał głos syntezatora (`speechSynthesis`) za słaby („jakby po polsku czytał angielskie słowa”). Dlatego:
