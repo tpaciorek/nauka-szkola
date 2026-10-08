@@ -51,7 +51,7 @@
       key: 'nauka-3a-przyroda-warstwy-lasu-v1', mistrz: ['🏆', 'Znawczyni lasu'],
       poziomy: [['learn', '🌳', 'Poznaj piętra lasu'], ['animals', '🐿️', 'Kto gdzie mieszka?'], ['drop', '🎮', 'Spadające znaleziska'],
         ['plants', '🫐', 'Co tu rośnie?'], ['light', '☀️', 'Światło w lesie'], ['catch', '🧺', 'Leśny koszyk'],
-        ['pick', '🔍', 'Znajdź wszystkie'], ['gives', '🎁', 'Po co nam las?'], ['boss', '👑', 'Wielki sprawdzian']]
+        ['pick', '🔍', 'Znajdź wszystkie'], ['color', '🖍️', 'Pokoloruj tabelkę'], ['gives', '🎁', 'Po co nam las?'], ['leaf', '🍃', 'Liść brzozy'], ['boss', '👑', 'Wielki sprawdzian']]
     }
   ];
   const SEEN_KEY = 'nauka-3a-odznaki-v2';

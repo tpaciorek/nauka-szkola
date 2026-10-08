@@ -53,3 +53,13 @@ Wszystkie zdjęcia pochodzą z Wikimedia Commons (zmniejszone do 480 px). Licenc
 | w-podszyt.jpg | Borealis55 | Public domain | https://commons.wikimedia.org/wiki/File:Understory.JPG |
 | w-runo.jpg | Pit1233 | Public domain | https://commons.wikimedia.org/wiki/File:Rezerwat_Dziki_Ostr%C3%B3w_runo_1.jpg |
 | las.jpg | Tortuosa | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Beechforest062005.jpg |
+| sosna.jpg | Crusier | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Pinus_sylvestris_Beskid_%C5%BBywiecki.JPG |
+| buk.jpg | Agnieszka Kwiecień, Nova | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Fagus_sylvatica_Buk_zwyczajny_2024-05-01_Wle%C5%84_08.jpg |
+| orzel.jpg | Joselodos | CC0 | https://commons.wikimedia.org/wiki/File:Portrait_of_a_golden_eagle.jpg |
+| galezie.jpg | Anne Burgess | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Forest_Floor_-_geograph.org.uk_-_290303.jpg |
+| lisc-brzoza.jpg | T. C. Woodeggs | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Betula_pendula,_Blatt,_-freigestellt-_remixed.png |
+| lisc-dab.jpg | Dmitry Makeev | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Oak._img-002.jpg |
+| lisc-klon.jpg | Dmitry Makeev | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Acer_platanoides._img-014.jpg |
+| lisc-lipa.jpg | Dmitry Makeev | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Tilia_cordata._img-012.jpg |
+| lisc-kasztan.jpg | Mike Pennington | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Horse_Chestnut_(Aesculus_hippocastanum)_leaf,_Halligarth_-_geograph.org.uk_-_1884676.jpg |
+| lisc-buk.jpg | Dominicus Johannes Bergsma | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Blad_van_beuk_(Fagus_sylvatica)_02.JPG |

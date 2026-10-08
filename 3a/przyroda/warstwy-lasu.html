@@ -335,6 +335,29 @@
     .etile.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.7; }
     .found-count { text-align: center; font-weight: 900; color: var(--muted); }
 
+    /* ---------- Pokoloruj tabelkę ---------- */
+    .crayons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .crayon {
+      display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 6px 10px;
+      border-radius: 16px; border: 3px solid var(--line); background: #fff; font-weight: 900; font-size: 1rem; text-align: left;
+    }
+    .crayon i { flex: none; width: 34px; height: 34px; border-radius: 50% 40% 55% 45%; background: var(--cc); box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.15); }
+    .crayon.on { border-color: var(--ink); box-shadow: 0 0 0 3px var(--cc); transform: scale(1.03); }
+    .ctable { display: grid; grid-template-columns: repeat(4, 1fr); border: 3px solid #6b9bd1; border-radius: 12px; overflow: hidden; background: #fff; }
+    @media (max-width: 400px) { .ctable { grid-template-columns: repeat(3, 1fr); } }
+    .cell {
+      position: relative; min-height: 76px; padding: 6px 2px; border: 1px solid #93c5fd; border-radius: 0; background: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      font-size: 0.95rem; font-weight: 900; transition: background 0.2s ease;
+    }
+    .cell img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+    .cell.dark { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+    .cell.wrong::after { content: '✕'; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--bad); color: #fff; font-size: 0.8rem; display: grid; place-items: center; text-shadow: none; }
+    .cell.right::after { content: '✓'; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--good); color: #fff; font-size: 0.8rem; display: grid; place-items: center; text-shadow: none; }
+    .leaf-card { background: #fff; border: 3px solid var(--line); border-radius: 24px; overflow: hidden; }
+    .leaf-card img { display: block; width: 100%; max-height: 300px; object-fit: contain; background: #fff; }
+    .leaf-card .lc-body { padding: 12px 14px; font-weight: 700; line-height: 1.6; font-size: 1.05rem; }
+
     /* ---------- Gry zręcznościowe ---------- */
     .arena {
       position: relative; flex: 1; min-height: 380px; border-radius: 24px; overflow: hidden;
@@ -477,6 +500,7 @@
       { id: 'wilga', name: 'Wilga', l: 'k', kind: 'zw', v: 'mieszka', note: 'Wilga to żółty ptak, który zawiesza gniazdo wysoko w koronie drzewa.' },
       { id: 'zieba', name: 'Zięba', l: 'k', kind: 'zw', v: 'mieszka', note: 'Zięba gnieździ się wysoko, w dziuplach i na gałęziach drzew.' },
       { id: 'kuna', name: 'Kuna', l: 'k', kind: 'zw', v: 'mieszka', note: 'Kuna leśna świetnie wspina się po drzewach i chowa w dziuplach.' },
+      { id: 'orzel', name: 'Orzeł', l: 'k', kind: 'zw', v: 'mieszka', note: 'Orzeł to wielki ptak drapieżny – gniazdo buduje wysoko, na szczytach drzew.' },
 
       { id: 'kos', name: 'Kos', l: 'p', kind: 'zw', v: 'mieszka', note: 'Kos to ptak śpiewający – gniazdo buduje w gęstych krzewach podszytu.' },
       { id: 'sojka', name: 'Sójka', l: 'p', kind: 'zw', v: 'mieszka', note: 'Sójka mieszka wśród krzewów i młodych drzew. Uwielbia żołędzie!' },
@@ -503,6 +527,8 @@
 
       { id: 'zoledzie', name: 'Żołędzie', l: 'k', kind: 'ro', v: 'rosną', note: 'Żołędzie to owoce dębu – rosną wysoko w koronie drzewa.' },
       { id: 'szyszki', name: 'Szyszki', l: 'k', kind: 'ro', v: 'rosną', note: 'Szyszki wiszą na gałęziach świerka, wysoko w koronie.' },
+      { id: 'sosna', name: 'Sosna', l: 'k', kind: 'ro', v: 'rośnie', note: 'Sosna to wysokie drzewo iglaste – jej korona jest wysoko nad lasem.' },
+      { id: 'buk', name: 'Buk', l: 'k', kind: 'ro', v: 'rośnie', note: 'Buk to wysokie drzewo liściaste – jego korona tworzy zielony dach lasu.' },
       { id: 'leszczyna', name: 'Leszczyna', l: 'p', kind: 'ro', v: 'rośnie', note: 'Leszczyna to krzew – rosną na niej orzechy laskowe.' },
       { id: 'jalowiec', name: 'Jałowiec', l: 'p', kind: 'ro', v: 'rośnie', note: 'Jałowiec to kłujący krzew z granatowymi owocami.' },
       { id: 'bez', name: 'Dziki bez', l: 'p', kind: 'ro', v: 'rośnie', note: 'Dziki bez (czarny bez) to krzew z czarnymi owocami.' },
@@ -515,7 +541,8 @@
       { id: 'mech', name: 'Mech', l: 'r', kind: 'ro', v: 'rośnie', note: 'Mech tworzy miękki, zielony dywan w runie.' },
       { id: 'muchomor', name: 'Muchomor', l: 'r', kind: 'ro', v: 'rośnie', note: 'Muchomor rośnie w runie. Uwaga – jest trujący! Nie zrywamy go i nie niszczymy.' },
       { id: 'borowik', name: 'Borowik', l: 'r', kind: 'ro', v: 'rośnie', note: 'Borowik (prawdziwek) to smaczny grzyb z runa leśnego.' },
-      { id: 'liscie', name: 'Opadłe liście', l: 's', kind: 'ro', v: 'leżą', note: 'Opadłe liście tworzą ściółkę – miękki koc na ziemi.' }
+      { id: 'liscie', name: 'Opadłe liście', l: 's', kind: 'ro', v: 'leżą', note: 'Opadłe liście tworzą ściółkę – miękki koc na ziemi.' },
+      { id: 'galezie', name: 'Gałęzie', l: 's', kind: 'ro', v: 'leżą', note: 'Opadłe gałęzie i gałązki leżą na ziemi – są częścią ściółki.' }
     ];
     const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
     const animals = ITEMS.filter(i => i.kind === 'zw');
@@ -559,6 +586,18 @@
         note: 'W lesie jesteśmy gośćmi u zwierząt – zostawiamy go tak czysty i spokojny, jak go zastaliśmy 💚.' }
     ];
 
+    // Zeszyt ćw. 3 s. 39 – pokoloruj pola według kodu (kolory jak w zeszycie!)
+    const COLOR_CODE = { s: '#facc15', r: '#22c55e', p: '#f97316', k: '#7c2d12' };
+    const COLOR_WORDS = ['mech', 'sarna', 'jalowiec', 'sosna', 'dzdzownica', 'wilga', 'paproc', 'mrowka', 'galezie', 'buk', 'orzel', 'muchomor'];
+
+    // Zeszyt ćw. 4 s. 39 – opisz liść brzozy
+    const LEAVES = [['lisc-brzoza', 'brzoza'], ['lisc-dab', 'dąb'], ['lisc-klon', 'klon'], ['lisc-lipa', 'lipa'], ['lisc-kasztan', 'kasztanowiec'], ['lisc-buk', 'buk']];
+    const LEAF_FEATURES = {
+      good: [['🔺', 'Ma kształt trójkąta (trochę jak romb)'], ['🪚', 'Brzeg jest ząbkowany – jak piłka'], ['📍', 'Ma zaostrzony czubek'], ['🧵', 'Ma długi, cienki ogonek'], ['🍂', 'Latem jest zielony, jesienią żółty'], ['✋', 'Jest mały – mieści się na dłoni']],
+      bad: [['⚪', 'Jest okrągły jak moneta'], ['🌊', 'Ma głębokie wcięcia, jak liść dębu'], ['🖐️', 'Składa się z 5–7 listków, jak kasztanowiec'], ['🌵', 'Ma ostre kolce']]
+    };
+    const LEAF_TEXT = 'Liść brzozy jest <b>mały</b>. Ma kształt <b>trójkąta</b> z <b>zaostrzonym czubkiem</b>. Jego brzeg jest <b>ząbkowany</b>, jak ostrze piłki. Liść ma <b>długi, cienki ogonek</b>. Latem jest <b>zielony</b>, a jesienią robi się <b>żółty</b>. Przez środek liścia biegnie żyłka, a od niej odchodzą mniejsze żyłki.';
+
     const LEVELS = [
       { id: 'learn', icon: '🌳', name: 'Poznaj piętra lasu', desc: 'Cztery warstwy lasu', type: 'learn' },
       { id: 'animals', icon: '🐿️', name: 'Kto gdzie mieszka?', desc: 'Zwierzęta na zdjęciach', type: 'photo', pool: () => shuffle(animals).slice(0, 10) },
@@ -567,7 +606,9 @@
       { id: 'light', icon: '☀️', name: 'Światło w lesie', desc: 'Dokończ zdania', type: 'text', pool: () => shuffle(LIGHT_Q).slice(0, 7) },
       { id: 'catch', icon: '🧺', name: 'Leśny koszyk', desc: 'Gra: łap tylko z jednego piętra', type: 'catch', arcade: true },
       { id: 'pick', icon: '🔍', name: 'Znajdź wszystkie', desc: 'Kto mieszka na tym piętrze?', type: 'pick' },
+      { id: 'color', icon: '🖍️', name: 'Pokoloruj tabelkę', desc: 'Kolorowanie według kodu (zeszyt s. 39)', type: 'color' },
       { id: 'gives', icon: '🎁', name: 'Po co nam las?', desc: 'Co las daje ludziom i zwierzętom', type: 'gives' },
+      { id: 'leaf', icon: '🍃', name: 'Liść brzozy', desc: 'Rozpoznaj i opisz liść', type: 'leaf' },
       { id: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Wszystko o lesie', type: 'photo', boss: true }
     ];
 
@@ -621,7 +662,17 @@
       "w-korony":["John Robert McPherson","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Tall_open_forest_canopy_from_below_Mt_Glorious_01.jpg"],
       "w-podszyt":["Borealis55","Public domain","https://commons.wikimedia.org/wiki/File:Understory.JPG"],
       "w-runo":["Pit1233","Public domain","https://commons.wikimedia.org/wiki/File:Rezerwat_Dziki_Ostr%C3%B3w_runo_1.jpg"],
-      "las":["Tortuosa","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Beechforest062005.jpg"]
+      "las":["Tortuosa","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Beechforest062005.jpg"],
+      "sosna":["Crusier","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Pinus_sylvestris_Beskid_%C5%BBywiecki.JPG"],
+      "buk":["Agnieszka Kwiecień, Nova","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Fagus_sylvatica_Buk_zwyczajny_2024-05-01_Wle%C5%84_08.jpg"],
+      "orzel":["Joselodos","CC0","https://commons.wikimedia.org/wiki/File:Portrait_of_a_golden_eagle.jpg"],
+      "galezie":["Anne Burgess","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Forest_Floor_-_geograph.org.uk_-_290303.jpg"],
+      "lisc-brzoza":["T. C. Woodeggs","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Betula_pendula,_Blatt,_-freigestellt-_remixed.png"],
+      "lisc-dab":["Dmitry Makeev","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Oak._img-002.jpg"],
+      "lisc-klon":["Dmitry Makeev","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Acer_platanoides._img-014.jpg"],
+      "lisc-lipa":["Dmitry Makeev","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Tilia_cordata._img-012.jpg"],
+      "lisc-kasztan":["Mike Pennington","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Horse_Chestnut_(Aesculus_hippocastanum)_leaf,_Halligarth_-_geograph.org.uk_-_1884676.jpg"],
+      "lisc-buk":["Dominicus Johannes Bergsma","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Blad_van_beuk_(Fagus_sylvatica)_02.JPG"]
     };
 
     const MAX_STARS = LEVELS.length * 3;
@@ -885,7 +936,7 @@
       const lvl = LEVELS[idx];
       session = { idx, lvl, mistakes: 0, total: 0, solved: 0, queue: [] };
       document.body.classList.add('in-level');
-      ({ learn: startLearn, photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, gives: startGives })[lvl.type]();
+      ({ learn: startLearn, photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, gives: startGives, color: startColor, leaf: startLeaf })[lvl.type]();
     }
 
     function shell(bubble, opts = {}) {
@@ -1350,6 +1401,140 @@
         window.scrollTo(0, 0);
       };
       render();
+    }
+
+    /* =====================================================================
+       🖍️ POKOLORUJ TABELKĘ – wybierz kredkę i koloruj pola według kodu
+       (zeszyt ćw. 3: ściółka żółta, runo zielone, podszyt pomarańczowy,
+       korony drzew brązowe). „Sprawdź” pokazuje źle pokolorowane pola.
+       ===================================================================== */
+    function startColor() {
+      const order = ['s', 'r', 'p', 'k'];   // kolejność legendy jak w zeszycie
+      const paint = {};
+      let crayon = null, checks = 0;
+      session.total = COLOR_WORDS.length;
+      shell('Wybierz kredkę 🖍️, a potem dotykaj pól. Kolory są takie jak w zeszycie!');
+      setProgress(0);
+      const task = $('#task');
+      task.innerHTML = `
+        <div class="crayons">${order.map(l => `<button class="crayon" data-l="${l}" style="--cc:${COLOR_CODE[l]}"><i></i>${LAYERS[l].short}</button>`).join('')}</div>
+        <div class="ctable">${COLOR_WORDS.map(id => `<button class="cell" data-id="${id}"><img src="${src(id)}" alt="" />${lowerFirst(ITEM[id].name)}</button>`).join('')}</div>
+        <button class="btn" id="checkBtn">✅ Sprawdź</button>
+        <div id="feedbackWrap"></div>`;
+      task.querySelectorAll('.crayon').forEach(b => b.addEventListener('click', () => {
+        crayon = b.dataset.l; sfx.tap();
+        task.querySelectorAll('.crayon').forEach(x => x.classList.toggle('on', x === b));
+        owlSay(`Kredka: <b>${LAYERS[crayon].short}</b>. Dotknij wszystkiego, co ${crayon === 's' ? 'leży w ściółce' : 'jest ' + IN_LAYER[crayon]}.`);
+      }));
+      task.querySelectorAll('.cell').forEach(c => c.addEventListener('click', () => {
+        if (!crayon) { owlSay('Najpierw wybierz kredkę u góry 🖍️', 'sad'); return; }
+        const id = c.dataset.id;
+        paint[id] = paint[id] === crayon ? null : crayon;   // drugie dotknięcie tym samym kolorem – zmazuje
+        c.style.background = paint[id] ? COLOR_CODE[paint[id]] : '#fff';
+        c.classList.toggle('dark', paint[id] === 'k' || paint[id] === 'r' || paint[id] === 'p');
+        c.classList.remove('wrong', 'right');
+        sfx.tap();
+        setProgress(Object.values(paint).filter(Boolean).length / COLOR_WORDS.length);
+      }));
+      $('#checkBtn').addEventListener('click', () => {
+        const empty = COLOR_WORDS.filter(id => !paint[id]);
+        if (empty.length) { owlSay(`Zostało jeszcze ${empty.length} ${empty.length === 1 ? 'puste pole' : empty.length < 5 ? 'puste pola' : 'pustych pól'} – pokoloruj wszystkie 🖍️`, 'sad'); return; }
+        checks++;
+        const wrong = COLOR_WORDS.filter(id => paint[id] !== ITEM[id].l);
+        task.querySelectorAll('.cell').forEach(c => c.classList.toggle('wrong', wrong.includes(c.dataset.id)));
+        if (!wrong.length) {
+          task.querySelectorAll('.cell').forEach(c => { c.classList.add('right'); markFound(c.dataset.id); });
+          save(); sfx.win();
+          owlSay('Cała tabelka pokolorowana dobrze! 🎉 Teraz możesz tak samo pokolorować ją w zeszycie.', 'happy');
+          $('#checkBtn').remove();
+          $('#feedbackWrap').innerHTML = `<button class="btn" id="doneBtn">Zobacz wynik →</button>`;
+          $('#doneBtn').addEventListener('click', () => finishLevel(starsFor(session.mistakes, session.total),
+            checks === 1 ? 'Za pierwszym razem bez błędu – brawo!' : `Poprawiono ${session.mistakes} ${session.mistakes === 1 ? 'pole' : session.mistakes < 5 ? 'pola' : 'pól'}. Teraz wszystko się zgadza!`));
+          later(() => $('#doneBtn')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+        } else {
+          session.mistakes += wrong.length; sfx.bad();
+          const w = ITEM[wrong[0]];
+          owlSay(`Prawie! ${wrong.length === 1 ? 'Jedno pole jest' : wrong.length < 5 ? `${wrong.length} pola są` : `${wrong.length} pól jest`} ✕ źle. Podpowiedź: ${lowerFirst(w.name)} ${w.v} ${IN_LAYER[w.l]}. Popraw i sprawdź jeszcze raz!`, 'sad');
+        }
+      });
+    }
+
+    /* =====================================================================
+       🍃 LIŚĆ BRZOZY – rozpoznaj liść, wybierz cechy, przeczytaj wzór opisu
+       ===================================================================== */
+    function startLeaf() {
+      session.total = 1 + LEAF_FEATURES.good.length;
+      shell('');
+      const task = $('#task');
+      // krok 1: który to liść brzozy?
+      const leaves = shuffle(LEAVES);
+      let done = false;
+      setProgress(0);
+      task.innerHTML = `
+        <div class="q-card"><div class="q-num">Krok 1 z 3</div><div class="q-text">Który liść to <b>liść brzozy</b>? 🍃</div></div>
+        <div class="grid3">${leaves.map(([id]) => `<button class="tile" data-id="${id}"><img src="${src(id)}" alt="" style="object-fit:contain;background:#fff" /><span>?</span></button>`).join('')}</div>
+        <div id="feedbackWrap"></div>`;
+      owlSay('Przyjrzyj się kształtom i brzegom liści 🔍');
+      task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
+        if (done || b.classList.contains('bad')) return;
+        const name = LEAVES.find(l => l[0] === b.dataset.id)[1];
+        b.querySelector('span').textContent = name;
+        if (b.dataset.id === 'lisc-brzoza') {
+          done = true; b.classList.add('ok'); sfx.good();
+          owlSay(pick(PRAISE) + ' To liść brzozy – trójkątny i ząbkowany!', 'happy');
+          $('#feedbackWrap').innerHTML = `<button class="btn" id="nextS">Dalej →</button>`;
+          $('#nextS').addEventListener('click', step2);
+          later(() => $('#nextS')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+        } else {
+          b.classList.add('bad'); session.mistakes++; sfx.bad();
+          owlSay(`To liść: <b>${name}</b>. Liść brzozy jest mały, trójkątny i ma ząbki na brzegu. Szukaj dalej!`, 'sad');
+        }
+      }));
+
+      // krok 2: jaki jest liść brzozy?
+      function step2() {
+        setProgress(1 / 3);
+        const tiles = shuffle([...LEAF_FEATURES.good.map(g => [...g, true]), ...LEAF_FEATURES.bad.map(b => [...b, false])]);
+        let got = 0, fin = false;
+        task.innerHTML = `
+          <div class="leaf-card"><img src="${src('lisc-brzoza')}" alt="Liście brzozy" style="max-height:200px" /><div class="credit">${credit('lisc-brzoza')}</div></div>
+          <div class="q-card"><div class="q-num">Krok 2 z 3</div><div class="q-text">Jaki jest liść brzozy? Dotknij <b>wszystkich</b> pasujących opisów.</div></div>
+          <div class="grid2">${tiles.map((t, i) => `<button class="etile" data-i="${i}"><b>${t[0]}</b>${t[1]}</button>`).join('')}</div>
+          <div class="found-count" id="cnt">Znaleziono: 0 z ${LEAF_FEATURES.good.length}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay('Patrz na zdjęcie i wybieraj 👀');
+        window.scrollTo(0, 0);
+        task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
+          if (fin || b.classList.contains('ok') || b.classList.contains('bad')) return;
+          const t = tiles[+b.dataset.i];
+          if (t[2]) {
+            b.classList.add('ok'); got++; sfx.good();
+            $('#cnt').textContent = `Znaleziono: ${got} z ${LEAF_FEATURES.good.length}`;
+            if (got === LEAF_FEATURES.good.length) {
+              fin = true; owlSay(pick(PRAISE), 'happy');
+              $('#feedbackWrap').innerHTML = `<button class="btn" id="nextS">Dalej: wzór opisu →</button>`;
+              $('#nextS').addEventListener('click', step3);
+              later(() => $('#nextS')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            } else owlSay('Tak! ✅ Co jeszcze pasuje?', 'happy');
+          } else {
+            b.classList.add('bad'); session.mistakes++; sfx.bad();
+            owlSay('To nie pasuje do liścia brzozy 🙂 Szukaj dalej!', 'sad');
+          }
+        }));
+      }
+
+      // krok 3: wzór opisu do przepisania do zeszytu
+      function step3() {
+        setProgress(2 / 3);
+        task.innerHTML = `
+          <div class="q-card"><div class="q-num">Krok 3 z 3</div><div class="q-text">Tak można opisać liść brzozy ✏️</div></div>
+          <div class="leaf-card"><div class="lc-body">${LEAF_TEXT}</div></div>
+          <div class="note">💡 W zeszycie napisz opis swoimi słowami. Pomogą Ci pytania: <b>Jaki jest duży? Jaki ma kształt? Jaki ma brzeg? Jaki ma kolor? Czy ma ogonek?</b></div>
+          <button class="btn" id="doneBtn">Zobacz wynik →</button>`;
+        owlSay('Przeczytaj opis na głos – potem łatwiej napiszesz swój w zeszycie!', 'happy');
+        $('#doneBtn').addEventListener('click', () => finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Znasz już liść brzozy! 🍃`));
+        window.scrollTo(0, 0);
+      }
     }
 
     /* =====================================================================
