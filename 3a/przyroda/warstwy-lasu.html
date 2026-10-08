@@ -70,7 +70,7 @@
     .pill.back { color: var(--primary-dark); }
     .topbar .spacer { flex: 1; }
     .topbar .pill { white-space: nowrap; }
-    @media (max-width: 420px) { .topbar { gap: 6px; padding: 10px 10px; } .topbar .pill { padding: 8px 10px; } }
+    @media (max-width: 420px) { .topbar { gap: 4px; padding: 10px 8px; } .topbar .pill { padding: 6px 8px; font-size: 0.92rem; min-height: 40px; gap: 4px; } }
     body.in-level .topbar { display: none; }
 
     main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
@@ -335,6 +335,32 @@
     .etile.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.7; }
     .found-count { text-align: center; font-weight: 900; color: var(--muted); }
 
+    /* ---------- Czytanie i teoria ---------- */
+    .say-mini {
+      flex: none; width: 42px; height: 42px; border-radius: 50%; align-self: center;
+      border: 2px solid var(--line); background: #fff; font-size: 1.15rem; display: grid; place-items: center; padding: 0;
+    }
+    .say-mini.on, .btn.on { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 50% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0.12); } }
+    .q-card { position: relative; }
+    .q-card .say-mini { position: absolute; top: 8px; right: 8px; width: 38px; height: 38px; font-size: 1rem; }
+    .theory { display: flex; flex-direction: column; gap: 10px; }
+    .th-title { margin: 0; font-size: 1.35rem; font-weight: 900; }
+    .th-p { margin: 0; font-weight: 700; line-height: 1.55; font-size: 1.04rem; color: #1f2937; }
+    .th-row { background: #fff; border-radius: 18px; border: 2px solid var(--line); border-left: 8px solid var(--lc, var(--primary)); padding: 10px 12px; }
+    .th-row h3 { margin: 0 0 4px; font-size: 1.05rem; display: flex; align-items: center; gap: 6px; }
+    .th-row p { margin: 0; font-weight: 700; line-height: 1.5; color: #334155; }
+    .th-row .chips { margin-top: 8px; }
+    .th-tip { background: #fef9c3; border: 2px solid #fde68a; border-radius: 18px; padding: 10px 12px; font-weight: 800; line-height: 1.5; }
+    .th-img { width: 100%; max-height: 220px; object-fit: contain; background: #fff; border-radius: 18px; border: 2px solid var(--line); display: block; }
+    .theory-actions { padding: 14px 0 calc(16px + env(safe-area-inset-bottom)); }
+    .modal { position: fixed; inset: 0; z-index: 60; background: rgba(20, 50, 31, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+    .modal-card {
+      width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: #f0fdf4;
+      border-radius: 26px 26px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
     /* ---------- Pokoloruj tabelkę ---------- */
     .crayons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .crayon {
@@ -455,6 +481,7 @@
       <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
       <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
       <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
+      <button class="pill" id="readBtn" aria-label="Włącz lub wyłącz czytanie na głos">🗣️</button>
       <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
     </header>
     <main id="screen"></main>
@@ -612,6 +639,54 @@
       { id: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Wszystko o lesie', type: 'photo', boss: true }
     ];
 
+    /* ---------- Teoria „Przypomnij sobie” przed zadaniami ----------
+       Najpierw opowiadamy i przypominamy, potem wymagamy. Klucz = id poziomu.
+       Gry zręcznościowe i sprawdzian nie mają teorii (jest przycisk 📖 w innych). */
+    const thChips = ids => `<div class="chips no-read">${ids.map(id => `<div class="chip-ph"><img src="${src(id)}" alt="" loading="lazy" /><span>${ITEM[id].name}</span></div>`).join('')}</div>`;
+    const thRow = (l, text, ids) => `<div class="th-row" style="${lc(l)}"><h3>${LAYERS[l].icon} ${LAYERS[l].name}</h3><p>${text}</p>${ids ? thChips(ids) : ''}</div>`;
+    const THEORY = {
+      animals: () => ({ title: 'Kto gdzie mieszka?', html: `
+        <p class="th-p">Każde zwierzę w lesie ma swoje ulubione piętro. Tam znajduje dom, kryjówkę i jedzenie.</p>
+        ${thRow('k', 'Wysoko, w koronach drzew, mieszkają ptaki, które mają gniazda na gałęziach albo w dziuplach: puszczyk, dzięcioł, sikora, szpak, wilga i zięba. Gniazda mają tu też wielkie ptaki drapieżne – bielik, jastrząb i orzeł. Po gałęziach skaczą wiewiórka i kuna.', ['puszczyk', 'dzieciol', 'sikora', 'bielik', 'wiewiorka', 'kuna'])}
+        ${thRow('p', 'W podszycie, wśród krzaków i młodych drzewek, chowają się duże ssaki: sarna, jeleń, dzik, wilk, zając i lis. W gałęziach krzewów gniazda mają kos, sójka, gil i dzwoniec. Pająki rozpinają tu sieci.', ['sarna', 'jelen', 'dzik', 'lis', 'kos', 'gil'])}
+        ${thRow('r', 'W runie, nisko przy ziemi, wśród mchów i paproci, mieszkają jeż, mysz, żaba i ślimak. Gniazda na ziemi mają słowik i rudzik.', ['jez', 'mysz', 'zaba', 'slimak', 'rudzik'])}
+        ${thRow('s', 'W ściółce, pod opadłymi liśćmi, żyją małe stworzonka: dżdżownica, mrówka i żuk. To leśni sprzątacze!', ['dzdzownica', 'mrowka', 'zuk'])}
+        <div class="th-tip">🦉 Sztuczka Sówki: lata wysoko albo mieszka w dziupli? – <b>korony drzew</b>. Duży ssak albo ptak w krzakach? – <b>podszyt</b>. Małe zwierzątko przy samej ziemi? – <b>runo</b>. Chowa się pod liśćmi? – <b>ściółka</b>.</div>` }),
+      plants: () => ({ title: 'Co gdzie rośnie?', html: `
+        <p class="th-p">Rośliny w lesie też mają swoje piętra – od najwyższych drzew aż po liście leżące na ziemi.</p>
+        ${thRow('k', 'Korony drzew to gałęzie i liście wysokich drzew: sosny, buka, dębu i świerka. Wysoko na drzewach rosną też ich owoce – żołędzie dębu i szyszki świerka.', ['sosna', 'buk', 'zoledzie', 'szyszki'])}
+        ${thRow('p', 'Podszyt to krzewy i młode drzewka: leszczyna z orzechami laskowymi, kłujący jałowiec, dziki bez, malina, jeżyna i jarzębina z czerwonymi owocami.', ['leszczyna', 'jalowiec', 'malina', 'jezyna', 'jarzebina'])}
+        ${thRow('r', 'Runo to niziutkie rośliny i grzyby: mech, paproć, borówka (czarna jagoda), wrzos, smaczny borowik i trujący muchomor.', ['mech', 'paproc', 'borowka', 'wrzos', 'muchomor'])}
+        ${thRow('s', 'Ściółka to wszystko, co spadło na ziemię: opadłe liście, gałęzie, kawałki kory i nasiona.', ['liscie', 'galezie'])}
+        <div class="th-tip">🦉 Sztuczka Sówki: wysokie drzewo albo coś, co wisi wysoko na drzewie? – <b>korony</b>. Krzak, często z owocami? – <b>podszyt</b>. Malutkie przy ziemi albo grzyb? – <b>runo</b>. Leży na ziemi, bo spadło? – <b>ściółka</b>.</div>` }),
+      light: () => ({ title: 'Światło w lesie', html: `
+        ${towerHTML()}
+        <p class="th-p">Słońce świeci z góry. Najpierw jego światło łapią <b>korony drzew</b> – dlatego tam jest najjaśniej. Część światła przechodzi niżej, do <b>podszytu</b>. Do <b>runa leśnego</b> dociera już niewiele, a do <b>ściółki</b> – najmniej.</p>
+        <p class="th-p">Dlatego w runie rosną rośliny, które lubią <b>cień i wilgoć</b>: mchy, paprocie i grzyby.</p>
+        <p class="th-p">Wiosną drzewa nie mają jeszcze liści. Słońce dochodzi wtedy aż do ziemi i w runie zakwita mnóstwo kwiatów.</p>
+        <div class="th-tip">🦉 Zapamiętaj: <b>podszyt</b> to młode drzewa i krzewy, a <b>ściółka</b> to opadłe liście, gałązki, kora i nasiona. W koronach drzew schronienie mają ptaki i wiewiórki.</div>` }),
+      pick: () => ({ title: 'Mieszkańcy pięter lasu', html: `
+        <p class="th-p">W tym zadaniu szukasz wszystkiego z jednego piętra – i zwierząt, i roślin. Przypomnij sobie:</p>
+        ${thRow('k', 'ptaki z dziupli i wielkie ptaki drapieżne, wiewiórka i kuna, wysokie drzewa, żołędzie i szyszki.', ['wiewiorka', 'dzieciol', 'szyszki', 'zoledzie'])}
+        ${thRow('p', 'duże ssaki (sarna, jeleń, dzik, wilk, zając, lis), ptaki z krzaków, krzewy z owocami.', ['sarna', 'dzik', 'malina', 'leszczyna'])}
+        ${thRow('r', 'jeż, mysz, żaba, ślimak, słowik, rudzik, mchy, paprocie, jagody, wrzos i grzyby.', ['jez', 'zaba', 'mech', 'borowik'])}
+        ${thRow('s', 'dżdżownica, mrówka, żuk, opadłe liście i gałęzie.', ['dzdzownica', 'mrowka', 'liscie'])}` }),
+      color: () => ({ title: 'Kolorowanie według kodu', html: `
+        <p class="th-p">To zadanie jest takie samo jak ćwiczenie 3 w zeszycie. <b>Uwaga!</b> Kolory są tu takie jak w zeszycie, a nie jak w innych zadaniach w grze:</p>
+        <div class="crayons no-read">${['s', 'r', 'p', 'k'].map(l => `<div class="crayon" style="--cc:${COLOR_CODE[l]}"><i></i>${LAYERS[l].short}</div>`).join('')}</div>
+        <p class="th-p">Ściółka – <b>żółty</b>. Runo leśne – <b>zielony</b>. Podszyt – <b>pomarańczowy</b>. Korony drzew – <b>brązowy</b>.</p>
+        <div class="th-tip">🦉 Jak kolorować: najpierw dotknij kredki, potem pól z nazwami. Pomyłka? Dotknij pola jeszcze raz tą samą kredką – kolor zniknie. Pamiętaj: sosna i buk to wysokie drzewa, jałowiec to krzew, a gałęzie leżą na ziemi.</div>` }),
+      gives: () => ({ title: 'Po co nam las?', html: `
+        <div class="th-row"><h3>🧒 Las i ludzie</h3><p>Drzewa wytwarzają <b>tlen</b> i oczyszczają powietrze – dlatego las nazywamy „zielonymi płucami”. Las daje <b>drewno</b> na domy, meble i papier, a także jagody, maliny, grzyby i zioła na lekarstwa. W lesie można odpocząć i pospacerować.</p></div>
+        <div class="th-row"><h3>🦔 Las i zwierzęta</h3><p>Las to <b>dom i spiżarnia</b> zwierząt. Mają tu kryjówki, miejsca na gniazda i dziuple oraz jedzenie: żołędzie, orzechy, owoce i nasiona. Zimą jeż śpi pod ciepłymi liśćmi.</p></div>
+        <div class="th-row"><h3>💚 Jak dbamy o las?</h3><p>W lesie jesteśmy gośćmi. Nie hałasujemy i nie śmiecimy. Nie niszczymy roślin ani grzybów – nawet trujących. Nie dotykamy gniazd. Chodzimy po ścieżkach i nigdy nie rozpalamy ognia.</p></div>` }),
+      leaf: () => ({ title: 'Jak opisać liść?', html: `
+        <img class="th-img" src="${src('lisc-brzoza')}" alt="Gałązka brzozy z liśćmi" />
+        <p class="th-p">Żeby opisać liść, odpowiedz po kolei na pytania: <b>Jaki jest duży?</b> <b>Jaki ma kształt</b> – okrągły, owalny, trójkątny? <b>Jaki ma brzeg</b> – gładki, ząbkowany, z wcięciami? <b>Jaki ma kolor?</b> <b>Czy ma ogonek</b> – długi czy krótki?</p>
+        <p class="th-p">Liść brzozy jest mały i <b>trójkątny</b>, ma zaostrzony czubek, <b>ząbkowany brzeg</b> i długi ogonek. Latem jest zielony, jesienią żółty.</p>
+        <div class="th-tip">🦉 Inne liście: dąb ma liście z falistymi wcięciami, klon – z ostrymi „palcami”, lipa – w kształcie serca, a kasztanowiec – złożony z 5–7 listków.</div>` })
+    };
+
     // autorzy zdjęć: [autor, licencja, strona pliku]
     const CREDITS = {
       "puszczyk":["Martin Mecnarowski","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Strix_aluco_3_(Martin_Mecnarowski).jpg"],
@@ -688,7 +763,7 @@
     const screen = $('#screen');
 
     /* ---------- Stan i zapis ---------- */
-    function defaultState() { return { stars: {}, found: {}, best: {}, streak: { last: null, count: 0 }, sfx: true }; }
+    function defaultState() { return { stars: {}, found: {}, best: {}, streak: { last: null, count: 0 }, sfx: true, read: true }; }
     function loadState() {
       try {
         const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
@@ -746,6 +821,54 @@
       win: () => tone([523, 659, 784, 1047], 0.12),
       lose: () => tone([392, 330, 262], 0.16, 'triangle')
     };
+
+    /* ---------- Czytanie na głos (polski głos przeglądarki) ----------
+       Przyciski 🔊 czytają dymek Sówki, pytanie i teorię. Gdy w pasku jest
+       włączone 🗣️, Sówka sama czyta teorię, pytania i podpowiedzi po błędzie. */
+    let plVoice = null, sayBtn = null;
+    function pickVoice() {
+      if (!window.speechSynthesis) return;
+      const pl = speechSynthesis.getVoices().filter(v => /^pl/i.test(v.lang));
+      plVoice = pl.find(v => /Google|Natural|Online|Neural|Siri|Zosia|Ewa/i.test(v.name)) || pl.find(v => /Paulina|Zofia|Marek/i.test(v.name)) || pl[0] || null;
+    }
+    if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+    function plain(html) {
+      const d = document.createElement('div');
+      d.innerHTML = String(html).replace(/___/g, ' … ');
+      d.querySelectorAll('.no-read, .credit, .say-mini, .letter, .sun').forEach(e => e.remove());
+      d.querySelectorAll('small').forEach(e => e.prepend(', '));
+      d.querySelectorAll('.blank:not(.filled)').forEach(e => { e.textContent = ' … '; });
+      d.querySelectorAll('h2, h3, p, li, .th-tip, .quiz-opt, .tower-floor, small').forEach(e => e.append(/[.!?:…]\s*$/.test(e.textContent) ? ' ' : '. '));
+      return d.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\uFE0F\u200D]/gu, ' ')
+        .replace(/→|←|↓|↑|✕|✓/g, ' ').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
+    }
+    function markSaying(btn) {
+      if (sayBtn) sayBtn.classList.remove('on');
+      sayBtn = btn || null;
+      if (sayBtn) sayBtn.classList.add('on');
+    }
+    function stopSpeak() { try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    function speak(text, btn) {
+      if (!window.speechSynthesis || !text) return;
+      stopSpeak();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
+      u.rate = 0.92; u.pitch = 1.1;
+      u.onend = u.onerror = () => { if (sayBtn === btn) markSaying(null); };
+      markSaying(btn);
+      try { speechSynthesis.speak(u); } catch (e) {}
+    }
+    const autoSay = html => { if (state.read) speak(plain(html)); };
+    // przycisk 🔊: data-say = selektor elementu do przeczytania (data-extra – drugi element); drugie dotknięcie zatrzymuje
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-say]');
+      if (!b) return;
+      if (sayBtn === b) { stopSpeak(); return; }
+      const el = document.querySelector(b.dataset.say);
+      const ex = b.dataset.extra ? document.querySelector(b.dataset.extra) : null;
+      if (el) speak(plain(el.innerHTML + (ex ? '. ' + ex.innerHTML : '')), b);
+    });
+    const sayMini = (sel, extra) => `<button class="say-mini" data-say="${sel}" ${extra ? `data-extra="${extra}"` : ''} aria-label="Przeczytaj na głos">🔊</button>`;
 
     /* ---------- Sówka Lulu (leśna, brązowa) ---------- */
     function owlSVG(mood) {
@@ -819,7 +942,13 @@
       $('#starCount').textContent = totalStars();
       $('#streakCount').textContent = currentStreak();
       $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+      $('#readBtn').textContent = state.read ? '🗣️' : '🤐';
+      $('#readBtn').title = state.read ? 'Sówka czyta na głos' : 'Czytanie wyłączone';
     }
+    $('#readBtn').addEventListener('click', () => {
+      state.read = !state.read; save(); updateTopbar();
+      if (state.read) speak('Hu hu! Będę czytać na głos.'); else stopSpeak();
+    });
     $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
 
     /* ---------- Pętla gier zręcznościowych ---------- */
@@ -844,7 +973,7 @@
        MAPA
        ===================================================================== */
     function renderMap() {
-      stopGame();
+      stopGame(); stopSpeak();
       document.body.classList.remove('in-level');
       updateTopbar();
       const tot = totalStars();
@@ -931,12 +1060,47 @@
        ===================================================================== */
     let session = null;
 
-    function startLevel(idx) {
-      stopGame();
+    function startLevel(idx, skipTheory) {
+      stopGame(); stopSpeak();
       const lvl = LEVELS[idx];
       session = { idx, lvl, mistakes: 0, total: 0, solved: 0, queue: [] };
       document.body.classList.add('in-level');
-      ({ learn: startLearn, photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, gives: startGives, color: startColor, leaf: startLeaf })[lvl.type]();
+      const run = () => { stopSpeak(); ({ learn: startLearn, photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, gives: startGives, color: startColor, leaf: startLeaf })[lvl.type](); };
+      if (THEORY[lvl.id] && !skipTheory) renderTheory(run); else run();
+    }
+
+    /* ---------- „Przypomnij sobie” – teoria przed zadaniami ---------- */
+    function renderTheory(run) {
+      const th = THEORY[session.lvl.id]();
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <span style="flex:1"></span>
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          <div class="guide"><div class="owl-mini" id="owl">${owlSVG('happy')}</div><div class="bubble" id="bubble">Zanim zaczniemy zadania – przypomnijmy sobie najważniejsze rzeczy! 📖</div></div>
+          <div class="theory" id="theory"><h2 class="th-title">📖 ${th.title}</h2>${th.html}</div>
+          <div class="theory-actions">
+            <button class="btn soft" id="readTh" data-say="#theory">🔊 Przeczytaj mi</button>
+            <button class="btn" id="goTh">Rozumiem – zaczynamy! →</button>
+          </div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', renderMap);
+      $('#goTh').addEventListener('click', run);
+      window.scrollTo(0, 0);
+      if (state.read) speak(plain($('#theory').innerHTML), $('#readTh'));
+    }
+    function openTheory() {
+      const th = THEORY[session.lvl.id]();
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = `<div class="modal-card"><div class="theory" id="theoryM"><h2 class="th-title">📖 ${th.title}</h2>${th.html}</div>
+        <div class="theory-actions"><button class="btn soft" data-say="#theoryM">🔊 Przeczytaj mi</button><button class="btn" id="closeTh">Wracam do zadania →</button></div></div>`;
+      document.body.appendChild(m);
+      const close = () => { stopSpeak(); m.remove(); };
+      m.querySelector('#closeTh').addEventListener('click', close);
+      m.addEventListener('click', e => { if (e.target === m) close(); });
     }
 
     function shell(bubble, opts = {}) {
@@ -945,14 +1109,16 @@
           <div class="level-top">
             <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
             ${opts.hearts ? `<div class="hearts" id="hearts"></div><span class="spacer" style="flex:1"></span>` : '<div class="progress"><div class="progress-fill" id="progFill"></div></div>'}
+            ${THEORY[session.lvl.id] ? '<button class="icon-btn" id="thBtn" aria-label="Przypomnij sobie teorię" title="Przypomnij sobie">📖</button>' : ''}
             <div class="level-badge">${session.lvl.icon}</div>
           </div>
-          ${opts.noGuide ? '' : `<div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">${bubble}</div></div>`}
+          ${opts.noGuide ? '' : `<div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">${bubble}</div>${sayMini('#bubble')}</div>`}
           <div class="task" id="task"></div>
         </section>`;
       $('#quitBtn').addEventListener('click', () => {
         if (opts.hearts || confirm('Przerwać zadanie? Gwiazdki dostaniesz, gdy dojdziesz do końca.')) renderMap();
       });
+      if ($('#thBtn')) $('#thBtn').addEventListener('click', openTheory);
       window.scrollTo(0, 0);
     }
     function setProgress(frac) { const p = $('#progFill'); if (p) p.style.width = Math.round(frac * 100) + '%'; }
@@ -991,7 +1157,7 @@
           </div>
         </section>`;
       $('#toMapBtn').addEventListener('click', renderMap);
-      $('#againBtn').addEventListener('click', () => startLevel(session.idx));
+      $('#againBtn').addEventListener('click', () => startLevel(session.idx, true));
       if (nextIdx > 0) $('#nextBtn').addEventListener('click', () => startLevel(nextIdx));
       sfx.win();
       if (stars >= 2) confetti();
@@ -1019,6 +1185,7 @@
         if (page === 0) {
           owlSay('Las ma <b>4 piętra</b>, jak wysoki dom 🏠. Słoneczka ☀️ pokazują, ile światła dociera na każde piętro.');
           task.innerHTML = `${towerHTML()}<button class="btn" id="nextP">Poznaj każde piętro →</button>`;
+          autoSay('Las ma 4 piętra, jak wysoki dom. Na samej górze są korony drzew, niżej podszyt, potem runo leśne, a na samym dole ściółka. Słoneczka pokazują, ile światła dociera na każde piętro.');
         } else {
           const L = LAYERS[LAYER_ORDER[page - 1]];
           const zw = animals.filter(i => i.l === L.id), ro = plants.filter(i => i.l === L.id);
@@ -1030,15 +1197,17 @@
               <div class="credit">${credit(L.img)}</div>
               <div class="lc-body">
                 <span class="layer-chip">${L.icon} ${L.name}</span> <b style="color:var(--muted);font-size:.85rem">${L.floor} • ${L.sun}</b>
-                <p>${L.text}</p>
+                <p id="lcText">Piętro ${page}: <b>${L.name}</b>. ${L.text}</p>
                 <div class="mini-title">🐾 Kto tu mieszka?</div>${chips(zw)}
                 <div class="mini-title">🌱 Co tu rośnie?</div>${chips(ro)}
               </div>
             </div>
+            <button class="btn soft" data-say="#lcText">🔊 Przeczytaj mi</button>
             <div class="dots">${Array.from({ length: pages }, (_, i) => `<i class="${i === page ? 'on' : ''}"></i>`).join('')}</div>
             <button class="btn" id="nextP">${page < pages - 1 ? 'Następne piętro ↓' : 'Sprawdźmy, co pamiętasz! →'}</button>
             ${page > 0 ? '<button class="btn soft" id="prevP">↑ Wróć</button>' : ''}`;
           const pv = $('#prevP'); if (pv) pv.addEventListener('click', () => { page--; render(); });
+          if (state.read) speak(plain($('#lcText').innerHTML), task.querySelector('[data-say="#lcText"]'));
         }
         $('#nextP').addEventListener('click', () => {
           sfx.tap();
@@ -1091,6 +1260,7 @@
       if (ok) { session.solved++; sfx.good(); }
       else {
         session.mistakes++; sfx.bad();
+        later(() => autoSay((t.item ? `${t.item.name} ${t.item.v} ${IN_LAYER[t.item.l]}. ` : 'Poprawna odpowiedź: ' + t.a + '. ') + noteHTML), 350);
         if (!t.again) session.queue.push({ ...t, again: true }); else session.solved++;
       }
       const wrap = $('#feedbackWrap');
@@ -1116,10 +1286,11 @@
           <div class="photo-name">${it.name}</div>
           <div class="credit">${credit(it.id)}</div>
         </div>
-        <div class="q-line">Na którym piętrze lasu ${it.v}?</div>
+        <div class="q-line" id="qline">${it.name} – na którym piętrze lasu ${it.v}?</div>
         ${layerButtons()}
         <div id="feedbackWrap"></div>`;
       owlSay(it.kind === 'zw' ? `Gdzie mieszka to zwierzę? 🤔` : `Gdzie to rośnie? 🤔`);
+      autoSay(`${it.name}. Na którym piętrze lasu ${it.v}?`);
       let done = false;
       task.querySelectorAll('.layer-btn').forEach(btn => btn.addEventListener('click', () => {
         if (done) return; done = true;
@@ -1143,14 +1314,16 @@
       const sentence = t.s ? t.s.replace('___', '<span class="blank" id="blank">&nbsp;?&nbsp;</span>') : t.q;
       task.innerHTML = `
         <div class="q-card">
+          ${sayMini('#qtext', '#qopts')}
           <div class="q-num">${t.s ? 'Dokończ zdanie' : 'Pytanie'}</div>
-          <div class="q-text">${sentence}</div>
+          <div class="q-text" id="qtext">${sentence}</div>
         </div>
-        <div class="quiz-opts">
+        <div class="quiz-opts" id="qopts">
           ${opts.map((o, i) => `<button class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span><span>${o}</span></button>`).join('')}
         </div>
         <div id="feedbackWrap"></div>`;
       owlSay(t.s ? 'Wybierz, jak skończyć zdanie ✏️' : 'Przeczytaj pytanie i wybierz odpowiedź.');
+      autoSay(t.s || t.q);
       let done = false;
       task.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
         if (done) return; done = true;
@@ -1380,6 +1553,7 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay(`Dotknij <b>wszystkich</b> zwierząt i roślin, które są ${IN_LAYER[R.l]} 🔍`);
+        autoSay(`Znajdź wszystko z piętra: ${L.name}.`);
         task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
           if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
           const it = ITEM[b.dataset.id];
@@ -1414,6 +1588,7 @@
       let crayon = null, checks = 0;
       session.total = COLOR_WORDS.length;
       shell('Wybierz kredkę 🖍️, a potem dotykaj pól. Kolory są takie jak w zeszycie!');
+      autoSay('Wybierz kredkę, a potem dotykaj pól. Kolory są takie jak w zeszycie.');
       setProgress(0);
       const task = $('#task');
       task.innerHTML = `
@@ -1475,6 +1650,7 @@
         <div class="grid3">${leaves.map(([id]) => `<button class="tile" data-id="${id}"><img src="${src(id)}" alt="" style="object-fit:contain;background:#fff" /><span>?</span></button>`).join('')}</div>
         <div id="feedbackWrap"></div>`;
       owlSay('Przyjrzyj się kształtom i brzegom liści 🔍');
+      autoSay('Który liść to liść brzozy?');
       task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
         if (done || b.classList.contains('bad')) return;
         const name = LEAVES.find(l => l[0] === b.dataset.id)[1];
@@ -1503,6 +1679,7 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${LEAF_FEATURES.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay('Patrz na zdjęcie i wybieraj 👀');
+        autoSay('Jaki jest liść brzozy? Dotknij wszystkich pasujących opisów.');
         window.scrollTo(0, 0);
         task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
           if (fin || b.classList.contains('ok') || b.classList.contains('bad')) return;
@@ -1528,10 +1705,12 @@
         setProgress(2 / 3);
         task.innerHTML = `
           <div class="q-card"><div class="q-num">Krok 3 z 3</div><div class="q-text">Tak można opisać liść brzozy ✏️</div></div>
-          <div class="leaf-card"><div class="lc-body">${LEAF_TEXT}</div></div>
+          <div class="leaf-card"><div class="lc-body" id="leafText">${LEAF_TEXT}</div></div>
+          <button class="btn soft" id="leafSay" data-say="#leafText">🔊 Przeczytaj mi</button>
           <div class="note">💡 W zeszycie napisz opis swoimi słowami. Pomogą Ci pytania: <b>Jaki jest duży? Jaki ma kształt? Jaki ma brzeg? Jaki ma kolor? Czy ma ogonek?</b></div>
           <button class="btn" id="doneBtn">Zobacz wynik →</button>`;
-        owlSay('Przeczytaj opis na głos – potem łatwiej napiszesz swój w zeszycie!', 'happy');
+        owlSay('Posłuchaj albo przeczytaj opis na głos – potem łatwiej napiszesz swój w zeszycie!', 'happy');
+        if (state.read) speak(plain(LEAF_TEXT), $('#leafSay'));
         $('#doneBtn').addEventListener('click', () => finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Znasz już liść brzozy! 🍃`));
         window.scrollTo(0, 0);
       }
@@ -1556,6 +1735,7 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay(ri === 0 ? 'Las jest bardzo ważny! Pokaż, co nam daje 💚' : 'Dotknij wszystkich dobrych odpowiedzi.');
+        autoSay(R.q);
         task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
           if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
           const t = tiles[+b.dataset.i];

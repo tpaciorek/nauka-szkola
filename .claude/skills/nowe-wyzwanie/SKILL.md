@@ -119,9 +119,12 @@ Strona działa pod adresem **https://tpaciorek.github.io/nauka-szkola/** (repo `
 - Tylko ścieżki **względne** (`./`, `../`), nigdy `/coś` od korzenia domeny ani `file://`.
 - GitHub Pages rozróżnia wielkość liter – nazwy plików i odwołania zawsze małymi literami.
 - Żadnych plików/folderów zaczynających się od `_` (Jekyll je pomija). Żadnego backendu – wszystko statyczne.
-- Nowe pliki są widoczne dopiero po commicie i `git push`; commituj/pushuj tylko na prośbę użytkownika, ale zawsze przypomnij, że bez pusha link nie pokaże zmian, i podaj bezpośredni link do nowego wyzwania.
+- Nowe pliki są widoczne dopiero po commicie i `git push`; po skończonej i przetestowanej pracy commituj i pushuj (użytkownik tego oczekuje) i podaj bezpośredni link do nowego wyzwania.
 
 ## Zasady dla każdego nowego wyzwania (także innego typu niż słówka)
+
+- **Najpierw opowiedz, potem wymagaj** (wyraźna prośba użytkownika, stały format): przed poziomami z nową wiedzą ekran „📖 Przypomnij sobie” – krótka teoria dla dziecka (zdjęcia/obrazki, kolorowe sekcje, „Sztuczka Sówki” na końcu), przyciski „🔊 Przeczytaj mi” i „Rozumiem – zaczynamy! →”. W trakcie poziomu przycisk 📖 w górnym pasku otwiera tę teorię w okienku. Nie wszędzie: gry zręcznościowe i wielki sprawdzian bez teorii, „Jeszcze raz” po wyniku pomija teorię. Wzór: `THEORY`, `renderTheory()`, `openTheory()` w `3a/przyroda/warstwy-lasu.html`.
+- **Czytanie na głos po polsku** (prośba użytkownika „mogłoby coś czytać”): `speak()`/`plain()`/`autoSay()` z `warstwy-lasu.html` – głos `pl-PL` przeglądarki (preferuje Google/Natural/Online, potem Paulina/Zofia), przycisk 🔊 obok dymku Sówki i w karcie pytania (czyta pytanie z odpowiedziami), 🗣️ w pasku włącza/wyłącza automatyczne czytanie (domyślnie włączone: teoria, pytanie, podpowiedź po błędzie). `plain()` usuwa emoji, litery A–D, podpisy zdjęć i elementy `.no-read`. Przy wejściu na mapę `stopSpeak()`.
 
 - **Mobile-first**: działa na 360 px szerokości, przyciski ≥ 48 px, `touch-action: manipulation`, `viewport-fit=cover` + `env(safe-area-inset-*)`. Na komputerze też grywalne (fizyczna klawiatura).
 - **Pisanie na telefonie**: własna klawiatura ekranowa zamiast `<input>` (brak autokorekty, klawiatura systemowa nie zasłania ekranu). Wielka litera na start.
@@ -138,4 +141,4 @@ Strona działa pod adresem **https://tpaciorek.github.io/nauka-szkola/** (repo `
 2. Ustaw widok `mobile` (375×812), przejdź mapę, po jednym zadaniu z każdego typu (poziomy odblokujesz w konsoli: `state.stars = {...}; startLevel(n)`), błędną i dobrą odpowiedź, ekran wyniku.
 3. Sprawdź konsolę (brak błędów), potem `localStorage.clear()`, żeby nie zostawić testowych postępów.
 4. Sprawdź, że linki w menu prowadzą do nowego pliku.
-5. Nie commituj bez prośby użytkownika.
+5. Commit + push, potem podaj link.
