@@ -824,7 +824,7 @@
 
     /* ---------- Czytanie na głos (polski głos przeglądarki) ----------
        Przyciski 🔊 czytają dymek Sówki, pytanie i teorię. Gdy w pasku jest
-       włączone 🗣️, Sówka sama czyta teorię, pytania i podpowiedzi po błędzie. */
+       włączone 🗣️, Sówka sama czyta tylko teorię (pytania – na żądanie, przyciskiem 🔊). */
     let plVoice = null, sayBtn = null;
     function pickVoice() {
       if (!window.speechSynthesis) return;
@@ -858,7 +858,7 @@
       markSaying(btn);
       try { speechSynthesis.speak(u); } catch (e) {}
     }
-    const autoSay = html => { if (state.read) speak(plain(html)); };
+    const autoSay = html => { if (state.read) speak(plain(html)); };   // tylko teoria – pytań nie czytamy sami (prośba rodzica)
     // przycisk 🔊: data-say = selektor elementu do przeczytania (data-extra – drugi element); drugie dotknięcie zatrzymuje
     document.addEventListener('click', e => {
       const b = e.target.closest('[data-say]');
@@ -1260,7 +1260,6 @@
       if (ok) { session.solved++; sfx.good(); }
       else {
         session.mistakes++; sfx.bad();
-        later(() => autoSay((t.item ? `${t.item.name} ${t.item.v} ${IN_LAYER[t.item.l]}. ` : 'Poprawna odpowiedź: ' + t.a + '. ') + noteHTML), 350);
         if (!t.again) session.queue.push({ ...t, again: true }); else session.solved++;
       }
       const wrap = $('#feedbackWrap');
@@ -1290,7 +1289,6 @@
         ${layerButtons()}
         <div id="feedbackWrap"></div>`;
       owlSay(it.kind === 'zw' ? `Gdzie mieszka to zwierzę? 🤔` : `Gdzie to rośnie? 🤔`);
-      autoSay(`${it.name}. Na którym piętrze lasu ${it.v}?`);
       let done = false;
       task.querySelectorAll('.layer-btn').forEach(btn => btn.addEventListener('click', () => {
         if (done) return; done = true;
@@ -1323,7 +1321,6 @@
         </div>
         <div id="feedbackWrap"></div>`;
       owlSay(t.s ? 'Wybierz, jak skończyć zdanie ✏️' : 'Przeczytaj pytanie i wybierz odpowiedź.');
-      autoSay(t.s || t.q);
       let done = false;
       task.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
         if (done) return; done = true;
@@ -1553,7 +1550,6 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay(`Dotknij <b>wszystkich</b> zwierząt i roślin, które są ${IN_LAYER[R.l]} 🔍`);
-        autoSay(`Znajdź wszystko z piętra: ${L.name}.`);
         task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
           if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
           const it = ITEM[b.dataset.id];
@@ -1588,7 +1584,6 @@
       let crayon = null, checks = 0;
       session.total = COLOR_WORDS.length;
       shell('Wybierz kredkę 🖍️, a potem dotykaj pól. Kolory są takie jak w zeszycie!');
-      autoSay('Wybierz kredkę, a potem dotykaj pól. Kolory są takie jak w zeszycie.');
       setProgress(0);
       const task = $('#task');
       task.innerHTML = `
@@ -1650,7 +1645,6 @@
         <div class="grid3">${leaves.map(([id]) => `<button class="tile" data-id="${id}"><img src="${src(id)}" alt="" style="object-fit:contain;background:#fff" /><span>?</span></button>`).join('')}</div>
         <div id="feedbackWrap"></div>`;
       owlSay('Przyjrzyj się kształtom i brzegom liści 🔍');
-      autoSay('Który liść to liść brzozy?');
       task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
         if (done || b.classList.contains('bad')) return;
         const name = LEAVES.find(l => l[0] === b.dataset.id)[1];
@@ -1679,7 +1673,6 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${LEAF_FEATURES.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay('Patrz na zdjęcie i wybieraj 👀');
-        autoSay('Jaki jest liść brzozy? Dotknij wszystkich pasujących opisów.');
         window.scrollTo(0, 0);
         task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
           if (fin || b.classList.contains('ok') || b.classList.contains('bad')) return;
@@ -1735,7 +1728,6 @@
           <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
           <div id="feedbackWrap"></div>`;
         owlSay(ri === 0 ? 'Las jest bardzo ważny! Pokaż, co nam daje 💚' : 'Dotknij wszystkich dobrych odpowiedzi.');
-        autoSay(R.q);
         task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
           if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
           const t = tiles[+b.dataset.i];
