@@ -23,7 +23,9 @@ portal.css                  ← wspólny styl WSZYSTKICH stron-menu
 <klasa>/<przedmiot>/<wyzwanie>.html  ← samodzielna gra, jeden plik
 ```
 
-Przedmioty: `angielski`, `polski`, `matematyka`. Nazwy plików: małe litery, myślniki, bez polskich znaków (`dni-tygodnia.html`, `miesiace.html`).
+Przedmioty: `angielski`, `polski`, `matematyka`, `przyroda`. Nazwy plików: małe litery, myślniki, bez polskich znaków (`dni-tygodnia.html`, `miesiace.html`).
+
+**Przyroda – wzór `3a/przyroda/warstwy-lasu.html`** (ta sama Sówka, mapa i gwiazdki, ale zadania na prawdziwych zdjęciach: zdjęcie → wybór warstwy, zdania z luką, „znajdź wszystkie” w siatce zdjęć, wybór wielokrotny, gry zręcznościowe „spadające znaleziska” i „koszyk”, leśny album). Użytkownik chce, żeby przyroda była „ładna, ze zdjęciami”. Zdjęcia: Wikimedia Commons (główne zdjęcie artykułu z pl.wikipedia przez `prop=pageimages` albo wyszukiwanie w Commons), pobierane `curl` z User-Agentem, zmniejszane do 480 px JPEG (PowerShell `System.Drawing`), w `<klasa>/przyroda/zdjecia/` z `ZRODLA.md`; autor i licencja w obiekcie `CREDITS` – podpis pod każdym zdjęciem i ekran „Skąd są zdjęcia?”. Treść z podręcznika parafrazuj, nie przepisuj.
 
 ## Dodając wyzwanie, zawsze zaktualizuj menu
 

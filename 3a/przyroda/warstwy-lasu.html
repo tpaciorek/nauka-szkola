@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#15803d" />
+  <title>Warstwy lasu – przyroda z Sówką Lulu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14321f;
+      --muted: #5f7466;
+      --primary: #16a34a;
+      --primary-dark: #166534;
+      --primary-soft: #dcfce7;
+      --line: #bbf7d0;
+      --good: #16a34a;
+      --good-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --gold: #facc15;
+      /* kolory warstw jak w podręczniku */
+      --k: #16a34a;
+      --p: #eab308;
+      --r: #ea580c;
+      --s: #d6a06a;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(134, 239, 172, 0.55), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(253, 224, 71, 0.35), transparent 35%),
+        linear-gradient(180deg, #f0fdf4 0%, #ecfccb 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+    button:disabled { cursor: default; }
+    img { -webkit-user-drag: none; user-select: none; }
+
+    #app {
+      max-width: 560px; margin: 0 auto;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* ---------- Górny pasek ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: rgba(240, 253, 244, 0.88);
+      backdrop-filter: blur(10px);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 42px; padding: 8px 14px;
+      border-radius: 999px; border: 2px solid var(--line);
+      background: #fff; font-weight: 900; font-size: 1rem;
+      text-decoration: none; color: var(--ink);
+    }
+    .pill.back { color: var(--primary-dark); }
+    .topbar .spacer { flex: 1; }
+    .topbar .pill { white-space: nowrap; }
+    @media (max-width: 420px) { .topbar { gap: 6px; padding: 10px 10px; } .topbar .pill { padding: 8px 10px; } }
+    body.in-level .topbar { display: none; }
+
+    main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
+    body.in-level main { padding-bottom: 0; }
+
+    /* ---------- Sowa ---------- */
+    .owl-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .owl-big { width: 130px; flex: none; animation: bob 3s ease-in-out infinite; }
+    .owl-mini { width: 56px; flex: none; }
+    .jump { animation: jump 0.6s ease; }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+    .bubble {
+      position: relative; flex: 1;
+      background: #fff; border: 2px solid var(--line);
+      border-radius: 20px; padding: 10px 14px;
+      font-weight: 700; line-height: 1.4; font-size: 1rem;
+      box-shadow: 0 8px 20px rgba(22, 101, 52, 0.1);
+    }
+    .bubble::before {
+      content: ''; position: absolute; left: -10px; top: 18px;
+      border: 9px solid transparent; border-right-color: var(--line); border-left: 0;
+    }
+    .bubble::after {
+      content: ''; position: absolute; left: -7px; top: 19px;
+      border: 8px solid transparent; border-right-color: #fff; border-left: 0;
+    }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes pop { 0% { transform: scale(0.94); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ---------- Mapa ---------- */
+    .hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
+    .reward-bar {
+      background: #fff; border: 2px solid var(--line); border-radius: 20px;
+      padding: 12px 14px; font-weight: 800; font-size: 0.95rem;
+    }
+    .bar { height: 12px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #4ade80, var(--primary)); border-radius: 999px; transition: width 0.6s ease; }
+    .section-title { font-size: 1.3rem; font-weight: 900; margin: 24px 0 10px; }
+    .muted { color: var(--muted); font-weight: 700; margin: -4px 0 12px; font-size: 0.95rem; }
+
+    .path { display: flex; flex-direction: column; align-items: flex-start; }
+    .path-dots { width: 4px; height: 18px; margin: 2px 0 2px 40px; border-left: 4px dotted #86efac; }
+    .node {
+      position: relative;
+      width: 84%; margin-left: calc(var(--off) * 8%);
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; text-align: left;
+      background: #fff; border: 3px solid var(--line); border-radius: 22px;
+      box-shadow: 0 6px 0 #bbf7d0;
+      transition: transform 0.12s ease;
+    }
+    .node:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #bbf7d0; }
+    .node-icon {
+      width: 52px; height: 52px; flex: none; border-radius: 50%;
+      display: grid; place-items: center; font-size: 1.5rem; font-weight: 900;
+      background: var(--primary-soft);
+    }
+    .node-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .node-num { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .node-name { font-size: 1.05rem; font-weight: 900; }
+    .node-desc { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .node-stars { font-size: 1.1rem; color: var(--gold); letter-spacing: -1px; flex: none; text-shadow: 0 1px 0 #ca8a04; }
+    .node-stars .off { color: #e5e7eb; text-shadow: none; }
+    .node.done { border-color: #86efac; }
+    .node.current { border-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); animation: glow 1.8s ease-in-out infinite; }
+    .node.current .node-icon { background: var(--primary); color: #fff; }
+    .node.locked { opacity: 0.55; background: #f8fafc; box-shadow: 0 6px 0 #e5e7eb; border-color: #e5e7eb; }
+    .node.locked .node-icon { background: #e5e7eb; }
+    .node.arcade .node-num { color: #c2410c; }
+    @keyframes glow { 0%, 100% { outline: 0 solid rgba(22, 163, 74, 0.25); } 50% { outline: 7px solid rgba(22, 163, 74, 0.15); } }
+    .here {
+      position: absolute; right: 10px; top: -13px;
+      background: var(--gold); color: var(--ink); font-size: 0.75rem; font-weight: 900;
+      padding: 3px 10px; border-radius: 999px; box-shadow: 0 2px 0 #ca8a04;
+    }
+
+    /* album znalezisk */
+    .album {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px;
+      background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 12px;
+    }
+    .album-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .album-item .ph {
+      width: 56px; height: 56px; border-radius: 50%; overflow: hidden;
+      border: 3px solid var(--lc, var(--line)); background: #f1f5f9;
+      display: grid; place-items: center; font-size: 1.3rem; color: #94a3b8; font-weight: 900;
+    }
+    .album-item .ph img { width: 100%; height: 100%; object-fit: cover; }
+    .album-item span { font-size: 0.62rem; font-weight: 800; color: var(--muted); text-align: center; line-height: 1.15; }
+    .album-item.locked .ph { border-color: #e5e7eb; }
+
+    .info-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 52px; padding: 10px 16px; margin-top: 14px;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 900; color: var(--primary-dark);
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .info-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+
+    /* ---------- Przyciski ---------- */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 58px; padding: 12px 18px;
+      border: 0; border-radius: 18px;
+      font-size: 1.2rem; font-weight: 900;
+      background: var(--primary); color: #fff;
+      box-shadow: 0 5px 0 var(--primary-dark);
+      transition: transform 0.1s ease;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .btn.soft { background: #fff; color: var(--primary-dark); border: 3px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+    .btn + .btn { margin-top: 12px; }
+    .link-btn.danger { background: none; border: 0; color: #9ca3af; margin: 28px auto 0; display: block; font-size: 0.85rem; font-weight: 800; text-decoration: underline; padding: 8px; }
+
+    /* ---------- Poziom ---------- */
+    .level { flex: 1; display: flex; flex-direction: column; }
+    .level-top { display: flex; align-items: center; gap: 12px; padding: 12px 0 8px; }
+    .icon-btn {
+      width: 44px; height: 44px; flex: none; border-radius: 50%;
+      border: 2px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--muted);
+    }
+    .progress { flex: 1; height: 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 999px; transition: width 0.4s ease; }
+    .level-badge { font-size: 1.5rem; font-weight: 900; }
+    .hearts { font-size: 1.2rem; letter-spacing: 1px; white-space: nowrap; }
+    .hearts .lost { filter: grayscale(1); opacity: 0.3; }
+    .guide { display: flex; align-items: flex-start; gap: 10px; margin: 2px 0 10px; }
+    .task { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+
+    /* zdjęcie w zadaniu */
+    .photo-card {
+      position: relative; background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      overflow: hidden; box-shadow: 0 8px 20px rgba(22, 101, 52, 0.12);
+    }
+    .photo-card img { display: block; width: 100%; height: min(34vh, 250px); object-fit: cover; }
+    .photo-name {
+      position: absolute; left: 12px; bottom: 30px;
+      background: rgba(255, 255, 255, 0.95); padding: 6px 14px; border-radius: 999px;
+      font-size: 1.25rem; font-weight: 900; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+    .credit { font-size: 0.62rem; font-weight: 700; color: var(--muted); padding: 5px 10px; line-height: 1.2; }
+    .photo-card .credit { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.88); }
+    .q-line { font-size: 1.15rem; font-weight: 900; text-align: center; line-height: 1.35; }
+
+    /* przyciski warstw – ułożone jak piętra lasu */
+    .layers { display: flex; flex-direction: column; gap: 8px; }
+    .layer-btn {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 54px; padding: 8px 14px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--lc); background: #fff;
+      font-size: 1.1rem; font-weight: 900;
+      box-shadow: 0 5px 0 var(--lc);
+    }
+    .layer-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--lc); }
+    .layer-btn .lic {
+      flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 1.3rem; background: var(--lc);
+    }
+    .layer-btn .floor { margin-left: auto; font-size: 0.75rem; color: var(--muted); font-weight: 800; }
+    .layer-btn.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .layer-btn.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.85; }
+    .layer-btn.dim { opacity: 0.45; }
+
+    /* pytania tekstowe */
+    .q-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; text-align: center;
+    }
+    .q-num { font-size: 0.82rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .q-text { font-size: 1.2rem; font-weight: 900; line-height: 1.45; }
+    .blank {
+      display: inline-block; min-width: 90px; border-bottom: 3px dashed var(--primary);
+      color: var(--primary-dark); padding: 0 4px;
+    }
+    .blank.filled { border-bottom-style: solid; background: var(--good-soft); border-radius: 6px 6px 0 0; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 56px; padding: 10px 16px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 800; line-height: 1.35;
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .quiz-opt:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+    .quiz-opt .letter {
+      flex: none; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 0.9rem; font-weight: 900;
+      background: var(--primary-soft); color: var(--primary-dark);
+    }
+    .quiz-opt.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .quiz-opt.ok .letter { background: var(--good); color: #fff; }
+    .quiz-opt.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.8; }
+    .quiz-opt.bad .letter { background: #fca5a5; color: #fff; }
+    .quiz-opt.dim { opacity: 0.5; }
+    .note {
+      text-align: left; background: #fef9c3; border: 2px solid #fde68a; border-radius: 16px;
+      padding: 10px 12px; font-weight: 700; line-height: 1.45; font-size: 0.95rem;
+    }
+    .feedback-head { font-weight: 900; text-align: center; font-size: 1.05rem; }
+    .feedback-head.ok { color: #166534; }
+    .feedback-head.bad { color: #b91c1c; }
+
+    /* ---------- Poznaj warstwy ---------- */
+    .tower { display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; border: 3px solid #fff; box-shadow: 0 8px 20px rgba(22, 101, 52, 0.15); }
+    .tower-floor {
+      position: relative; display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 10px 14px;
+      color: #fff; font-weight: 900; font-size: 1.15rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+      background-size: cover; background-position: center;
+    }
+    .tower-floor::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--lc) 0%, rgba(0, 0, 0, 0.05) 85%); opacity: 0.85; }
+    .tower-floor > * { position: relative; }
+    .tower-floor .tic { font-size: 1.8rem; }
+    .tower-floor small { display: block; font-size: 0.78rem; font-weight: 800; opacity: 0.95; }
+    .tower-floor .sun { margin-left: auto; font-size: 0.85rem; }
+
+    .layer-card { background: #fff; border: 3px solid var(--lc); border-radius: 24px; overflow: hidden; }
+    .layer-card > img { display: block; width: 100%; height: min(28vh, 210px); object-fit: cover; }
+    .layer-card .lc-body { padding: 12px 14px 14px; }
+    .layer-chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+      background: var(--lc); color: #fff; font-weight: 900; font-size: 1.05rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+    .layer-card p { margin: 10px 0 0; font-weight: 700; line-height: 1.5; color: #334155; }
+    .mini-title { font-weight: 900; font-size: 0.9rem; margin: 12px 0 6px; color: var(--muted); }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+    .chip-ph { flex: none; width: 68px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .chip-ph img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--lc); }
+    .chip-ph span { font-size: 0.7rem; font-weight: 800; text-align: center; line-height: 1.15; }
+    .dots { display: flex; justify-content: center; gap: 6px; }
+    .dots i { width: 9px; height: 9px; border-radius: 50%; background: #d1fae5; }
+    .dots i.on { background: var(--primary); }
+
+    /* ---------- Znajdź wszystkie (siatka zdjęć) ---------- */
+    .target-bar {
+      display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+      font-weight: 900; font-size: 1.05rem; text-align: center;
+    }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tile {
+      position: relative; padding: 0; border: 3px solid #fff; border-radius: 18px; overflow: hidden; background: #fff;
+      box-shadow: 0 4px 0 #d1fae5; aspect-ratio: 1 / 1.12; display: flex; flex-direction: column;
+    }
+    .tile img { width: 100%; flex: 1; min-height: 0; object-fit: cover; display: block; }
+    .tile span { font-size: 0.78rem; font-weight: 900; padding: 4px 2px; line-height: 1.1; }
+    .tile.ok { border-color: var(--good); }
+    .tile.ok::after { content: '✓'; position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--good); color: #fff; font-weight: 900; display: grid; place-items: center; }
+    .tile.bad { border-color: var(--bad); opacity: 0.6; }
+    .tile.bad::after { content: '✕'; position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--bad); color: #fff; font-weight: 900; display: grid; place-items: center; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .etile {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      min-height: 92px; padding: 8px; border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-weight: 800; font-size: 0.92rem; line-height: 1.25; text-align: center; box-shadow: 0 4px 0 var(--line);
+    }
+    .etile b { font-size: 1.9rem; line-height: 1; }
+    .etile.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 4px 0 var(--good); }
+    .etile.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.7; }
+    .found-count { text-align: center; font-weight: 900; color: var(--muted); }
+
+    /* ---------- Gry zręcznościowe ---------- */
+    .arena {
+      position: relative; flex: 1; min-height: 380px; border-radius: 24px; overflow: hidden;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+      background: #14532d url('zdjecia/las.jpg') center / cover;
+      margin-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+    .band {
+      position: absolute; left: 0; right: 0; display: flex; align-items: center; padding: 0 12px;
+      border: 0; color: #fff; font-weight: 900; font-size: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(90deg, var(--lc), transparent 70%); opacity: 0.92;
+      border-top: 2px dashed rgba(255, 255, 255, 0.5);
+    }
+    .band:first-child { border-top: 0; }
+    .band .bl { display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.25); padding: 4px 10px; border-radius: 999px; }
+    .band.flash-ok { animation: flashOk 0.7s ease; }
+    .band.flash-bad { animation: flashBad 0.7s ease; }
+    @keyframes flashOk { 0%, 100% { box-shadow: inset 0 0 0 0 #4ade80; } 40% { box-shadow: inset 0 0 0 6px #4ade80; background: rgba(74, 222, 128, 0.55); } }
+    @keyframes flashBad { 0%, 100% { box-shadow: inset 0 0 0 0 #f87171; } 40% { box-shadow: inset 0 0 0 6px #f87171; background: rgba(248, 113, 113, 0.55); } }
+    .faller {
+      position: absolute; width: 96px; display: flex; flex-direction: column; align-items: center; pointer-events: none;
+      transition: transform 0.35s ease, opacity 0.35s ease; z-index: 3;
+    }
+    .faller img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); }
+    .faller span { margin-top: 3px; background: #fff; border-radius: 999px; padding: 2px 9px; font-size: 0.85rem; font-weight: 900; white-space: nowrap; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+    .faller.small img { width: 64px; height: 64px; border-width: 3px; }
+    .faller.small span { font-size: 0.72rem; }
+    .score-pill {
+      position: absolute; top: 10px; right: 10px; z-index: 4; background: #fff; border-radius: 999px; padding: 6px 12px;
+      font-weight: 900; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+    .target-pill {
+      position: absolute; top: 10px; left: 10px; right: 90px; z-index: 4; display: flex; align-items: center; gap: 6px;
+      background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.95rem;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25); border: 3px solid var(--lc);
+    }
+    .basket {
+      position: absolute; bottom: 8px; width: 100px; height: 70px; z-index: 3; pointer-events: none;
+      display: flex; align-items: flex-end; justify-content: center; font-size: 3.6rem; line-height: 1;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+    }
+    .float-txt { position: absolute; z-index: 5; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.9s ease forwards; text-shadow: 0 2px 4px rgba(0,0,0,.5); color: #fff; }
+    @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+    .arcade-start {
+      position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; padding: 20px; text-align: center; background: rgba(20, 50, 31, 0.72); color: #fff;
+    }
+    .arcade-start h3 { margin: 0; font-size: 1.5rem; }
+    .arcade-start p { margin: 0; font-weight: 700; line-height: 1.5; max-width: 340px; }
+    .arcade-start .btn { max-width: 320px; }
+
+    /* ---------- Wynik ---------- */
+    .result { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 24px; }
+    .result .owl-big { width: 160px; }
+    .result h2 { font-size: 1.9rem; margin: 6px 0 0; }
+    .result-stars { display: flex; gap: 8px; font-size: 3.4rem; line-height: 1; }
+    .rs { color: #e5e7eb; }
+    .rs.on { color: var(--gold); text-shadow: 0 3px 0 #ca8a04; animation: starIn 0.5s ease both; animation-delay: var(--d); }
+    @keyframes starIn { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { transform: scale(1); } }
+    .result p { font-weight: 700; color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .reward-pop {
+      background: #fef9c3; border: 3px solid var(--gold); border-radius: 18px; padding: 12px 18px;
+      font-weight: 900; font-size: 1.1rem; animation: pop 0.5s ease; display: flex; align-items: center; gap: 10px;
+    }
+    .reward-pop .ic { font-size: 2rem; }
+    .result-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* źródła */
+    .info-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+    .info-card { background: #fff; border: 3px solid var(--line); border-radius: 22px; padding: 16px; }
+    .info-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .info-card p { margin: 0 0 8px; font-weight: 700; line-height: 1.55; color: #334155; }
+    .src-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .src-list li { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: #334155; }
+    .src-list img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex: none; }
+    .src-list a { color: var(--primary-dark); }
+
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (min-width: 600px) {
+      .owl-big { width: 150px; }
+      main { padding-left: 20px; padding-right: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a class="pill back" href="./index.html" aria-label="Wróć do przyrody">← Wróć</a>
+      <span class="spacer"></span>
+      <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
+      <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
+      <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
+      <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
+    </header>
+    <main id="screen"></main>
+  </div>
+
+  <script src="../osiagniecia.js"></script>
+  <script>
+    /* =====================================================================
+       WARSTWY LASU – przyroda z Sówką Lulu (Jesień w lesie: „Po co nam las?”)
+       Cztery piętra lasu, zwierzęta i rośliny na zdjęciach, światło w lesie
+       i to, co las daje ludziom i zwierzętom. Zdjęcia: zdjecia/ (Wikimedia
+       Commons, autorzy w CREDITS i w zdjecia/ZRODLA.md).
+       ===================================================================== */
+    const CONFIG = {
+      storageKey: 'nauka-3a-przyroda-warstwy-lasu-v1',
+      img: 'zdjecia/',
+      intro: 'Cześć! Jestem <b>Sówka Lulu</b> 🦉 i mieszkam w lesie. Las jest jak wielki dom z <b>czterema piętrami</b>! Pokażę Ci, kto mieszka na każdym z nich. Zaczynamy?'
+    };
+
+    const LAYERS = {
+      k: { id: 'k', name: 'Korony drzew', short: 'korony drzew', icon: '🌳', floor: 'najwyżej', img: 'w-korony', color: 'var(--k)', sun: '☀️☀️☀️☀️',
+        text: 'Najwyższe piętro lasu – tu dociera <b>najwięcej słońca</b>. Wysoko na drzewach gniazda mają duże ptaki drapieżne, jak jastrząb i bielik. W dziuplach mieszkają sikory, szpaki i puszczyki, a po gałęziach skaczą wiewiórki i kuny.' },
+      p: { id: 'p', name: 'Podszyt', short: 'podszyt', icon: '🌿', floor: 'piętro 2', img: 'w-podszyt', color: 'var(--p)', sun: '☀️☀️☀️',
+        text: 'To <b>młode drzewa i krzewy</b>: leszczyna, jałowiec, dziki bez, maliny i jeżyny. W gałęziach gniazda budują kosy, gile i dzwońce. Żyje tu mnóstwo owadów, a między krzakami chowają się sarny, jelenie, dziki, wilki, zające i lisy.' },
+      r: { id: 'r', name: 'Runo leśne', short: 'runo leśne', icon: '🍄', floor: 'piętro 3', img: 'w-runo', color: 'var(--r)', sun: '☀️☀️',
+        text: 'Niziutko przy ziemi rosną <b>mchy, paprocie, krzewinki i grzyby</b>. Latem dojrzewają tu jagody i kwitną kwiaty. Mieszkają jeże, myszy i wiele owadów, a gniazda mają słowiki i rudziki.' },
+      s: { id: 's', name: 'Ściółka', short: 'ściółka', icon: '🍂', floor: 'na samym dole', img: 'liscie', color: 'var(--s)', sun: '☀️',
+        text: 'Sam dół lasu: <b>opadłe liście, gałązki, kawałki kory i nasiona</b>. Słońca jest tu najmniej. Żyją tu dżdżownice, mrówki, żuki i larwy owadów – to oni sprzątają las!' }
+    };
+    const LAYER_ORDER = ['k', 'p', 'r', 's'];
+    // forma „w …” do podpowiedzi
+    const IN_LAYER = { k: 'w koronach drzew', p: 'w podszycie', r: 'w runie leśnym', s: 'w ściółce' };
+
+    // zw = zwierzę, ro = roślina/grzyb; v = czasownik w pytaniu
+    const ITEMS = [
+      { id: 'puszczyk', name: 'Puszczyk', l: 'k', kind: 'zw', v: 'mieszka', note: 'Puszczyk to sowa, tak jak ja! 🦉 Za dnia śpi w dziupli wysoko na drzewie, a nocą poluje.' },
+      { id: 'wiewiorka', name: 'Wiewiórka', l: 'k', kind: 'zw', v: 'mieszka', note: 'Wiewiórka skacze po gałęziach i buduje gniazdo wysoko w koronach drzew.' },
+      { id: 'dzieciol', name: 'Dzięcioł', l: 'k', kind: 'zw', v: 'mieszka', note: 'Dzięcioł dziobem kuje dziuple w pniach i gałęziach drzew – stuk, stuk!' },
+      { id: 'bielik', name: 'Bielik', l: 'k', kind: 'zw', v: 'mieszka', note: 'Bielik to wielki ptak drapieżny. Gniazdo zakłada na czubkach starych drzew.' },
+      { id: 'jastrzab', name: 'Jastrząb', l: 'k', kind: 'zw', v: 'mieszka', note: 'Jastrząb to ptak szponiasty – gniazdo ma wysoko w koronie drzewa.' },
+      { id: 'sikora', name: 'Sikora', l: 'k', kind: 'zw', v: 'mieszka', note: 'Sikory gnieżdżą się w dziuplach wysoko na drzewach.' },
+      { id: 'szpak', name: 'Szpak', l: 'k', kind: 'zw', v: 'mieszka', note: 'Szpaki zakładają gniazda w dziuplach drzew.' },
+      { id: 'wilga', name: 'Wilga', l: 'k', kind: 'zw', v: 'mieszka', note: 'Wilga to żółty ptak, który zawiesza gniazdo wysoko w koronie drzewa.' },
+      { id: 'zieba', name: 'Zięba', l: 'k', kind: 'zw', v: 'mieszka', note: 'Zięba gnieździ się wysoko, w dziuplach i na gałęziach drzew.' },
+      { id: 'kuna', name: 'Kuna', l: 'k', kind: 'zw', v: 'mieszka', note: 'Kuna leśna świetnie wspina się po drzewach i chowa w dziuplach.' },
+
+      { id: 'kos', name: 'Kos', l: 'p', kind: 'zw', v: 'mieszka', note: 'Kos to ptak śpiewający – gniazdo buduje w gęstych krzewach podszytu.' },
+      { id: 'sojka', name: 'Sójka', l: 'p', kind: 'zw', v: 'mieszka', note: 'Sójka mieszka wśród krzewów i młodych drzew. Uwielbia żołędzie!' },
+      { id: 'gil', name: 'Gil', l: 'p', kind: 'zw', v: 'mieszka', note: 'Gil ma czerwony brzuszek i buduje gniazdo w gałęziach krzewów.' },
+      { id: 'dzwoniec', name: 'Dzwoniec', l: 'p', kind: 'zw', v: 'mieszka', note: 'Dzwoniec to zielonkawy ptak śpiewający, który gniazduje w podszycie.' },
+      { id: 'sarna', name: 'Sarna', l: 'p', kind: 'zw', v: 'mieszka', note: 'Sarny chowają się wśród krzewów i młodych drzew podszytu.' },
+      { id: 'jelen', name: 'Jeleń', l: 'p', kind: 'zw', v: 'mieszka', note: 'Jeleń to duży ssak – w podszycie znajduje kryjówkę i jedzenie.' },
+      { id: 'dzik', name: 'Dzik', l: 'p', kind: 'zw', v: 'mieszka', note: 'Dzik buszuje wśród krzewów podszytu.' },
+      { id: 'wilk', name: 'Wilk', l: 'p', kind: 'zw', v: 'mieszka', note: 'Wilk przemierza las i ukrywa się w gęstym podszycie.' },
+      { id: 'zajac', name: 'Zając', l: 'p', kind: 'zw', v: 'mieszka', note: 'Zając kryje się w krzakach podszytu.' },
+      { id: 'lis', name: 'Lis', l: 'p', kind: 'zw', v: 'mieszka', note: 'Lis skrada się między krzewami – w podręczniku jest w podszycie, razem z sarną, dzikiem i wilkiem.' },
+      { id: 'pajak', name: 'Pająk', l: 'p', kind: 'zw', v: 'mieszka', note: 'Pająk rozpina sieć między gałązkami krzewów podszytu.' },
+
+      { id: 'jez', name: 'Jeż', l: 'r', kind: 'zw', v: 'mieszka', note: 'Jeż tupta nisko przy ziemi, wśród mchów i krzewinek runa.' },
+      { id: 'mysz', name: 'Mysz', l: 'r', kind: 'zw', v: 'mieszka', note: 'Mała mysz leśna biega po runie i chowa się w mchu.' },
+      { id: 'slowik', name: 'Słowik', l: 'r', kind: 'zw', v: 'mieszka', note: 'Słowik ma gniazdo nisko, w runie leśnym – i pięknie śpiewa!' },
+      { id: 'rudzik', name: 'Rudzik', l: 'r', kind: 'zw', v: 'mieszka', note: 'Rudzik zakłada gniazdo nisko przy ziemi, w runie.' },
+      { id: 'slimak', name: 'Ślimak', l: 'r', kind: 'zw', v: 'mieszka', note: 'Ślimak pełza wśród wilgotnych mchów i roślin runa.' },
+      { id: 'zaba', name: 'Żaba', l: 'r', kind: 'zw', v: 'mieszka', note: 'Żaba lubi wilgotne, zacienione runo leśne.' },
+
+      { id: 'dzdzownica', name: 'Dżdżownica', l: 's', kind: 'zw', v: 'mieszka', note: 'Dżdżownica żyje w ściółce i w ziemi – zjada opadłe liście.' },
+      { id: 'mrowka', name: 'Mrówka', l: 's', kind: 'zw', v: 'mieszka', note: 'Mrówki budują kopce z igieł i gałązek zebranych ze ściółki.' },
+      { id: 'zuk', name: 'Żuk', l: 's', kind: 'zw', v: 'mieszka', note: 'Żuk leśny chodzi po ściółce i sprząta resztki – to leśny sprzątacz.' },
+
+      { id: 'zoledzie', name: 'Żołędzie', l: 'k', kind: 'ro', v: 'rosną', note: 'Żołędzie to owoce dębu – rosną wysoko w koronie drzewa.' },
+      { id: 'szyszki', name: 'Szyszki', l: 'k', kind: 'ro', v: 'rosną', note: 'Szyszki wiszą na gałęziach świerka, wysoko w koronie.' },
+      { id: 'leszczyna', name: 'Leszczyna', l: 'p', kind: 'ro', v: 'rośnie', note: 'Leszczyna to krzew – rosną na niej orzechy laskowe.' },
+      { id: 'jalowiec', name: 'Jałowiec', l: 'p', kind: 'ro', v: 'rośnie', note: 'Jałowiec to kłujący krzew z granatowymi owocami.' },
+      { id: 'bez', name: 'Dziki bez', l: 'p', kind: 'ro', v: 'rośnie', note: 'Dziki bez (czarny bez) to krzew z czarnymi owocami.' },
+      { id: 'malina', name: 'Malina', l: 'p', kind: 'ro', v: 'rośnie', note: 'Malina to krzew – jej owoce dojrzewają latem.' },
+      { id: 'jezyna', name: 'Jeżyna', l: 'p', kind: 'ro', v: 'rośnie', note: 'Jeżyna to kolczasty krzew z czarnymi owocami.' },
+      { id: 'jarzebina', name: 'Jarzębina', l: 'p', kind: 'ro', v: 'rośnie', note: 'Jarzębina to niewysokie drzewko z czerwonymi owocami – rośnie w podszycie.' },
+      { id: 'borowka', name: 'Borówka', l: 'r', kind: 'ro', v: 'rośnie', note: 'Borówka (czarna jagoda) to niziutka krzewinka runa leśnego.' },
+      { id: 'wrzos', name: 'Wrzos', l: 'r', kind: 'ro', v: 'rośnie', note: 'Wrzos to krzewinka, która jesienią kwitnie na fioletowo.' },
+      { id: 'paproc', name: 'Paproć', l: 'r', kind: 'ro', v: 'rośnie', note: 'Paprocie lubią cień i wilgoć runa leśnego.' },
+      { id: 'mech', name: 'Mech', l: 'r', kind: 'ro', v: 'rośnie', note: 'Mech tworzy miękki, zielony dywan w runie.' },
+      { id: 'muchomor', name: 'Muchomor', l: 'r', kind: 'ro', v: 'rośnie', note: 'Muchomor rośnie w runie. Uwaga – jest trujący! Nie zrywamy go i nie niszczymy.' },
+      { id: 'borowik', name: 'Borowik', l: 'r', kind: 'ro', v: 'rośnie', note: 'Borowik (prawdziwek) to smaczny grzyb z runa leśnego.' },
+      { id: 'liscie', name: 'Opadłe liście', l: 's', kind: 'ro', v: 'leżą', note: 'Opadłe liście tworzą ściółkę – miękki koc na ziemi.' }
+    ];
+    const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+    const animals = ITEMS.filter(i => i.kind === 'zw');
+    const plants = ITEMS.filter(i => i.kind === 'ro');
+
+    // Ćwiczenie 2 – dokończ zdania (+ pytania o światło)
+    const LIGHT_Q = [
+      { s: 'Najwięcej światła dochodzi do ___.', a: 'koron drzew', options: ['koron drzew', 'ściółki', 'runa leśnego', 'podszytu'], note: 'Korony drzew są najwyżej – najbliżej słońca ☀️.' },
+      { s: 'Najmniej światła dociera do ___.', a: 'ściółki', options: ['ściółki', 'koron drzew', 'podszytu', 'gniazd ptaków'], note: 'Ściółkę zasłaniają wszystkie wyższe piętra: drzewa, krzewy i rośliny runa.' },
+      { s: 'W koronach drzew znajdują schronienie ___.', a: 'ptaki i wiewiórki', options: ['ptaki i wiewiórki', 'dżdżownice i żuki', 'jeże i ślimaki', 'sarny i dziki'], note: 'Wysoko na drzewach mają gniazda i dziuple ptaki, a po gałęziach skaczą wiewiórki i kuny.' },
+      { s: 'Mchy, paprocie i grzyby rosną w ___.', a: 'runie leśnym', options: ['runie leśnym', 'koronach drzew', 'podszycie', 'dziuplach'], note: 'Runo leśne to niskie rośliny przy samej ziemi.' },
+      { s: 'Ściółka leśna to ___.', a: 'opadłe liście, gałązki, kora i nasiona', options: ['opadłe liście, gałązki, kora i nasiona', 'najwyższe gałęzie drzew', 'młode drzewa i krzewy', 'mchy i paprocie'], note: 'Ściółka to „leśny dywan” z tego, co spadło na ziemię.' },
+      { s: 'Podszyt to ___.', a: 'młode drzewa i krzewy', options: ['młode drzewa i krzewy', 'opadłe liście', 'mchy i grzyby', 'wierzchołki starych drzew'], note: 'W podszycie rosną np. leszczyna, jałowiec, maliny i jeżyny.' },
+      { s: 'W runie leśnym jest mało światła, bo ___.', a: 'zasłaniają je drzewa i krzewy', options: ['zasłaniają je drzewa i krzewy', 'tam zawsze jest noc', 'mieszkają tam sowy', 'grzyby gaszą słońce'], note: 'Liście drzew i krzewów łapią słońce wyżej, więc na dół dociera go niewiele.' },
+      { s: 'Wiosną w runie kwitnie dużo kwiatów, bo ___.', a: 'drzewa nie mają jeszcze liści', options: ['drzewa nie mają jeszcze liści', 'pada śnieg', 'jest bardzo ciemno', 'zwierzęta je sadzą'], note: 'Zanim drzewa wypuszczą liście, słońce dochodzi aż do ziemi – i kwiaty runa szybko z tego korzystają 🌸.' },
+      { s: 'Mchy, paprocie i grzyby dobrze rosną w runie, bo lubią ___.', a: 'cień i wilgoć', options: ['cień i wilgoć', 'upał i suszę', 'wiatr na czubkach drzew', 'hałas'], note: 'W runie jest cieniście i wilgotno – idealnie dla mchów, paproci i grzybów.' }
+    ];
+
+    // pytania sprawdzające po „Poznaj warstwy”
+    const LEARN_Q = [
+      { q: 'Ile pięter (warstw) ma las?', a: '4', options: ['2', '3', '4', '5'], note: 'Korony drzew, podszyt, runo leśne i ściółka – razem cztery piętra.' },
+      { q: 'Która warstwa lasu jest najwyżej?', a: 'Korony drzew', options: ['Korony drzew', 'Podszyt', 'Runo leśne', 'Ściółka'], note: 'Korony drzew to najwyższe piętro – tu jest najwięcej słońca.' },
+      { q: 'Jak nazywa się warstwa z młodych drzew i krzewów?', a: 'Podszyt', options: ['Podszyt', 'Ściółka', 'Runo leśne', 'Korony drzew'], note: 'Podszyt jest pod koronami drzew – to krzewy i młode drzewka.' },
+      { q: 'Gdzie rosną mchy, paprocie, jagody i grzyby?', a: 'W runie leśnym', options: ['W runie leśnym', 'W koronach drzew', 'W podszycie', 'Na chmurach'], note: 'Runo leśne to niskie rośliny tuż przy ziemi.' },
+      { q: 'Co tworzy ściółkę?', a: 'Opadłe liście, gałązki, kora i nasiona', options: ['Opadłe liście, gałązki, kora i nasiona', 'Krzewy malin', 'Gniazda ptaków', 'Kwitnące wrzosy'], note: 'Ściółka to sam dół lasu – tu żyją dżdżownice, mrówki i żuki.' }
+    ];
+
+    // Ćwiczenie 4 – co daje las
+    const GIVES = [
+      { q: 'Co las daje <b>ludziom</b>? Dotknij wszystkiego, co pasuje.',
+        good: [['🌬️', 'Tlen i czyste powietrze'], ['🪵', 'Drewno na domy i meble'], ['📄', 'Papier (robi się go z drewna)'], ['🫐', 'Jagody, maliny i grzyby'], ['🌿', 'Zioła na lekarstwa'], ['🚶', 'Miejsce na spacer i odpoczynek']],
+        bad: [['🧴', 'Plastikowe butelki'], ['🏭', 'Smog i spaliny'], ['📺', 'Telewizory']],
+        note: 'Las to „zielone płuca” – drzewa produkują tlen i oczyszczają powietrze. Daje też drewno, owoce, grzyby, zioła i miejsce na odpoczynek.' },
+      { q: 'Co las daje <b>zwierzętom</b>? Dotknij wszystkiego, co pasuje.',
+        good: [['🏠', 'Dom i kryjówkę'], ['🌰', 'Pokarm: żołędzie, orzechy, owoce'], ['🪺', 'Miejsce na gniazda i dziuple'], ['🌳', 'Schronienie przed wiatrem i upałem'], ['🍂', 'Ciepłe liście na zimowy sen']],
+        bad: [['🍭', 'Cukierki'], ['🚗', 'Szybkie drogi'], ['📢', 'Hałas']],
+        note: 'Las jest domem i spiżarnią zwierząt. Jeż śpi zimą pod liśćmi, a wiewiórka chowa orzechy na zapas.' },
+      { q: 'Jak <b>dbamy o las</b>? Wybierz dobre zachowania.',
+        good: [['🗑️', 'Zabieram swoje śmieci'], ['🤫', 'Zachowuję się cicho'], ['🍄', 'Nie niszczę grzybów, nawet trujących'], ['🚶', 'Chodzę po ścieżkach'], ['🔥', 'Nie rozpalam ognia']],
+        bad: [['📢', 'Krzyczę i hałasuję'], ['🌱', 'Zrywam rośliny dla zabawy'], ['🪺', 'Zaglądam i dotykam gniazd']],
+        note: 'W lesie jesteśmy gośćmi u zwierząt – zostawiamy go tak czysty i spokojny, jak go zastaliśmy 💚.' }
+    ];
+
+    const LEVELS = [
+      { id: 'learn', icon: '🌳', name: 'Poznaj piętra lasu', desc: 'Cztery warstwy lasu', type: 'learn' },
+      { id: 'animals', icon: '🐿️', name: 'Kto gdzie mieszka?', desc: 'Zwierzęta na zdjęciach', type: 'photo', pool: () => shuffle(animals).slice(0, 10) },
+      { id: 'drop', icon: '🎮', name: 'Spadające znaleziska', desc: 'Gra: dotknij piętra, zanim spadnie!', type: 'drop', arcade: true },
+      { id: 'plants', icon: '🫐', name: 'Co tu rośnie?', desc: 'Rośliny i grzyby na zdjęciach', type: 'photo', pool: () => shuffle(plants).slice(0, 10) },
+      { id: 'light', icon: '☀️', name: 'Światło w lesie', desc: 'Dokończ zdania', type: 'text', pool: () => shuffle(LIGHT_Q).slice(0, 7) },
+      { id: 'catch', icon: '🧺', name: 'Leśny koszyk', desc: 'Gra: łap tylko z jednego piętra', type: 'catch', arcade: true },
+      { id: 'pick', icon: '🔍', name: 'Znajdź wszystkie', desc: 'Kto mieszka na tym piętrze?', type: 'pick' },
+      { id: 'gives', icon: '🎁', name: 'Po co nam las?', desc: 'Co las daje ludziom i zwierzętom', type: 'gives' },
+      { id: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Wszystko o lesie', type: 'photo', boss: true }
+    ];
+
+    // autorzy zdjęć: [autor, licencja, strona pliku]
+    const CREDITS = {
+      "puszczyk":["Martin Mecnarowski","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Strix_aluco_3_(Martin_Mecnarowski).jpg"],
+      "wiewiorka":["Mareckr Marek Rykiel","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Squirrel_by_mareckr.jpg"],
+      "dzieciol":["Marek Szczepanek","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Dendrocopos_major_4_(Marek_Szczepanek).jpg"],
+      "bielik":["Karl Adami","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Merikotkas_kanarbikus.jpg"],
+      "jastrzab":["Norbert Kenntner, Berlin","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Northern_Goshawk_ad_M2.jpg"],
+      "sikora":["Holger Uwe Schmitt","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:13_bis_15_Zentimeter_wird_eine_Kohlmeise_lang._06.jpg"],
+      "szpak":["Charles J. Sharp","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Common_Starling_(Sturnus_vulgaris)_Leek_Wootton.jpg"],
+      "wilga":["Apatura1955","CC0","https://commons.wikimedia.org/wiki/File:Rigogolo-(Oriolus_oriolus)_Lazio,_isola_di_Ventotene_(LT)_19.4.2024.png"],
+      "zieba":["Charles J. Sharp","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Chaffinch_(Fringilla_coelebs)_male.jpg"],
+      "kuna":["caroline legg","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Pine_Marten_(48173751702).jpg"],
+      "kos":["Dion Art","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:%D0%A7%D1%91%D1%80%D0%BD%D1%8B%D0%B9_%D0%B4%D1%80%D0%BE%D0%B7%D0%B4_(Turdus_merula,_mas),_%D0%91%D0%B8%D1%82%D1%86%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B5%D1%81.jpg"],
+      "sojka":["Luc Viatour","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Garrulus_glandarius_1_Luc_Viatour.jpg"],
+      "gil":["Holger Uwe Schmitt","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:26_Gramm_etwa_wiegt_ein_Dompfaff_M%C3%A4nnchen._17.jpg"],
+      "dzwoniec":["Andreas Trepte","CC BY-SA 2.5","https://commons.wikimedia.org/wiki/File:European_Greenfinch_male_female.jpg"],
+      "sarna":["Henryk Bielamowicz","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Przysieki,_sarny_(HB1).jpg"],
+      "jelen":["Lviatour","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Cervus_elaphus_Luc_Viatour_6.jpg"],
+      "dzik":["Jerzy Strzelecki","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Locha(js).jpg"],
+      "wilk":["User:Mas3cf","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg"],
+      "zajac":["Jean-Jacques Boujot from Paris, France","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Lepus_europaeus_(Causse_M%C3%A9jean,_Loz%C3%A8re)-cropped.jpg"],
+      "lis":["ClaudiaTen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_(cropped).jpg"],
+      "pajak":["Bartłomiej Molawka","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Araneus_diadematus_close-up.jpg"],
+      "jez":["Jörg Hempel","CC BY-SA 2.0 de","https://commons.wikimedia.org/wiki/File:Erinaceus_europaeus_LC0119.jpg"],
+      "mysz":["Hans Hillewaert","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Apodemus_sylvaticus_(Sardinia).jpg"],
+      "slowik":["Dion Art","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:%D0%92%D0%BE%D1%81%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B9_%D1%81%D0%BE%D0%BB%D0%BE%D0%B2%D0%B5%D0%B9_(Luscinia_luscinia),_%D0%91%D0%B8%D1%82%D1%86%D0%B5%D0%B2%D1%81%D0%BA%D0%B8%D0%B9_%D0%BB%D0%B5%D1%81.jpg"],
+      "rudzik":["Francis C. Franklin","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Erithacus_rubecula_with_cocked_head.jpg"],
+      "slimak":["user:Kosiarz-PL, cropped Przykuta","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Helix_pomatia_may_2008_cropped.jpg"],
+      "zaba":["Monika Betley","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Dixi-Rana_temporaria.jpg"],
+      "dzdzownica":["Michael Linnenbach","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Regenwurm1.jpg"],
+      "mrowka":["Salicyna","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Formica_rufa_2019-03-24_7893.jpg"],
+      "zuk":["James K. Lindsey","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Anoplotrupes.stercorosus.jpg"],
+      "zoledzie":["böhringer friedrich","CC BY-SA 3.0 at","https://commons.wikimedia.org/wiki/File:Acorns_of_Quercus_robur,_Eichel_der_Stieleiche_17.JPG"],
+      "szyszki":["Kritzolina","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Picea_abies_cones_at_Munich_Waldfriedhof.jpg"],
+      "leszczyna":["Anne Burgess","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Hazel_Nuts_(Corylus_avellana)_-_geograph.org.uk_-_6562241.jpg"],
+      "jalowiec":["W.carter","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Blue_and_green_juniper_berries_in_a_branch_in_Norrkila_4.jpg"],
+      "bez":["AnemoneProjectors","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Elder_(Sambucus_nigra)_fruits_(3961668575).jpg"],
+      "malina":["Juhanson","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Raspberries_(Rubus_Idaeus).jpg"],
+      "jezyna":["Grossbildjaeger","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Brombeeren_unreif_und_reif_an_der_Hecke_Karlsruhe_Deutschland.JPG"],
+      "jarzebina":["Jonathan Billinger","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Rowan_berries,_Sorbus_aucuparia_-_geograph.org.uk_-_1457725.jpg"],
+      "borowka":["Rosa-Maria Rinkl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Heidelbeeren_im_Wald.JPG"],
+      "wrzos":["Dietmar Rabich","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Haltern_am_See,_Westruper_Heide_--_2021_--_4689.jpg"],
+      "paproc":["Johann Jaritz","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:P%C3%B6rtschach_Winklern_10.-Oktober-Stra%C3%9Fe_69_Echter_Wurmfarn_21062024_1142.jpg"],
+      "mech":["Extemporalist","CC0","https://commons.wikimedia.org/wiki/File:Mosses,_Lichens,_and_Grasses_sparkle_on_the_forest_floor_in_Lac_La_Hache_Provincial_Park.png"],
+      "muchomor":["Onderwijsgek","CC BY-SA 3.0 nl","https://commons.wikimedia.org/wiki/File:Amanita_muscaria_3_vliegenzwammen_op_rij.jpg"],
+      "borowik":["Jerzy Opioła","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Boletus_edulis_B1.jpg"],
+      "liscie":["Sérgio Rola sergio_rola","CC0","https://commons.wikimedia.org/wiki/File:Autumn_forest_floor_(Unsplash).jpg"],
+      "w-korony":["John Robert McPherson","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Tall_open_forest_canopy_from_below_Mt_Glorious_01.jpg"],
+      "w-podszyt":["Borealis55","Public domain","https://commons.wikimedia.org/wiki/File:Understory.JPG"],
+      "w-runo":["Pit1233","Public domain","https://commons.wikimedia.org/wiki/File:Rezerwat_Dziki_Ostr%C3%B3w_runo_1.jpg"],
+      "las":["Tortuosa","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Beechforest062005.jpg"]
+    };
+
+    const MAX_STARS = LEVELS.length * 3;
+    const REWARDS = [
+      { frac: 0.15, id: 'glasses', name: 'okulary', icon: '👓' },
+      { frac: 0.35, id: 'scarf', name: 'szalik', icon: '🧣' },
+      { frac: 0.6, id: 'hat', name: 'czapka leśniczego', icon: '🎓' },
+      { frac: 0.85, id: 'crown', name: 'złota korona', icon: '👑' }
+    ].map(r => ({ ...r, at: Math.max(1, Math.round(r.frac * MAX_STARS)) }));
+    const PRAISE = ['Super!', 'Brawo!', 'Hu hu! Świetnie!', 'Ekstra!', 'Tak jest! 🎉', 'Prawdziwa znawczyni lasu! 🌳', 'Wow, pięknie!', 'Doskonale!'];
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const screen = $('#screen');
+
+    /* ---------- Stan i zapis ---------- */
+    function defaultState() { return { stars: {}, found: {}, best: {}, streak: { last: null, count: 0 }, sfx: true }; }
+    function loadState() {
+      try {
+        const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        if (s) return Object.assign(defaultState(), s);
+      } catch (e) {}
+      return defaultState();
+    }
+    function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); } catch (e) {} }
+    const state = loadState();
+
+    const totalStars = () => LEVELS.reduce((s, l) => s + (state.stars[l.id] || 0), 0);
+    const accessories = () => REWARDS.filter(r => totalStars() >= r.at).map(r => r.id);
+    const unlocked = i => i === 0 || !!state.stars[LEVELS[i - 1].id];
+
+    function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); }
+    function bumpStreak() {
+      const t = dayStr(new Date()), s = state.streak;
+      if (s.last === t) return;
+      s.count = s.last === yesterdayStr() ? s.count + 1 : 1;
+      s.last = t;
+    }
+    const currentStreak = () => state.streak.last === dayStr(new Date()) || state.streak.last === yesterdayStr() ? state.streak.count : 0;
+
+    /* ---------- Narzędzia ---------- */
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    const src = id => CONFIG.img + id + '.jpg';
+    const credit = id => CREDITS[id] ? `📷 fot. ${CREDITS[id][0]}, ${CREDITS[id][1]}` : '';
+    const lc = l => `--lc:${LAYERS[l].color}`;
+    const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+
+    /* ---------- Dźwięki ---------- */
+    let actx = null;
+    function tone(freqs, dur = 0.1, type = 'sine', vol = 0.15) {
+      if (!state.sfx) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        freqs.forEach((f, i) => {
+          const o = actx.createOscillator(), g = actx.createGain(), st = t0 + i * dur;
+          o.type = type; o.frequency.value = f;
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(vol, st + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur * 1.6);
+          o.connect(g).connect(actx.destination);
+          o.start(st); o.stop(st + dur * 1.7);
+        });
+      } catch (e) {}
+    }
+    const sfx = {
+      good: () => tone([660, 990], 0.09),
+      bad: () => tone([240, 180], 0.12, 'triangle'),
+      tap: () => tone([520], 0.04, 'sine', 0.07),
+      win: () => tone([523, 659, 784, 1047], 0.12),
+      lose: () => tone([392, 330, 262], 0.16, 'triangle')
+    };
+
+    /* ---------- Sówka Lulu (leśna, brązowa) ---------- */
+    function owlSVG(mood) {
+      const acc = accessories();
+      const eyes = mood === 'happy'
+        ? `<path d="M31 64 q13 -13 26 0 M63 64 q13 -13 26 0" stroke="#1e1b4b" stroke-width="5" fill="none" stroke-linecap="round"/>`
+        : `<circle cx="44" cy="62" r="14" fill="#fff"/><circle cx="76" cy="62" r="14" fill="#fff"/>
+           <circle cx="46" cy="63" r="7" fill="#1e1b4b"/><circle cx="78" cy="63" r="7" fill="#1e1b4b"/>
+           <circle cx="48.5" cy="60" r="2.3" fill="#fff"/><circle cx="80.5" cy="60" r="2.3" fill="#fff"/>
+           ${mood === 'sad' ? '<path d="M32 44 l20 5 M88 44 l-20 5" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>' : ''}`;
+      const scarf = acc.includes('scarf')
+        ? `<rect x="24" y="84" width="72" height="12" rx="6" fill="#16a34a"/><rect x="70" y="90" width="12" height="28" rx="4" fill="#15803d"/>
+           <path d="M70 104 h12 M70 110 h12" stroke="#86efac" stroke-width="2"/>` : '';
+      const glasses = acc.includes('glasses')
+        ? `<circle cx="44" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <circle cx="76" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <path d="M58 60 q2 -3 4 0" stroke="#1e1b4b" stroke-width="3.5" fill="none"/>` : '';
+      const crown = acc.includes('crown')
+        ? `<polygon points="36,40 37,12 49,27 60,5 71,27 83,12 84,40" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" stroke-linejoin="round"/>
+           <circle cx="60" cy="30" r="4" fill="#ef4444"/><circle cx="45" cy="33" r="3" fill="#3b82f6"/><circle cx="75" cy="33" r="3" fill="#22c55e"/>` : '';
+      const hat = acc.includes('hat') && !acc.includes('crown')
+        ? `<path d="M44 34 v10 q16 7 32 0 v-10z" fill="#3f6212"/>
+           <polygon points="26,30 60,16 94,30 60,44" fill="#365314"/>
+           <path d="M60 30 L90 33 V48" stroke="#facc15" stroke-width="3" fill="none"/><circle cx="90" cy="50" r="4" fill="#facc15"/>` : '';
+      return `<svg class="owl-svg" viewBox="0 0 120 135" aria-hidden="true">
+        <ellipse cx="60" cy="131" rx="34" ry="4" fill="rgba(20,50,31,0.14)"/>
+        <polygon points="26,46 19,14 47,32" fill="#78350f"/>
+        <polygon points="94,46 101,14 73,32" fill="#78350f"/>
+        <ellipse cx="60" cy="80" rx="42" ry="46" fill="#b45309"/>
+        <ellipse cx="21" cy="92" rx="11" ry="24" fill="#78350f" transform="rotate(14 21 92)"/>
+        <ellipse cx="99" cy="92" rx="11" ry="24" fill="#78350f" transform="rotate(-14 99 92)"/>
+        <ellipse cx="60" cy="98" rx="26" ry="27" fill="#fef3c7"/>
+        <path d="M48 96 q5 5 10 0 M62 96 q5 5 10 0 M55 107 q5 5 10 0" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+        ${eyes}
+        <polygon points="54,73 66,73 60,84" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" stroke-linejoin="round"/>
+        <ellipse cx="47" cy="126" rx="8" ry="4.5" fill="#f59e0b"/><ellipse cx="73" cy="126" rx="8" ry="4.5" fill="#f59e0b"/>
+        ${scarf}${glasses}${hat}${crown}
+      </svg>`;
+    }
+
+    function owlSay(html, mood) {
+      const b = $('#bubble');
+      if (b) { b.innerHTML = html; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+      const o = $('#owl');
+      if (o) {
+        o.innerHTML = owlSVG(mood);
+        o.classList.remove('jump', 'shake'); void o.offsetWidth;
+        if (mood === 'happy') o.classList.add('jump');
+        if (mood === 'sad') o.classList.add('shake');
+      }
+    }
+
+    function confetti() {
+      const colors = ['#16a34a', '#facc15', '#ea580c', '#d6a06a', '#4ade80', '#a16207'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+
+    function markFound(id) { state.found[id] = true; }
+
+    /* ---------- Górny pasek ---------- */
+    function updateTopbar() {
+      $('#starCount').textContent = totalStars();
+      $('#streakCount').textContent = currentStreak();
+      $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+    }
+    $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
+
+    /* ---------- Pętla gier zręcznościowych ---------- */
+    let raf = null, keyHandler = null, timers = [];
+    function stopGame() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null; keyHandler = null;
+      timers.forEach(clearTimeout); timers = [];
+    }
+    function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
+    function gameLoop(step) {
+      let last = performance.now();
+      const f = now => {
+        const dt = Math.min(50, now - last); last = now;
+        if (step(dt) !== false) raf = requestAnimationFrame(f);
+      };
+      raf = requestAnimationFrame(f);
+    }
+    document.addEventListener('keydown', e => { if (keyHandler) keyHandler(e); });
+
+    /* =====================================================================
+       MAPA
+       ===================================================================== */
+    function renderMap() {
+      stopGame();
+      document.body.classList.remove('in-level');
+      updateTopbar();
+      const tot = totalStars();
+      const next = REWARDS.find(r => tot < r.at);
+      const prevAt = [...REWARDS].reverse().find(r => tot >= r.at)?.at || 0;
+      const pct = next ? Math.round((tot - prevAt) / (next.at - prevAt) * 100) : 100;
+      const cur = LEVELS.findIndex((l, i) => unlocked(i) && !state.stars[l.id]);
+
+      let greet;
+      if (tot === 0) greet = CONFIG.intro;
+      else if (tot === MAX_STARS) greet = 'Hu hu! Znasz las od czubków drzew aż po ściółkę! 🏆 Możesz wracać do ulubionych zadań, kiedy tylko chcesz.';
+      else if (cur >= 0) greet = `Witaj z powrotem w lesie! 🌳 Dziś czeka na Ciebie: <b>${LEVELS[cur].name}</b>. Dasz radę! 💪`;
+      else greet = 'Wszystkie zadania odblokowane! Zagraj jeszcze raz tam, gdzie brakuje Ci gwiazdek ⭐.';
+
+      const node = (l, i) => {
+        const s = state.stars[l.id] || 0, un = unlocked(i);
+        const cls = (!un ? 'locked' : i === cur ? 'current' : s ? 'done' : '') + (l.arcade ? ' arcade' : '');
+        return `<button class="node ${cls}" data-level="${i}" ${un ? '' : 'disabled'} style="--off:${[0, 1, 2, 1][i % 4]}">
+          <span class="node-icon">${un ? l.icon : '🔒'}</span>
+          <span class="node-body"><span class="node-num">${l.boss ? 'Finał' : l.arcade ? 'Gra zręcznościowa' : `Zadanie ${i + 1}`}</span>
+            <span class="node-name">${l.name}</span><span class="node-desc">${l.desc}</span></span>
+          <span class="node-stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></span>
+          ${i === cur ? '<span class="here">🦉 Tu jesteś!</span>' : ''}
+        </button>`;
+      };
+
+      const foundN = ITEMS.filter(i => state.found[i.id]).length;
+      const album = LAYER_ORDER.map(l => ITEMS.filter(i => i.l === l).map(i => {
+        const got = !!state.found[i.id];
+        return `<div class="album-item ${got ? '' : 'locked'}" style="${lc(l)}" title="${got ? i.name : '???'}">
+          <div class="ph">${got ? `<img src="${src(i.id)}" alt="${i.name}" loading="lazy" />` : '?'}</div>
+          <span>${got ? i.name : '???'}</span></div>`;
+      }).join('')).join('');
+
+      screen.innerHTML = `
+        <section class="hero">
+          <div class="owl-big">${owlSVG(tot === MAX_STARS ? 'happy' : '')}</div>
+          <div class="bubble">${greet}</div>
+        </section>
+        <div class="reward-bar">
+          ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
+          <div class="bar"><div style="width:${pct}%"></div></div>
+        </div>
+        <h2 class="section-title">🗺️ Leśna ścieżka</h2>
+        <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
+        <h2 class="section-title">📸 Mój leśny album</h2>
+        <p class="muted">Każde zwierzę i roślina, które poprawnie przypiszesz do piętra, trafia do albumu. Masz ${foundN} z ${ITEMS.length}.</p>
+        <div class="album">${album}</div>
+        <button class="info-btn" id="srcBtn">📷 Skąd są zdjęcia?</button>
+        <button class="link-btn danger" id="resetBtn">Zacznij od nowa (dla rodzica)</button>`;
+
+      screen.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => startLevel(+b.dataset.level)));
+      $('#srcBtn').addEventListener('click', renderSources);
+      $('#resetBtn').addEventListener('click', () => {
+        if (confirm('Usunąć wszystkie gwiazdki i album w tej grze?')) {
+          try { localStorage.removeItem(CONFIG.storageKey); } catch (e) {}
+          location.reload();
+        }
+      });
+      window.scrollTo(0, 0);
+    }
+
+    function renderSources() {
+      const ids = [...LAYER_ORDER.map(l => LAYERS[l].img), 'las', ...ITEMS.map(i => i.id)].filter((v, i, a) => a.indexOf(v) === i);
+      screen.innerHTML = `
+        <div class="info-wrap">
+          <section class="hero">
+            <div class="owl-mini">${owlSVG('happy')}</div>
+            <div class="bubble">Wszystkie zdjęcia zrobili prawdziwi fotografowie i podzielili się nimi za darmo w Wikimedia Commons. Dziękujemy! 💚</div>
+          </section>
+          <div class="info-card">
+            <h3>📷 Autorzy zdjęć</h3>
+            <ul class="src-list">${ids.filter(id => CREDITS[id]).map(id => `<li><img src="${src(id)}" alt="" loading="lazy" />
+              <span>${ITEM[id] ? ITEM[id].name : 'Las'} – ${CREDITS[id][0]}, <a href="${CREDITS[id][2]}" target="_blank" rel="noopener">${CREDITS[id][1]}</a></span></li>`).join('')}</ul>
+          </div>
+          <button class="btn" id="backMapBtn">← Wróć do mapy</button>
+        </div>`;
+      $('#backMapBtn').addEventListener('click', renderMap);
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       POZIOMY – wspólne
+       ===================================================================== */
+    let session = null;
+
+    function startLevel(idx) {
+      stopGame();
+      const lvl = LEVELS[idx];
+      session = { idx, lvl, mistakes: 0, total: 0, solved: 0, queue: [] };
+      document.body.classList.add('in-level');
+      ({ learn: startLearn, photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, gives: startGives })[lvl.type]();
+    }
+
+    function shell(bubble, opts = {}) {
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            ${opts.hearts ? `<div class="hearts" id="hearts"></div><span class="spacer" style="flex:1"></span>` : '<div class="progress"><div class="progress-fill" id="progFill"></div></div>'}
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          ${opts.noGuide ? '' : `<div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">${bubble}</div></div>`}
+          <div class="task" id="task"></div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', () => {
+        if (opts.hearts || confirm('Przerwać zadanie? Gwiazdki dostaniesz, gdy dojdziesz do końca.')) renderMap();
+      });
+      window.scrollTo(0, 0);
+    }
+    function setProgress(frac) { const p = $('#progFill'); if (p) p.style.width = Math.round(frac * 100) + '%'; }
+
+    function starsFor(mistakes, total) {
+      const r = total ? mistakes / total : 0;
+      return r <= 0.1 ? 3 : r <= 0.3 ? 2 : 1;
+    }
+
+    function finishLevel(stars, line) {
+      stopGame();
+      const prev = state.stars[session.lvl.id] || 0;
+      state.stars[session.lvl.id] = Math.max(prev, stars);
+      bumpStreak();
+      save();
+      if (window.Odznaki) Odznaki.sprawdz();
+      const tot = totalStars();
+      const newReward = REWARDS.find(r => r.at > tot - (state.stars[session.lvl.id] - prev) && r.at <= tot);
+      const nextIdx = session.idx + 1 < LEVELS.length ? session.idx + 1 : -1;
+
+      document.body.classList.add('in-level');
+      screen.innerHTML = `
+        <section class="result">
+          <div class="owl-big">${owlSVG(stars >= 2 ? 'happy' : '')}</div>
+          <h2>${stars === 3 ? 'Rewelacja!' : stars === 2 ? 'Bardzo dobrze!' : 'Dobra robota!'}</h2>
+          <p>${line}</p>
+          <div class="result-stars">
+            ${[0, 1, 2].map(i => `<span class="rs ${i < stars ? 'on' : ''}" style="--d:${i * 0.15}s">★</span>`).join('')}
+          </div>
+          ${newReward ? `<div class="reward-pop"><span class="ic">${newReward.icon}</span><span>Sówka dostaje: <b>${newReward.name}</b>!</span></div>` : ''}
+          ${stars < 3 ? '<p>Zagraj jeszcze raz po 3 ⭐ i odznakę 🏅</p>' : ''}
+          <div class="result-actions">
+            ${nextIdx > 0 ? '<button class="btn" id="nextBtn">Dalej: ' + LEVELS[nextIdx].icon + ' ' + LEVELS[nextIdx].name + ' →</button>' : ''}
+            <button class="btn soft" id="againBtn">🔁 Jeszcze raz</button>
+            <button class="btn soft" id="toMapBtn">🗺️ Mapa</button>
+          </div>
+        </section>`;
+      $('#toMapBtn').addEventListener('click', renderMap);
+      $('#againBtn').addEventListener('click', () => startLevel(session.idx));
+      if (nextIdx > 0) $('#nextBtn').addEventListener('click', () => startLevel(nextIdx));
+      sfx.win();
+      if (stars >= 2) confetti();
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       1. POZNAJ PIĘTRA LASU – karty warstw + krótkie pytania
+       ===================================================================== */
+    function towerHTML() {
+      return `<div class="tower">${LAYER_ORDER.map(l => `
+        <div class="tower-floor" style="${lc(l)};background-image:url('${src(LAYERS[l].img)}')">
+          <span class="tic">${LAYERS[l].icon}</span><span>${LAYERS[l].name}<small>${LAYERS[l].floor}</small></span>
+          <span class="sun" title="ile światła">${LAYERS[l].sun}</span>
+        </div>`).join('')}</div>`;
+    }
+
+    function startLearn() {
+      let page = 0;
+      const pages = 1 + LAYER_ORDER.length;
+      shell('');
+      const render = () => {
+        setProgress(page / (pages + LEARN_Q.length));
+        const task = $('#task');
+        if (page === 0) {
+          owlSay('Las ma <b>4 piętra</b>, jak wysoki dom 🏠. Słoneczka ☀️ pokazują, ile światła dociera na każde piętro.');
+          task.innerHTML = `${towerHTML()}<button class="btn" id="nextP">Poznaj każde piętro →</button>`;
+        } else {
+          const L = LAYERS[LAYER_ORDER[page - 1]];
+          const zw = animals.filter(i => i.l === L.id), ro = plants.filter(i => i.l === L.id);
+          owlSay(`Piętro ${page}: <b>${L.name}</b> ${L.icon}. Przewiń zdjęcia w bok, żeby zobaczyć wszystkich mieszkańców!`, page === 4 ? 'happy' : '');
+          const chips = arr => `<div class="chips">${arr.map(i => `<div class="chip-ph"><img src="${src(i.id)}" alt="" /><span>${i.name}</span></div>`).join('')}</div>`;
+          task.innerHTML = `
+            <div class="layer-card" style="${lc(L.id)}">
+              <img src="${src(L.img)}" alt="${L.name}" />
+              <div class="credit">${credit(L.img)}</div>
+              <div class="lc-body">
+                <span class="layer-chip">${L.icon} ${L.name}</span> <b style="color:var(--muted);font-size:.85rem">${L.floor} • ${L.sun}</b>
+                <p>${L.text}</p>
+                <div class="mini-title">🐾 Kto tu mieszka?</div>${chips(zw)}
+                <div class="mini-title">🌱 Co tu rośnie?</div>${chips(ro)}
+              </div>
+            </div>
+            <div class="dots">${Array.from({ length: pages }, (_, i) => `<i class="${i === page ? 'on' : ''}"></i>`).join('')}</div>
+            <button class="btn" id="nextP">${page < pages - 1 ? 'Następne piętro ↓' : 'Sprawdźmy, co pamiętasz! →'}</button>
+            ${page > 0 ? '<button class="btn soft" id="prevP">↑ Wróć</button>' : ''}`;
+          const pv = $('#prevP'); if (pv) pv.addEventListener('click', () => { page--; render(); });
+        }
+        $('#nextP').addEventListener('click', () => {
+          sfx.tap();
+          if (++page < pages) render();
+          else {
+            session.queue = shuffle(LEARN_Q).map(q => ({ type: 'text', ...q }));
+            session.total = session.queue.length;
+            session.offset = pages;
+            session.span = pages + LEARN_Q.length;
+            nextTask();
+          }
+        });
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    /* =====================================================================
+       KOLEJKA ZADAŃ: zdjęcie → warstwa, zdanie z luką, pytanie
+       Błędne zadanie wraca raz na koniec kolejki.
+       ===================================================================== */
+    function startQueue() {
+      const lvl = session.lvl;
+      if (lvl.boss) {
+        session.queue = shuffle([
+          ...shuffle(ITEMS).slice(0, 7).map(item => ({ type: 'photo', item })),
+          ...shuffle(LIGHT_Q).slice(0, 3).map(q => ({ type: 'text', ...q })),
+          ...shuffle(LEARN_Q).slice(0, 2).map(q => ({ type: 'text', ...q }))
+        ]);
+      } else if (lvl.type === 'photo') session.queue = lvl.pool().map(item => ({ type: 'photo', item }));
+      else session.queue = lvl.pool().map(q => ({ type: 'text', ...q }));
+      session.total = session.queue.length;
+      shell('');
+      nextTask();
+    }
+
+    function nextTask() {
+      if (!session.queue.length) {
+        return finishLevel(starsFor(session.mistakes, session.total),
+          `Błędów: ${session.mistakes} na ${session.total} ${session.total >= 5 ? 'zadań' : 'zadania'}.`);
+      }
+      const span = session.span || session.total;
+      setProgress(((session.offset || 0) + session.solved) / span);
+      const t = session.queue.shift();
+      if (t.type === 'photo') renderPhotoTask(t); else renderTextTask(t);
+      window.scrollTo(0, 0);
+    }
+
+    function answered(t, ok, noteHTML) {
+      if (ok) { session.solved++; sfx.good(); }
+      else {
+        session.mistakes++; sfx.bad();
+        if (!t.again) session.queue.push({ ...t, again: true }); else session.solved++;
+      }
+      const wrap = $('#feedbackWrap');
+      wrap.innerHTML = `
+        ${ok ? '' : '<div class="feedback-head bad">To zadanie wróci jeszcze na końcu 🔁</div>'}
+        <div class="note">💡 ${noteHTML}</div>
+        <button class="btn" id="nextQBtn">${session.queue.length ? 'Dalej →' : 'Zobacz wynik →'}</button>`;
+      $('#nextQBtn').addEventListener('click', nextTask);
+      later(() => $('#nextQBtn')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+    }
+
+    function layerButtons() {
+      return `<div class="layers" id="opts">${LAYER_ORDER.map(l => `
+        <button class="layer-btn" data-l="${l}" style="${lc(l)}"><span class="lic">${LAYERS[l].icon}</span>${LAYERS[l].name}<span class="floor">${LAYERS[l].floor}</span></button>`).join('')}</div>`;
+    }
+
+    function renderPhotoTask(t) {
+      const it = t.item;
+      const task = $('#task');
+      task.innerHTML = `
+        <div class="photo-card">
+          <img src="${src(it.id)}" alt="${it.name}" />
+          <div class="photo-name">${it.name}</div>
+          <div class="credit">${credit(it.id)}</div>
+        </div>
+        <div class="q-line">Na którym piętrze lasu ${it.v}?</div>
+        ${layerButtons()}
+        <div id="feedbackWrap"></div>`;
+      owlSay(it.kind === 'zw' ? `Gdzie mieszka to zwierzę? 🤔` : `Gdzie to rośnie? 🤔`);
+      let done = false;
+      task.querySelectorAll('.layer-btn').forEach(btn => btn.addEventListener('click', () => {
+        if (done) return; done = true;
+        const ok = btn.dataset.l === it.l;
+        task.querySelectorAll('.layer-btn').forEach(b => {
+          b.disabled = true;
+          if (b.dataset.l === it.l) b.classList.add('ok');
+          else if (b === btn) b.classList.add('bad');
+          else b.classList.add('dim');
+        });
+        if (ok) { markFound(it.id); save(); owlSay(pick(PRAISE), 'happy'); }
+        else owlSay(`Prawie! ${it.name} ${it.v} ${IN_LAYER[it.l]} 💪`, 'sad');
+        answered(t, ok, it.note);
+      }));
+    }
+
+    function renderTextTask(t) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const opts = shuffle(t.options);
+      const task = $('#task');
+      const sentence = t.s ? t.s.replace('___', '<span class="blank" id="blank">&nbsp;?&nbsp;</span>') : t.q;
+      task.innerHTML = `
+        <div class="q-card">
+          <div class="q-num">${t.s ? 'Dokończ zdanie' : 'Pytanie'}</div>
+          <div class="q-text">${sentence}</div>
+        </div>
+        <div class="quiz-opts">
+          ${opts.map((o, i) => `<button class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span><span>${o}</span></button>`).join('')}
+        </div>
+        <div id="feedbackWrap"></div>`;
+      owlSay(t.s ? 'Wybierz, jak skończyć zdanie ✏️' : 'Przeczytaj pytanie i wybierz odpowiedź.');
+      let done = false;
+      task.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
+        if (done) return; done = true;
+        const ok = opts[+btn.dataset.i] === t.a;
+        task.querySelectorAll('.quiz-opt').forEach(b => {
+          b.disabled = true;
+          if (opts[+b.dataset.i] === t.a) b.classList.add('ok');
+          else if (b === btn) b.classList.add('bad');
+          else b.classList.add('dim');
+        });
+        const bl = $('#blank'); if (bl) { bl.textContent = t.a; bl.classList.add('filled'); }
+        if (ok) owlSay(pick(PRAISE), 'happy'); else owlSay('Prawie! Zobacz poprawną odpowiedź 💪', 'sad');
+        answered(t, ok, t.note);
+      }));
+    }
+
+    /* =====================================================================
+       🎮 SPADAJĄCE ZNALEZISKA – zdjęcie spada przez las, dotknij piętra,
+       na którym mieszka / rośnie, zanim spadnie na ziemię.
+       ===================================================================== */
+    function arcadeIntro(arena, title, text, onStart) {
+      const ov = document.createElement('div');
+      ov.className = 'arcade-start';
+      ov.innerHTML = `<div class="owl-mini" style="width:80px">${owlSVG('happy')}</div><h3>${title}</h3><p>${text}</p>
+        <button class="btn" id="goBtn">▶ Start!</button>`;
+      arena.appendChild(ov);
+      ov.querySelector('#goBtn').addEventListener('click', () => { ov.remove(); sfx.tap(); onStart(); });
+    }
+    function arcadeLose(arena, line) {
+      stopGame(); sfx.lose();
+      const ov = document.createElement('div');
+      ov.className = 'arcade-start';
+      ov.innerHTML = `<div class="owl-mini" style="width:80px">${owlSVG('sad')}</div><h3>Ojej, koniec serduszek!</h3><p>${line}</p>
+        <button class="btn" id="againBtn">🔁 Jeszcze raz</button><button class="btn soft" id="mapBtn">🗺️ Mapa</button>`;
+      arena.appendChild(ov);
+      ov.querySelector('#againBtn').addEventListener('click', () => startLevel(session.idx));
+      ov.querySelector('#mapBtn').addEventListener('click', renderMap);
+    }
+    function drawHearts(h) { $('#hearts').innerHTML = [0, 1, 2].map(i => `<span class="${i < h ? '' : 'lost'}">❤️</span>`).join(''); }
+    function floatText(arena, x, y, txt) {
+      const f = document.createElement('div');
+      f.className = 'float-txt'; f.textContent = txt;
+      f.style.left = x + 'px'; f.style.top = y + 'px';
+      arena.appendChild(f); setTimeout(() => f.remove(), 900);
+    }
+
+    function startDrop() {
+      const GOAL = 15;
+      shell('', { hearts: true, noGuide: true });
+      const task = $('#task');
+      task.innerHTML = `<div class="arena" id="arena">
+          ${LAYER_ORDER.map((l, i) => `<button class="band" data-l="${l}" style="${lc(l)};top:${i * 25}%;height:25%"><span class="bl">${LAYERS[l].icon} ${LAYERS[l].name}</span></button>`).join('')}
+          <div class="score-pill" id="score">0 / ${GOAL}</div>
+        </div>`;
+      const arena = $('#arena');
+      let hearts = 3, score = 0, cur = null, busy = true, deck = [];
+      drawHearts(hearts);
+      const nextItem = () => { if (!deck.length) deck = shuffle(ITEMS); return deck.pop(); };
+
+      function spawn() {
+        const item = nextItem();
+        const el = document.createElement('div');
+        el.className = 'faller';
+        el.innerHTML = `<img src="${src(item.id)}" alt="" /><span>${item.name}</span>`;
+        arena.appendChild(el);
+        const W = arena.clientWidth;
+        const x = W * 0.55 + Math.random() * (W * 0.45 - 100);
+        el.style.left = Math.max(W * 0.45, x) + 'px';
+        el.style.top = '-110px';
+        cur = { item, el, y: -110, dur: Math.max(3400, 7600 - score * 280) };
+        busy = false;
+      }
+      function resolve(l) {
+        if (busy || !cur) return;
+        busy = true;
+        const { item, el } = cur;
+        const H = arena.clientHeight;
+        const okBand = arena.querySelector(`.band[data-l="${item.l}"]`);
+        const target = LAYER_ORDER.indexOf(item.l) * 0.25 * H + 0.125 * H - 55;
+        el.style.top = target + 'px'; el.style.transition = 'top .35s ease, opacity .35s ease';
+        okBand.classList.remove('flash-ok'); void okBand.offsetWidth; okBand.classList.add('flash-ok');
+        if (l === item.l) {
+          score++; markFound(item.id); sfx.good();
+          floatText(arena, 20, target + 40, '+1 ⭐');
+          $('#score').textContent = `${score} / ${GOAL}`;
+        } else {
+          hearts--; sfx.bad(); drawHearts(hearts);
+          if (l) { const wb = arena.querySelector(`.band[data-l="${l}"]`); wb.classList.remove('flash-bad'); void wb.offsetWidth; wb.classList.add('flash-bad'); }
+          floatText(arena, 20, target + 40, `${item.name}: ${LAYERS[item.l].short}`);
+        }
+        later(() => {
+          el.style.opacity = '0';
+          later(() => {
+            el.remove(); cur = null;
+            if (hearts <= 0) return arcadeLose(arena, `Udało się ${score} z ${GOAL}. Spróbuj jeszcze raz – za każdym razem idzie lepiej!`);
+            if (score >= GOAL) { save(); return finishLevel(hearts, `Wszystkie ${GOAL} znalezisk trafiło na swoje piętro! Zostało serduszek: ${hearts} ❤️`); }
+            spawn();
+          }, 300);
+        }, l === item.l ? 450 : 1300);
+      }
+      arena.querySelectorAll('.band').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); resolve(b.dataset.l); }));
+      keyHandler = e => { const i = ['1', '2', '3', '4'].indexOf(e.key); if (i >= 0) resolve(LAYER_ORDER[i]); };
+
+      arcadeIntro(arena, '🎮 Spadające znaleziska',
+        `Zwierzęta i rośliny spadają przez las! <b>Dotknij piętra</b>, na którym mieszkają albo rosną – zanim spadną na ziemię. Masz 3 ❤️. Zbierz ${GOAL} punktów!<br><small>Na komputerze: klawisze 1–4.</small>`,
+        () => {
+          spawn();
+          gameLoop(dt => {
+            if (!cur || busy) return;
+            const H = arena.clientHeight;
+            cur.y += dt * (H + 110) / cur.dur;
+            cur.el.style.top = cur.y + 'px';
+            if (cur.y > H - 60) resolve(null);
+          });
+        });
+    }
+
+    /* =====================================================================
+       🎮 LEŚNY KOSZYK – łap koszykiem tylko to, co należy do wskazanego piętra.
+       ===================================================================== */
+    function startCatch() {
+      const GOAL = 12, PER_TARGET = 3;
+      shell('', { hearts: true, noGuide: true });
+      const task = $('#task');
+      task.innerHTML = `<div class="arena" id="arena">
+          <div class="target-pill" id="target"></div>
+          <div class="score-pill" id="score">0 / ${GOAL}</div>
+          <div class="basket" id="basket">🧺</div>
+        </div>`;
+      const arena = $('#arena'), basket = $('#basket');
+      let hearts = 3, score = 0, falling = [], spawnIn = 600, bx = 0, targets = shuffle(LAYER_ORDER), tIdx = 0, keyDir = 0;
+      drawHearts(hearts);
+      const target = () => targets[tIdx % targets.length];
+      function showTarget() {
+        const L = LAYERS[target()];
+        const tp = $('#target');
+        tp.setAttribute('style', lc(L.id));
+        tp.innerHTML = `Łap tylko: ${L.icon} ${L.name}`;
+      }
+      function placeBasket() { basket.style.left = (bx - 50) + 'px'; }
+      function moveTo(clientX) {
+        const r = arena.getBoundingClientRect();
+        bx = Math.max(50, Math.min(r.width - 50, clientX - r.left)); placeBasket();
+      }
+      arena.addEventListener('pointerdown', e => moveTo(e.clientX));
+      arena.addEventListener('pointermove', e => moveTo(e.clientX));
+      keyHandler = e => {
+        if (e.type !== 'keydown') return;
+        if (e.key === 'ArrowLeft') keyDir = -1; else if (e.key === 'ArrowRight') keyDir = 1;
+      };
+      const keyUp = e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') keyDir = 0; };
+      document.addEventListener('keyup', keyUp);
+
+      function spawn() {
+        const W = arena.clientWidth;
+        const want = Math.random() < 0.6;
+        const pool = ITEMS.filter(i => want ? i.l === target() : i.l !== target());
+        const item = pick(pool);
+        const el = document.createElement('div');
+        el.className = 'faller small';
+        el.innerHTML = `<img src="${src(item.id)}" alt="" /><span>${item.name}</span>`;
+        arena.appendChild(el);
+        const x = 10 + Math.random() * (W - 96 - 20);
+        el.style.left = x + 'px'; el.style.top = '-100px';
+        falling.push({ item, el, x: x + 48, y: -100, v: 0.075 + Math.min(0.06, score * 0.004) + Math.random() * 0.02 });
+      }
+
+      arcadeIntro(arena, '🧺 Leśny koszyk',
+        `Przesuwaj koszyk palcem w lewo i w prawo. <b>Łap tylko to, co mieszka lub rośnie na wskazanym piętrze</b> – napis u góry podpowie które. Złapanie czegoś z innego piętra zabiera ❤️. Złap ${GOAL}!<br><small>Na komputerze: strzałki ← →.</small>`,
+        () => {
+          bx = arena.clientWidth / 2; placeBasket(); showTarget();
+          gameLoop(dt => {
+            const H = arena.clientHeight, W = arena.clientWidth;
+            if (keyDir) { bx = Math.max(50, Math.min(W - 50, bx + keyDir * dt * 0.45)); placeBasket(); }
+            spawnIn -= dt;
+            if (spawnIn <= 0) { spawn(); spawnIn = Math.max(900, 1700 - score * 60); }
+            const basketTop = H - 78;
+            for (const f of falling.slice()) {
+              f.y += f.v * dt;
+              f.el.style.top = f.y + 'px';
+              const caught = f.y + 70 >= basketTop && f.y + 70 <= basketTop + 40 && Math.abs(f.x - bx) < 52;
+              if (caught || f.y > H) {
+                falling.splice(falling.indexOf(f), 1);
+                f.el.remove();
+                if (!caught) continue;
+                if (f.item.l === target()) {
+                  score++; markFound(f.item.id); sfx.good();
+                  floatText(arena, bx - 20, basketTop - 30, '+1 ⭐');
+                  $('#score').textContent = `${score} / ${GOAL}`;
+                  if (score >= GOAL) { document.removeEventListener('keyup', keyUp); save(); finishLevel(hearts, `Złapano ${GOAL} znalezisk z właściwych pięter! Zostało serduszek: ${hearts} ❤️`); return false; }
+                  if (score % PER_TARGET === 0) {
+                    tIdx++; showTarget();
+                    falling.forEach(o => o.el.remove()); falling = []; spawnIn = 900;
+                    floatText(arena, 20, 60, `Teraz: ${LAYERS[target()].name}!`);
+                  }
+                } else {
+                  hearts--; sfx.bad(); drawHearts(hearts);
+                  floatText(arena, Math.max(10, bx - 90), basketTop - 40, `${f.item.name}: ${LAYERS[f.item.l].short}`);
+                  if (hearts <= 0) { document.removeEventListener('keyup', keyUp); arcadeLose(arena, `Złapano ${score} z ${GOAL}. Patrz na napis u góry – podpowiada, które piętro łapiemy!`); return false; }
+                }
+              }
+            }
+          });
+        });
+    }
+
+    /* =====================================================================
+       🔍 ZNAJDŹ WSZYSTKIE – dotknij wszystkich zdjęć z danego piętra
+       ===================================================================== */
+    function startPick() {
+      const rounds = shuffle(LAYER_ORDER).map(l => {
+        const good = shuffle(ITEMS.filter(i => i.l === l)).slice(0, l === 's' ? 3 : 4);
+        const bad = shuffle(ITEMS.filter(i => i.l !== l)).slice(0, 9 - good.length);
+        return { l, good, tiles: shuffle([...good, ...bad]) };
+      });
+      session.total = rounds.reduce((s, r) => s + r.good.length, 0);
+      let ri = 0;
+      shell('');
+      const render = () => {
+        const R = rounds[ri], L = LAYERS[R.l];
+        setProgress(ri / rounds.length);
+        let got = 0, done = false;
+        const task = $('#task');
+        task.innerHTML = `
+          <div class="target-bar">Znajdź wszystko z piętra: <span class="layer-chip" style="${lc(R.l)}">${L.icon} ${L.name}</span></div>
+          <div class="grid3">${R.tiles.map(i => `<button class="tile" data-id="${i.id}"><img src="${src(i.id)}" alt="" /><span>${i.name}</span></button>`).join('')}</div>
+          <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay(`Dotknij <b>wszystkich</b> zwierząt i roślin, które są ${IN_LAYER[R.l]} 🔍`);
+        task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
+          if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
+          const it = ITEM[b.dataset.id];
+          if (it.l === R.l) {
+            b.classList.add('ok'); got++; markFound(it.id); sfx.good();
+            $('#cnt').textContent = `Znaleziono: ${got} z ${R.good.length}`;
+            if (got === R.good.length) {
+              done = true; save();
+              owlSay(pick(PRAISE) + ` Wszystko ${IN_LAYER[R.l]} znalezione!`, 'happy');
+              $('#feedbackWrap').innerHTML = `<button class="btn" id="nextR">${ri < rounds.length - 1 ? 'Następne piętro →' : 'Zobacz wynik →'}</button>`;
+              $('#nextR').addEventListener('click', () => { if (++ri < rounds.length) render(); else finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Wszystkie znaleziska (${session.total}) są na swoich piętrach!`); });
+              later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            } else owlSay(`Tak! ${it.name} ✅ Szukaj dalej…`, 'happy');
+          } else {
+            b.classList.add('bad'); session.mistakes++; sfx.bad();
+            owlSay(`Ojej, ${lowerFirst(it.name)} ${it.v} ${IN_LAYER[it.l]}. Szukaj dalej! 💪`, 'sad');
+          }
+        }));
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    /* =====================================================================
+       🎁 PO CO NAM LAS? – wybierz wszystko, co pasuje (ćw. 4)
+       ===================================================================== */
+    function startGives() {
+      session.total = GIVES.reduce((s, r) => s + r.good.length, 0);
+      let ri = 0;
+      shell('');
+      const render = () => {
+        const R = GIVES[ri];
+        setProgress(ri / GIVES.length);
+        const tiles = shuffle([...R.good.map(g => [...g, true]), ...R.bad.map(b => [...b, false])]);
+        let got = 0, done = false;
+        const task = $('#task');
+        task.innerHTML = `
+          <div class="q-card"><div class="q-num">Runda ${ri + 1} z ${GIVES.length}</div><div class="q-text">${R.q}</div></div>
+          <div class="grid2">${tiles.map((t, i) => `<button class="etile" data-i="${i}"><b>${t[0]}</b>${t[1]}</button>`).join('')}</div>
+          <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay(ri === 0 ? 'Las jest bardzo ważny! Pokaż, co nam daje 💚' : 'Dotknij wszystkich dobrych odpowiedzi.');
+        task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
+          if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
+          const t = tiles[+b.dataset.i];
+          if (t[2]) {
+            b.classList.add('ok'); got++; sfx.good();
+            $('#cnt').textContent = `Znaleziono: ${got} z ${R.good.length}`;
+            if (got === R.good.length) {
+              done = true;
+              owlSay(pick(PRAISE), 'happy');
+              $('#feedbackWrap').innerHTML = `<div class="note">💡 ${R.note}</div>
+                <button class="btn" id="nextR">${ri < GIVES.length - 1 ? 'Dalej →' : 'Zobacz wynik →'}</button>`;
+              $('#nextR').addEventListener('click', () => { if (++ri < GIVES.length) render(); else finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Wiesz już, po co nam las! 🌳`); });
+              later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            } else owlSay('Tak! ✅ Co jeszcze?', 'happy');
+          } else {
+            b.classList.add('bad'); session.mistakes++; sfx.bad();
+            owlSay(ri === 2 ? 'Tak nie robimy w lesie 🙂 Szukaj dalej!' : 'Hmm, tego las nie daje 🙂 Szukaj dalej!', 'sad');
+          }
+        }));
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    renderMap();
+  </script>
+</body>
+</html>

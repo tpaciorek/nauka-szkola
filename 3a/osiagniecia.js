@@ -45,6 +45,13 @@
         ['l4', '🐔', 'Pierwsze niebezpieczne życzenia'], ['l5', '🧁', 'Ciastka bez końca'], ['l6', '👻', 'Niewidzialni w mieście'],
         ['l7', '🍪', 'Piernikowy domek Baby Jagi'], ['l8', '🦁', 'Kamienne lwy ożywają'], ['l9', '👑', 'Wizyta u Prezydenta Miasta'],
         ['l10', '💙', 'Pościg, ZOO i pożegnanie'], ['l11', '🏆', 'Wielki quiz o Karolci']]
+    },
+    {
+      id: 'P', grupa: '🌳 Warstwy lasu', href: 'przyroda/warstwy-lasu.html',
+      key: 'nauka-3a-przyroda-warstwy-lasu-v1', mistrz: ['🏆', 'Znawczyni lasu'],
+      poziomy: [['learn', '🌳', 'Poznaj piętra lasu'], ['animals', '🐿️', 'Kto gdzie mieszka?'], ['drop', '🎮', 'Spadające znaleziska'],
+        ['plants', '🫐', 'Co tu rośnie?'], ['light', '☀️', 'Światło w lesie'], ['catch', '🧺', 'Leśny koszyk'],
+        ['pick', '🔍', 'Znajdź wszystkie'], ['gives', '🎁', 'Po co nam las?'], ['boss', '👑', 'Wielki sprawdzian']]
     }
   ];
   const SEEN_KEY = 'nauka-3a-odznaki-v2';
