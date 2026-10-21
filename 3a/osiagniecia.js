@@ -39,6 +39,14 @@
         ['write', '✏️', 'Napisz sam'], ['dictation', '🎧', 'Dyktando Sówki'], ['boss', '👑', 'Wielki sprawdzian']]
     },
     {
+      id: 'B', grupa: 'Angielski: My Bedroom', flaga: true, href: 'angielski/moj-pokoj.html',
+      key: 'nauka-3a-angielski-moj-pokoj-v1', mistrz: ['🏆', 'Mistrzyni Unit 1'],
+      poziomy: [['learn', '📖', 'Poznaj słówka'], ['choose', '🎯', 'Co to znaczy?'], ['catch', '🧺', 'Łap słówka'], ['tiles', '🧩', 'Literkowe klocki'],
+        ['prep', '📍', 'in, on, under, next to'], ['balloons', '🎈', 'Balonowe słuchanie'], ['where', '❓', 'Where’s…? Where are…?'],
+        ['gaps', '🕳️', 'Dziurawe słowa'], ['fly', '🦉', 'Lot Sówki'], ['build', '🧱', 'Ułóż zdanie'], ['write', '✏️', 'Napisz sam'],
+        ['phrase', '👋', 'Everyday English'], ['dictation', '🎧', 'Dyktando Sówki'], ['boss', '👑', 'Wielki sprawdzian']]
+    },
+    {
       id: 'K', grupa: '💙 Karolcia', href: 'polski/karolcia.html',
       key: 'nauka-3a-polski-karolcia-v1', mistrz: ['🏆', 'Ekspertka od Karolci'],
       poziomy: [['l1', '📖', 'Kim jest Karolcia?'], ['l2', '🚕', 'Latająca taksówka'], ['l3', '🐱', 'Nowi sąsiedzi i gadający koralik'],
