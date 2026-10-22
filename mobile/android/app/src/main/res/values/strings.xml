@@ -4,4 +4,11 @@
     <string name="offline_title">Nie udało się otworzyć strony</string>
     <string name="offline_message">Sprawdź połączenie z internetem i spróbuj ponownie. Twój dotychczasowy postęp jest bezpieczny na tym urządzeniu.</string>
     <string name="retry">Spróbuj ponownie</string>
+    <string name="transfer_title">Masz postęp w Chrome?</string>
+    <string name="transfer_message">Możesz jednorazowo skopiować do aplikacji wyniki, poziomy i odznaki zapisane na tej stronie w Chrome.</string>
+    <string name="transfer_open_chrome">Pobierz z Chrome</string>
+    <string name="transfer_skip">Pomiń</string>
+    <string name="transfer_success">Postęp z Chrome został przeniesiony.</string>
+    <string name="transfer_empty">Nie znaleziono postępu do przeniesienia.</string>
+    <string name="transfer_invalid">Nie udało się odczytać postępu. Spróbuj ponownie.</string>
 </resources>

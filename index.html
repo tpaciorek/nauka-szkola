@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nauka w szkole</title>
   <link rel="stylesheet" href="./portal.css" />
+  <script src="./transfer.js" defer></script>
 </head>
 <body>
   <main class="portal-shell">
@@ -28,10 +29,13 @@
               Aplikacja otwiera zawsze aktualne ćwiczenia z tej strony i zapamiętuje postęp na telefonie.
             </p>
           </div>
-          <a
-            class="app-download-button"
-            href="https://github.com/tpaciorek/nauka-szkola/releases/latest/download/nauka-szkola.apk"
-          >Pobierz aplikację</a>
+          <div class="app-download-actions">
+            <a
+              class="app-download-button"
+              href="https://github.com/tpaciorek/nauka-szkola/releases/latest/download/nauka-szkola.apk"
+            >Pobierz aplikację</a>
+            <a class="app-transfer-link" href="./?transfer=1">Przenieś postęp z Chrome</a>
+          </div>
         </section>
 
         <div class="portal-grid">

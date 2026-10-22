@@ -11,6 +11,10 @@ pozostają w pamięci aplikacji między uruchomieniami. Android może je też pr
 odtwarzaniu kopii zapasowej. Wyczyszczenie danych aplikacji lub jej odinstalowanie usuwa
 lokalny postęp.
 
+Przy pierwszym uruchomieniu bez lokalnych wyników aplikacja proponuje jednorazowy import
+postępu z Chrome. Strona przekazuje wyłącznie klucze `localStorage` zaczynające się od
+`nauka-`, po świadomym naciśnięciu przycisku przez użytkownika.
+
 ## Budowanie
 
 W katalogu `mobile/android` uruchom:

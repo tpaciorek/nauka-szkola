@@ -1,13 +1,17 @@
 package pl.tpaciorek.naukaszkola;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +27,26 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 public final class MainActivity extends Activity {
     private static final String HOME_URL = "https://tpaciorek.github.io/nauka-szkola/";
+    private static final String TRANSFER_URL = HOME_URL + "?transfer=1";
     private static final String ALLOWED_HOST = "tpaciorek.github.io";
+    private static final String PREFS_NAME = "nauka_szkola_settings";
+    private static final String PREF_TRANSFER_DECIDED = "progress_transfer_decided";
+    private static final int MAX_TRANSFER_BYTES = 512 * 1024;
 
     private WebView webView;
     private ProgressBar progressBar;
     private LinearLayout errorView;
+    private String pendingImportJson;
+    private boolean transferPromptDisplayedThisSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +81,11 @@ public final class MainActivity extends Activity {
 
         setContentView(root);
 
-        if (savedInstanceState == null || webView.restoreState(savedInstanceState) == null) {
+        prepareProgressImport(getIntent());
+
+        if (pendingImportJson != null) {
+            webView.loadUrl(HOME_URL);
+        } else if (savedInstanceState == null || webView.restoreState(savedInstanceState) == null) {
             webView.loadUrl(HOME_URL);
         }
     }
@@ -112,6 +132,18 @@ public final class MainActivity extends Activity {
             }
 
             @Override
+            public void onPageFinished(WebView view, String url) {
+                if (pendingImportJson != null && url.startsWith(HOME_URL)) {
+                    applyPendingProgress(view);
+                    return;
+                }
+
+                if (HOME_URL.equals(url)) {
+                    offerChromeTransferWhenNeeded(view);
+                }
+            }
+
+            @Override
             public void onReceivedError(
                     WebView view,
                     WebResourceRequest request,
@@ -123,6 +155,131 @@ public final class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void offerChromeTransferWhenNeeded(WebView view) {
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        if (transferPromptDisplayedThisSession
+                || preferences.getBoolean(PREF_TRANSFER_DECIDED, false)) {
+            return;
+        }
+
+        view.evaluateJavascript(
+                "Object.keys(localStorage).some(function(key){return key.indexOf('nauka-')===0;})",
+                result -> {
+                    if ("true".equals(result)) {
+                        preferences.edit().putBoolean(PREF_TRANSFER_DECIDED, true).apply();
+                        return;
+                    }
+
+                    if (!"false".equals(result) || isFinishing()) {
+                        return;
+                    }
+
+                    transferPromptDisplayedThisSession = true;
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.transfer_title)
+                            .setMessage(R.string.transfer_message)
+                            .setPositiveButton(R.string.transfer_open_chrome, (dialog, which) -> openTransferInChrome())
+                            .setNegativeButton(R.string.transfer_skip, (dialog, which) -> preferences
+                                    .edit()
+                                    .putBoolean(PREF_TRANSFER_DECIDED, true)
+                                    .apply())
+                            .show();
+                }
+        );
+    }
+
+    private void openTransferInChrome() {
+        Intent chromeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(TRANSFER_URL));
+        chromeIntent.setPackage("com.android.chrome");
+        try {
+            startActivity(chromeIntent);
+        } catch (ActivityNotFoundException exception) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(TRANSFER_URL)));
+        }
+    }
+
+    private void prepareProgressImport(Intent intent) {
+        Uri uri = intent != null ? intent.getData() : null;
+        if (uri == null
+                || !"naukaszkola".equals(uri.getScheme())
+                || !"import".equals(uri.getHost())) {
+            return;
+        }
+
+        String payload = uri.getFragment();
+        if (payload == null || payload.isEmpty() || payload.length() > MAX_TRANSFER_BYTES * 2) {
+            Toast.makeText(this, R.string.transfer_invalid, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            byte[] decoded = Base64.decode(
+                    payload,
+                    Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING
+            );
+            if (decoded.length > MAX_TRANSFER_BYTES) {
+                throw new IllegalArgumentException("Transfer payload is too large");
+            }
+
+            JSONObject source = new JSONObject(new String(decoded, StandardCharsets.UTF_8));
+            JSONObject safeProgress = new JSONObject();
+            Iterator<String> keys = source.keys();
+            int importedBytes = 0;
+
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object rawValue = source.opt(key);
+                if (!key.startsWith("nauka-") || key.length() > 128 || !(rawValue instanceof String)) {
+                    continue;
+                }
+
+                String value = (String) rawValue;
+                importedBytes += value.getBytes(StandardCharsets.UTF_8).length;
+                if (importedBytes > MAX_TRANSFER_BYTES) {
+                    throw new IllegalArgumentException("Transfer payload is too large");
+                }
+                safeProgress.put(key, value);
+            }
+
+            if (safeProgress.length() == 0) {
+                Toast.makeText(this, R.string.transfer_empty, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            pendingImportJson = safeProgress.toString();
+        } catch (Exception exception) {
+            pendingImportJson = null;
+            Toast.makeText(this, R.string.transfer_invalid, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void applyPendingProgress(WebView view) {
+        String progressJson = pendingImportJson;
+        pendingImportJson = null;
+        String script = "(function(){var data=JSON.parse(" + JSONObject.quote(progressJson) + ");"
+                + "Object.keys(data).forEach(function(key){localStorage.setItem(key,data[key]);});"
+                + "return Object.keys(data).length;})()";
+
+        view.evaluateJavascript(script, result -> {
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(PREF_TRANSFER_DECIDED, true)
+                    .apply();
+            Toast.makeText(this, R.string.transfer_success, Toast.LENGTH_LONG).show();
+            view.loadUrl(HOME_URL);
+        });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        prepareProgressImport(intent);
+        if (pendingImportJson != null) {
+            webView.loadUrl(HOME_URL);
+        }
     }
 
     private LinearLayout createErrorView() {
