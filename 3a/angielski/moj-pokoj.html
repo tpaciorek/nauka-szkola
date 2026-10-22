@@ -287,6 +287,7 @@
     .tile.used { visibility: hidden; }
 
     /* pisanie */
+    .answer-box > span:first-child { white-space: pre-wrap; }
     .answer-box {
       min-height: 64px; border-radius: 18px; border: 3px solid var(--primary); background: #fff;
       display: flex; align-items: center; justify-content: center; padding: 8px 14px;
@@ -1488,7 +1489,7 @@
           }, 900);
         }
         kbHandler = {
-          type(ch) { if (locked) return; const i = nextGap(); if (i === undefined) return; fill[i] = ch; },
+          type(ch) { if (locked || ch === ' ') return; const i = nextGap(); if (i === undefined) return; fill[i] = ch; },
           back() { if (locked) return; const f = hidden.filter(i => fill[i]); if (f.length) delete fill[f[f.length - 1]]; },
           enter() { if (!locked && nextGap() === undefined) check(); },
           refresh() { draw(); setShift(nextGap() === 0); if (!locked && nextGap() === undefined) check(); }
@@ -1527,7 +1528,7 @@
         const st = { value: '', attempts: 0, copy: false, locked: false };
         const box = $('#ansBox'), fb = $('#fb');
         kbHandler = {
-          type(ch) { if (!st.locked && st.value.length < word.length + 4) st.value += ch; },
+          type(ch) { if (st.locked || st.value.length >= word.length + 4 || (ch === ' ' && (!st.value || st.value.endsWith(' ')))) return; st.value += ch; },
           back() { if (!st.locked) st.value = st.value.slice(0, -1); },
           enter() { if (!st.locked && st.value) check(); },
           refresh() {
@@ -1540,7 +1541,7 @@
         kbHandler.refresh();
 
         function check() {
-          const v = st.value.trim();
+          const v = st.value.trim().replace(/\s+/g, ' ');
           if (v.toLowerCase() === word.toLowerCase()) {
             st.locked = true;
             box.classList.add('ok'); box.innerHTML = partsHTML(target);
