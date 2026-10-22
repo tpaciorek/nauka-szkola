@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nauka w szkole</string>
+    <string name="offline_title">Nie udało się otworzyć strony</string>
+    <string name="offline_message">Sprawdź połączenie z internetem i spróbuj ponownie. Twój dotychczasowy postęp jest bezpieczny na tym urządzeniu.</string>
+    <string name="retry">Spróbuj ponownie</string>
+</resources>

@@ -1,0 +1,51 @@
+name: Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/android/**"
+      - ".github/workflows/android-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile/android
+
+    steps:
+      - name: Pobierz kod
+        uses: actions/checkout@v4
+
+      - name: Skonfiguruj JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Skonfiguruj Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Skonfiguruj Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Zbuduj APK
+        run: gradle :app:assembleDebug --no-daemon
+
+      - name: Przygotuj nazwę pliku
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/nauka-szkola.apk
+
+      - name: Udostępnij APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: nauka-szkola-apk
+          path: mobile/android/app/build/outputs/apk/debug/nauka-szkola.apk
+          if-no-files-found: error
+          retention-days: 30
