@@ -193,6 +193,9 @@
     .flip .fb small { font-size: 0.78rem; color: var(--muted); font-weight: 800; }
     .flip.open .ff { transform: rotateY(-180deg); }
     .flip.open .fb { transform: rotateY(0); }
+    .wait .flip:not(.open) { animation: none; cursor: default; }
+    .wait .flip:not(.open) .ff { background: linear-gradient(160deg, #c7d2fe, #a5b4fc); box-shadow: 0 5px 0 #818cf8; }
+    .wait .flip:not(.open) .ff::after { content: '🔒 słuchaj…'; }
     .flip:not(.open) { animation: wiggle 2.6s ease-in-out infinite; }
     .flip:nth-child(2) { animation-delay: 0.3s; } .flip:nth-child(3) { animation-delay: 0.6s; } .flip:nth-child(4) { animation-delay: 0.9s; }
     @keyframes wiggle { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-3deg); } 95% { transform: rotate(3deg); } }
@@ -850,6 +853,7 @@
     }
     function bindFlips(root, onFlip) {
       root.querySelectorAll('.flip').forEach(f => f.addEventListener('click', () => {
+        if (root.classList.contains('wait')) return;   // Sówka jeszcze czyta
         const first = !f.classList.contains('open');
         f.classList.add('open'); sfx.flip();
         // pytanie z przodu („Jaki pies?”) czytamy razem z odpowiedzią; wyraz z luką („k_yk”, „leka…”) – tylko gotowy wyraz z tyłu
@@ -902,6 +906,15 @@
           const left = card.querySelectorAll('.flip:not(.open)').length;
           const el = Date.now() - t0;
           const mustListen = !free && listen();
+          // karty zablokowane, dopóki Sówka czyta (tekst kroku albo poprzednią kartę)
+          const waiting = mustListen && (sayActive || !readDone);
+          card.classList.toggle('wait', waiting && left > 0);
+          if (waiting && left > 0) {
+            go.classList.add('locked'); go.disabled = true;
+            go.style.setProperty('--p', Math.round((nFlips - left) / Math.max(1, nFlips) * 50) + '%');
+            lbl.textContent = sayActive ? '🔊 Słuchaj do końca…' : '🔊 Dotknij „Przeczytaj mi”';
+            return false;
+          }
           const ok = free || (left === 0 && (mustListen ? readDone && !sayActive : el >= need));
           if (ok) {
             if (go.classList.contains('locked') || !go.dataset.ready) { go.classList.remove('locked'); go.classList.add('ready'); go.dataset.ready = '1'; go.disabled = false; lbl.textContent = goText; }
