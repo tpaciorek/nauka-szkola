@@ -200,6 +200,11 @@
     .flips.words .flip { min-width: 96px; flex: 0 0 auto; min-height: 78px; }
     .flips.words .flip .ff { font-size: 1.15rem; }
 
+    .tempo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; font-weight: 900; font-size: 0.9rem; color: var(--muted); }
+    .reward-bar + .tempo { margin: 12px 0 0; }
+    .tempo span { flex-basis: 100%; }
+    .tempo button { flex: 1; min-height: 46px; border-radius: 14px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 0.95rem; color: var(--ink); }
+    .tempo button.on { background: var(--primary); border-color: var(--primary-dark); color: #fff; }
     .say-mini { flex: none; width: 42px; height: 42px; border-radius: 50%; align-self: center; border: 2px solid var(--line); background: #fff; font-size: 1.15rem; display: grid; place-items: center; padding: 0; }
     .say-mini.on, .btn.on { animation: pulse 1s ease-in-out infinite; }
     @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 50% { box-shadow: 0 0 0 7px rgba(99, 102, 241, 0.12); } }
@@ -276,8 +281,13 @@
       storageKey: 'nauka-3a-polski-gramatyka-v1',
       intro: 'Hu hu! 🦉 Przed sprawdzianem powtórzymy razem: <b>części mowy</b>, <b>alfabet</b>, <b>zdania</b>, <b>„nie” z czasownikiem</b> i trudne <b>rz, ż, ch</b>. Najpierw zawsze Ci opowiem, potem zadania. Zaczynamy?',
       // tempo czytania (jak czyta uczeń 3 klasy): wolniej i przerwa po każdym zdaniu
-      rate: 0.88,
-      pauseMs: 700,   // pauza po kropce; po ? 80%, po : ; – 55%, po przecinku 30%
+      pauseMs: 700,   // pauza po kropce (tempo „normalnie”); po ? 80%, po : ; – 55%, po przecinku 30%
+      // 3 tempa do wyboru – w każdym są przerwy, wolniejsze tempo = trochę dłuższe przerwy
+      tempa: [
+        { id: 'slow', icon: '🐢', name: 'wolno', rate: 0.75, pf: 1.3 },
+        { id: 'mid', icon: '🚶', name: 'normalnie', rate: 0.88, pf: 1 },
+        { id: 'fast', icon: '🐇', name: 'szybciej', rate: 1.02, pf: 0.75 }
+      ],
       // ile czasu daje się na obejrzenie kroku teorii: sekundy na słowo i na zdanie
       secPerWord: 0.45,
       secPerSentence: 0.8
@@ -587,7 +597,7 @@
     const screen = $('#screen');
 
     /* ---------- Stan ---------- */
-    function defaultState() { return { stars: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true }; }
+    function defaultState() { return { stars: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true, tempo: 'mid' }; }
     function loadState() {
       try { const s = JSON.parse(localStorage.getItem(CONFIG.storageKey)); if (s) return Object.assign(defaultState(), s); } catch (e) {}
       return defaultState();
@@ -657,31 +667,34 @@
         const s = m.trim();
         if (!/[\p{L}\d]/u.test(s)) { if (out.length) out[out.length - 1].t += ' ' + s; continue; }
         const end = s.slice(-1);
-        const pause = /[.!…]/.test(end) ? CONFIG.pauseMs : end === '?' ? CONFIG.pauseMs * 0.8 : /[:;–]/.test(end) ? CONFIG.pauseMs * 0.55 : end === ',' ? CONFIG.pauseMs * 0.3 : CONFIG.pauseMs;
-        out.push({ t: s.replace(/\s*–$/, ''), pause });
+        const pm = /[.!…]/.test(end) ? 1 : end === '?' ? 0.8 : /[:;–]/.test(end) ? 0.55 : end === ',' ? 0.3 : 1;
+        out.push({ t: s.replace(/\s*–$/, ''), pm });
       }
       return out;
     }
     function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
-    let sayQueue = [];
-    function stopSpeak() { sayToken++; sayQueue = []; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    let sayQueue = [], sayActive = false, sayStarted = false, sayTotal = 0;
+    const tempo = () => CONFIG.tempa.find(t => t.id === state.tempo) || CONFIG.tempa[1];
+    function stopSpeak() { sayToken++; sayQueue = []; sayActive = false; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
     // append = true: nie przerywaj tego, co Sówka czyta – dopisz na koniec (np. odwrócona karta)
-    function speak(text, btn, append) {
+    // onDone – wywołane, gdy Sówka przeczyta wszystko do końca (nie przy przerwaniu)
+    function speak(text, btn, append, onDone) {
       if (!window.speechSynthesis || !text) return;
-      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...chunks(text)); return; }
+      if (append && sayActive) { const c = chunks(text); sayQueue.push(...c); sayTotal += c.length; return; }
       stopSpeak();
       const my = sayToken;
-      sayQueue = chunks(text);
+      sayQueue = chunks(text); sayTotal = sayQueue.length; sayActive = true; sayStarted = false;
       markSaying(btn);
       const next = () => {
         if (my !== sayToken) return;
-        if (!sayQueue.length) { markSaying(null); return; }
+        if (!sayQueue.length) { sayActive = false; markSaying(null); if (onDone) onDone(); return; }
         const c = sayQueue.shift();
         const u = new SpeechSynthesisUtterance(c.t);
         u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
-        u.rate = CONFIG.rate; u.pitch = 1.05;
+        u.rate = tempo().rate; u.pitch = 1.05;
+        u.onstart = () => { sayStarted = true; };
         let done = false;
-        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, c.pause); };
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs * c.pm * tempo().pf); };
         u.onend = u.onerror = go;
         try { speechSynthesis.speak(u); } catch (e) { go(); }
       };
@@ -694,6 +707,15 @@
       const el = document.querySelector(b.dataset.say);
       const ex = b.dataset.extra ? document.querySelector(b.dataset.extra) : null;
       if (el) speak(plain(el.innerHTML + (ex ? '. ' + ex.innerHTML : '')), b);
+    });
+    // wybór tempa czytania (🐢 🚶 🐇) – działa od razu, także w trakcie czytania
+    const tempoHTML = () => `<div class="tempo no-read"><span>Tempo czytania:</span>${CONFIG.tempa.map(t => `<button class="${t.id === state.tempo ? 'on' : ''}" data-tempo="${t.id}">${t.icon} ${t.name}</button>`).join('')}</div>`;
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-tempo]');
+      if (!b) return;
+      state.tempo = b.dataset.tempo; save(); sfx.tap();
+      document.querySelectorAll('[data-tempo]').forEach(x => x.classList.toggle('on', x.dataset.tempo === state.tempo));
+      if (!sayActive) speak(`Tak będę czytać: ${tempo().name}. Posłuchaj, czy Ci pasuje.`);
     });
     const sayMini = (sel, extra) => `<button class="say-mini" data-say="${sel}" ${extra ? `data-extra="${extra}"` : ''} aria-label="Przeczytaj na głos">🔊</button>`;
 
@@ -794,6 +816,7 @@
           ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
           <div class="bar"><div style="width:${pct}%"></div></div>
         </div>
+        ${tempoHTML()}
         <h2 class="section-title">🗺️ Ścieżka do sprawdzianu</h2>
         <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
         <button class="link-btn danger" id="resetBtn">Zacznij od nowa (dla rodzica)</button>`;
@@ -853,7 +876,8 @@
             <div class="guide"><div class="owl-mini" id="owl">${owlSVG('happy')}</div><div class="bubble" id="bubble">${step === 0 ? `📖 Przypomnij sobie: <b>${th.title}</b>. Obejrzyj każdy krok!` : last ? 'Ostatni krok – i zaczynamy zadania! 💪' : `Krok ${step + 1} z ${n}. Czytamy dalej! 👀`}</div></div>
             <div class="th-card" id="theory"><div class="th-step no-read">Krok ${step + 1} z ${n}</div>${th.steps[step]}</div>
             <div class="theory-actions">
-              <button class="btn soft" id="readTh" data-say="#theory">🔊 Przeczytaj mi</button>
+              ${tempoHTML()}
+              <button class="btn soft" id="readTh">🔊 Przeczytaj mi</button>
               <div class="row2" style="margin-top:12px">
                 ${step > 0 ? '<button class="btn soft" id="prevTh">← Wstecz</button>' : ''}
                 <button class="btn" id="goTh"><span class="fill"></span><span id="goLbl"></span></button>
@@ -867,17 +891,26 @@
         const need = free ? 0 : readMs(card.innerHTML);
         const t0 = Date.now();
         const goText = last ? 'Rozumiem – zaczynamy! →' : 'Dalej →';
+        // gdy Sówka czyta na głos: „Dalej” dopiero, gdy skończy czytać (krok i odwrócone karty).
+        // Gdy czytanie wyłączone albo telefon nie ma głosu – czas na samodzielne przeczytanie.
+        let readDone = false;
+        const readBtn = $('#readTh');
+        const startRead = () => { readDone = false; speak(plain(card.innerHTML), readBtn, false, () => { readDone = true; }); };
+        readBtn.addEventListener('click', () => { if (sayBtn === readBtn) stopSpeak(); else startRead(); });
+        const listen = () => state.read && !!window.speechSynthesis && (sayStarted || sayActive || Date.now() - t0 < 3000);
         const check = () => {
           const left = card.querySelectorAll('.flip:not(.open)').length;
           const el = Date.now() - t0;
-          const ok = free || (left === 0 && el >= need);
+          const mustListen = !free && listen();
+          const ok = free || (left === 0 && (mustListen ? readDone && !sayActive : el >= need));
           if (ok) {
             if (go.classList.contains('locked') || !go.dataset.ready) { go.classList.remove('locked'); go.classList.add('ready'); go.dataset.ready = '1'; go.disabled = false; lbl.textContent = goText; }
             return true;
           }
           go.classList.add('locked'); go.disabled = true;
-          go.style.setProperty('--p', Math.min(100, Math.round(((el / need) * (nFlips ? 0.5 : 1) + (nFlips ? (nFlips - left) / nFlips * 0.5 : 0)) * 100)) + '%');
-          lbl.textContent = left ? `👆 Odwróć karty (zostało ${left})` : '⏳ Przeczytaj spokojnie…';
+          const part = mustListen ? (readDone ? 1 : sayActive && sayTotal ? 1 - (sayQueue.length + 1) / sayTotal : 0) : el / need;
+          go.style.setProperty('--p', Math.min(100, Math.round((part * (nFlips ? 0.5 : 1) + (nFlips ? (nFlips - left) / nFlips * 0.5 : 0)) * 100)) + '%');
+          lbl.textContent = left ? `👆 Odwróć karty (zostało ${left})` : !mustListen ? '⏳ Przeczytaj spokojnie…' : sayActive ? '🔊 Słuchaj do końca…' : '🔊 Dotknij „Przeczytaj mi”';
           return false;
         };
         bindFlips(card, check);
@@ -891,7 +924,7 @@
         if ($('#skipTh')) $('#skipTh').addEventListener('click', run);
         $('#quitBtn').addEventListener('click', renderMap);
         window.scrollTo(0, 0);
-        if (state.read) speak(plain(card.innerHTML), $('#readTh'));
+        if (state.read) startRead();
       };
       render();
     }
