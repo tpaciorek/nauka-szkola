@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#15803d" />
+  <title>Rośliny i zwierzęta – przyroda z Sówką Lulu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14321f;
+      --muted: #5f7466;
+      --primary: #16a34a;
+      --primary-dark: #166534;
+      --primary-soft: #dcfce7;
+      --line: #bbf7d0;
+      --good: #16a34a;
+      --good-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --gold: #facc15;
+      /* kolory warstw jak w podręczniku */
+      --k: #16a34a;
+      --p: #eab308;
+      --r: #ea580c;
+      --s: #d6a06a;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(134, 239, 172, 0.55), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(253, 224, 71, 0.35), transparent 35%),
+        linear-gradient(180deg, #f0fdf4 0%, #ecfccb 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+    button:disabled { cursor: default; }
+    img { -webkit-user-drag: none; user-select: none; }
+
+    #app {
+      max-width: 560px; margin: 0 auto;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* ---------- Górny pasek ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: rgba(240, 253, 244, 0.88);
+      backdrop-filter: blur(10px);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 42px; padding: 8px 14px;
+      border-radius: 999px; border: 2px solid var(--line);
+      background: #fff; font-weight: 900; font-size: 1rem;
+      text-decoration: none; color: var(--ink);
+    }
+    .pill.back { color: var(--primary-dark); }
+    .topbar .spacer { flex: 1; }
+    .topbar .pill { white-space: nowrap; }
+    @media (max-width: 420px) { .topbar { gap: 4px; padding: 10px 8px; } .topbar .pill { padding: 6px 8px; font-size: 0.92rem; min-height: 40px; gap: 4px; } }
+    body.in-level .topbar { display: none; }
+
+    main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
+    body.in-level main { padding-bottom: 0; }
+
+    /* ---------- Sowa ---------- */
+    .owl-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .owl-big { width: 130px; flex: none; animation: bob 3s ease-in-out infinite; }
+    .owl-mini { width: 56px; flex: none; }
+    .jump { animation: jump 0.6s ease; }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+    .bubble {
+      position: relative; flex: 1;
+      background: #fff; border: 2px solid var(--line);
+      border-radius: 20px; padding: 10px 14px;
+      font-weight: 700; line-height: 1.4; font-size: 1rem;
+      box-shadow: 0 8px 20px rgba(22, 101, 52, 0.1);
+    }
+    .bubble::before {
+      content: ''; position: absolute; left: -10px; top: 18px;
+      border: 9px solid transparent; border-right-color: var(--line); border-left: 0;
+    }
+    .bubble::after {
+      content: ''; position: absolute; left: -7px; top: 19px;
+      border: 8px solid transparent; border-right-color: #fff; border-left: 0;
+    }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes pop { 0% { transform: scale(0.94); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ---------- Mapa ---------- */
+    .hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
+    .reward-bar {
+      background: #fff; border: 2px solid var(--line); border-radius: 20px;
+      padding: 12px 14px; font-weight: 800; font-size: 0.95rem;
+    }
+    .bar { height: 12px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #4ade80, var(--primary)); border-radius: 999px; transition: width 0.6s ease; }
+    .section-title { font-size: 1.3rem; font-weight: 900; margin: 24px 0 10px; }
+    .muted { color: var(--muted); font-weight: 700; margin: -4px 0 12px; font-size: 0.95rem; }
+
+    .path { display: flex; flex-direction: column; align-items: flex-start; }
+    .path-dots { width: 4px; height: 18px; margin: 2px 0 2px 40px; border-left: 4px dotted #86efac; }
+    .node {
+      position: relative;
+      width: 84%; margin-left: calc(var(--off) * 8%);
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; text-align: left;
+      background: #fff; border: 3px solid var(--line); border-radius: 22px;
+      box-shadow: 0 6px 0 #bbf7d0;
+      transition: transform 0.12s ease;
+    }
+    .node:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #bbf7d0; }
+    .node-icon {
+      width: 52px; height: 52px; flex: none; border-radius: 50%;
+      display: grid; place-items: center; font-size: 1.5rem; font-weight: 900;
+      background: var(--primary-soft);
+    }
+    .node-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .node-num { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .node-name { font-size: 1.05rem; font-weight: 900; }
+    .node-desc { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .node-stars { font-size: 1.1rem; color: var(--gold); letter-spacing: -1px; flex: none; text-shadow: 0 1px 0 #ca8a04; }
+    .node-stars .off { color: #e5e7eb; text-shadow: none; }
+    .node.done { border-color: #86efac; }
+    .node.current { border-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); animation: glow 1.8s ease-in-out infinite; }
+    .node.current .node-icon { background: var(--primary); color: #fff; }
+    .node.locked { opacity: 0.55; background: #f8fafc; box-shadow: 0 6px 0 #e5e7eb; border-color: #e5e7eb; }
+    .node.locked .node-icon { background: #e5e7eb; }
+    .node.arcade .node-num { color: #c2410c; }
+    @keyframes glow { 0%, 100% { outline: 0 solid rgba(22, 163, 74, 0.25); } 50% { outline: 7px solid rgba(22, 163, 74, 0.15); } }
+    .here {
+      position: absolute; right: 10px; top: -13px;
+      background: var(--gold); color: var(--ink); font-size: 0.75rem; font-weight: 900;
+      padding: 3px 10px; border-radius: 999px; box-shadow: 0 2px 0 #ca8a04;
+    }
+
+    /* album znalezisk */
+    .album {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px;
+      background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 12px;
+    }
+    .album-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .album-item .ph {
+      width: 56px; height: 56px; border-radius: 50%; overflow: hidden;
+      border: 3px solid var(--lc, var(--line)); background: #f1f5f9;
+      display: grid; place-items: center; font-size: 1.3rem; color: #94a3b8; font-weight: 900;
+    }
+    .album-item .ph img { width: 100%; height: 100%; object-fit: cover; }
+    .album-item span { font-size: 0.62rem; font-weight: 800; color: var(--muted); text-align: center; line-height: 1.15; }
+    .album-item.locked .ph { border-color: #e5e7eb; }
+
+    .info-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 52px; padding: 10px 16px; margin-top: 14px;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 900; color: var(--primary-dark);
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .info-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+
+    /* ---------- Przyciski ---------- */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 58px; padding: 12px 18px;
+      border: 0; border-radius: 18px;
+      font-size: 1.2rem; font-weight: 900;
+      background: var(--primary); color: #fff;
+      box-shadow: 0 5px 0 var(--primary-dark);
+      transition: transform 0.1s ease;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .btn.soft { background: #fff; color: var(--primary-dark); border: 3px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+    .btn + .btn { margin-top: 12px; }
+    .link-btn.danger { background: none; border: 0; color: #9ca3af; margin: 28px auto 0; display: block; font-size: 0.85rem; font-weight: 800; text-decoration: underline; padding: 8px; }
+
+    /* ---------- Poziom ---------- */
+    .level { flex: 1; display: flex; flex-direction: column; }
+    .level-top { display: flex; align-items: center; gap: 12px; padding: 12px 0 8px; }
+    .icon-btn {
+      width: 44px; height: 44px; flex: none; border-radius: 50%;
+      border: 2px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--muted);
+    }
+    .progress { flex: 1; height: 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 999px; transition: width 0.4s ease; }
+    .level-badge { font-size: 1.5rem; font-weight: 900; }
+    .hearts { font-size: 1.2rem; letter-spacing: 1px; white-space: nowrap; }
+    .hearts .lost { filter: grayscale(1); opacity: 0.3; }
+    .guide { display: flex; align-items: flex-start; gap: 10px; margin: 2px 0 10px; }
+    .task { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+
+    /* zdjęcie w zadaniu */
+    .photo-card {
+      position: relative; background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      overflow: hidden; box-shadow: 0 8px 20px rgba(22, 101, 52, 0.12);
+    }
+    .photo-card img { display: block; width: 100%; height: min(34vh, 250px); object-fit: cover; }
+    .photo-name {
+      position: absolute; left: 12px; bottom: 30px;
+      background: rgba(255, 255, 255, 0.95); padding: 6px 14px; border-radius: 999px;
+      font-size: 1.25rem; font-weight: 900; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+    .credit { font-size: 0.62rem; font-weight: 700; color: var(--muted); padding: 5px 10px; line-height: 1.2; }
+    .photo-card .credit { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.88); }
+    .q-line { font-size: 1.15rem; font-weight: 900; text-align: center; line-height: 1.35; }
+
+    /* przyciski warstw – ułożone jak piętra lasu */
+    .layers { display: flex; flex-direction: column; gap: 8px; }
+    .layer-btn {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 54px; padding: 8px 14px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--lc); background: #fff;
+      font-size: 1.1rem; font-weight: 900;
+      box-shadow: 0 5px 0 var(--lc);
+    }
+    .layer-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--lc); }
+    .layer-btn .lic {
+      flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 1.3rem; background: var(--lc);
+    }
+    .layer-btn .floor { margin-left: auto; font-size: 0.75rem; color: var(--muted); font-weight: 800; }
+    .layer-btn.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .layer-btn.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.85; }
+    .layer-btn.dim { opacity: 0.45; }
+
+    /* pytania tekstowe */
+    .q-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; text-align: center;
+    }
+    .q-num { font-size: 0.82rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .q-text { font-size: 1.2rem; font-weight: 900; line-height: 1.45; }
+    .blank {
+      display: inline-block; min-width: 90px; border-bottom: 3px dashed var(--primary);
+      color: var(--primary-dark); padding: 0 4px;
+    }
+    .blank.filled { border-bottom-style: solid; background: var(--good-soft); border-radius: 6px 6px 0 0; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 56px; padding: 10px 16px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 800; line-height: 1.35;
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .quiz-opt:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+    .quiz-opt .letter {
+      flex: none; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 0.9rem; font-weight: 900;
+      background: var(--primary-soft); color: var(--primary-dark);
+    }
+    .quiz-opt.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .quiz-opt.ok .letter { background: var(--good); color: #fff; }
+    .quiz-opt.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.8; }
+    .quiz-opt.bad .letter { background: #fca5a5; color: #fff; }
+    .quiz-opt.dim { opacity: 0.5; }
+    .note {
+      text-align: left; background: #fef9c3; border: 2px solid #fde68a; border-radius: 16px;
+      padding: 10px 12px; font-weight: 700; line-height: 1.45; font-size: 0.95rem;
+    }
+    .feedback-head { font-weight: 900; text-align: center; font-size: 1.05rem; }
+    .feedback-head.ok { color: #166534; }
+    .feedback-head.bad { color: #b91c1c; }
+
+    /* ---------- Poznaj warstwy ---------- */
+    .tower { display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; border: 3px solid #fff; box-shadow: 0 8px 20px rgba(22, 101, 52, 0.15); }
+    .tower-floor {
+      position: relative; display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 10px 14px;
+      color: #fff; font-weight: 900; font-size: 1.15rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+      background-size: cover; background-position: center;
+    }
+    .tower-floor::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--lc) 0%, rgba(0, 0, 0, 0.05) 85%); opacity: 0.85; }
+    .tower-floor > * { position: relative; }
+    .tower-floor .tic { font-size: 1.8rem; }
+    .tower-floor small { display: block; font-size: 0.78rem; font-weight: 800; opacity: 0.95; }
+    .tower-floor .sun { margin-left: auto; font-size: 0.85rem; }
+
+    .layer-card { background: #fff; border: 3px solid var(--lc); border-radius: 24px; overflow: hidden; }
+    .layer-card > img { display: block; width: 100%; height: min(28vh, 210px); object-fit: cover; }
+    .layer-card .lc-body { padding: 12px 14px 14px; }
+    .layer-chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+      background: var(--lc); color: #fff; font-weight: 900; font-size: 1.05rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+    .layer-card p { margin: 10px 0 0; font-weight: 700; line-height: 1.5; color: #334155; }
+    .mini-title { font-weight: 900; font-size: 0.9rem; margin: 12px 0 6px; color: var(--muted); }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+    .chip-ph { flex: none; width: 68px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .chip-ph img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--lc); }
+    .chip-ph span { font-size: 0.7rem; font-weight: 800; text-align: center; line-height: 1.15; }
+    .dots { display: flex; justify-content: center; gap: 6px; }
+    .dots i { width: 9px; height: 9px; border-radius: 50%; background: #d1fae5; }
+    .dots i.on { background: var(--primary); }
+
+    /* ---------- Znajdź wszystkie (siatka zdjęć) ---------- */
+    .target-bar {
+      display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+      font-weight: 900; font-size: 1.05rem; text-align: center;
+    }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tile {
+      position: relative; padding: 0; border: 3px solid #fff; border-radius: 18px; overflow: hidden; background: #fff;
+      box-shadow: 0 4px 0 #d1fae5; aspect-ratio: 1 / 1.12; display: flex; flex-direction: column;
+    }
+    .tile img { width: 100%; flex: 1; min-height: 0; object-fit: cover; display: block; }
+    .tile span { font-size: 0.78rem; font-weight: 900; padding: 4px 2px; line-height: 1.1; }
+    .tile.ok { border-color: var(--good); }
+    .tile.ok::after { content: '✓'; position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--good); color: #fff; font-weight: 900; display: grid; place-items: center; }
+    .tile.bad { border-color: var(--bad); opacity: 0.6; }
+    .tile.bad::after { content: '✕'; position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--bad); color: #fff; font-weight: 900; display: grid; place-items: center; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .etile {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      min-height: 92px; padding: 8px; border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-weight: 800; font-size: 0.92rem; line-height: 1.25; text-align: center; box-shadow: 0 4px 0 var(--line);
+    }
+    .etile b { font-size: 1.9rem; line-height: 1; }
+    .etile.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 4px 0 var(--good); }
+    .etile.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.7; }
+    .found-count { text-align: center; font-weight: 900; color: var(--muted); }
+
+    /* ---------- Czytanie i teoria ---------- */
+    .say-mini {
+      flex: none; width: 42px; height: 42px; border-radius: 50%; align-self: center;
+      border: 2px solid var(--line); background: #fff; font-size: 1.15rem; display: grid; place-items: center; padding: 0;
+    }
+    .say-mini.on, .btn.on { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 50% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0.12); } }
+    .q-card { position: relative; }
+    .q-card .say-mini { position: absolute; top: 8px; right: 8px; width: 38px; height: 38px; font-size: 1rem; }
+    .theory { display: flex; flex-direction: column; gap: 10px; }
+    .th-title { margin: 0; font-size: 1.35rem; font-weight: 900; }
+    .th-p { margin: 0; font-weight: 700; line-height: 1.55; font-size: 1.04rem; color: #1f2937; }
+    .th-row { background: #fff; border-radius: 18px; border: 2px solid var(--line); border-left: 8px solid var(--lc, var(--primary)); padding: 10px 12px; }
+    .th-row h3 { margin: 0 0 4px; font-size: 1.05rem; display: flex; align-items: center; gap: 6px; }
+    .th-row p { margin: 0; font-weight: 700; line-height: 1.5; color: #334155; }
+    .th-row .chips { margin-top: 8px; }
+    .th-tip { background: #fef9c3; border: 2px solid #fde68a; border-radius: 18px; padding: 10px 12px; font-weight: 800; line-height: 1.5; }
+    .th-img { width: 100%; max-height: 220px; object-fit: contain; background: #fff; border-radius: 18px; border: 2px solid var(--line); display: block; }
+    .theory-actions { padding: 14px 0 calc(16px + env(safe-area-inset-bottom)); }
+    .modal { position: fixed; inset: 0; z-index: 60; background: rgba(20, 50, 31, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+    .modal-card {
+      width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: #f0fdf4;
+      border-radius: 26px 26px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* ---------- Pokoloruj tabelkę ---------- */
+    .crayons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .crayon {
+      display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 6px 10px;
+      border-radius: 16px; border: 3px solid var(--line); background: #fff; font-weight: 900; font-size: 1rem; text-align: left;
+    }
+    .crayon i { flex: none; width: 34px; height: 34px; border-radius: 50% 40% 55% 45%; background: var(--cc); box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.15); }
+    .crayon.on { border-color: var(--ink); box-shadow: 0 0 0 3px var(--cc); transform: scale(1.03); }
+    .ctable { display: grid; grid-template-columns: repeat(4, 1fr); border: 3px solid #6b9bd1; border-radius: 12px; overflow: hidden; background: #fff; }
+    @media (max-width: 400px) { .ctable { grid-template-columns: repeat(3, 1fr); } }
+    .cell {
+      position: relative; min-height: 76px; padding: 6px 2px; border: 1px solid #93c5fd; border-radius: 0; background: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      font-size: 0.95rem; font-weight: 900; transition: background 0.2s ease;
+    }
+    .cell img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+    .cell.dark { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+    .cell.wrong::after { content: '✕'; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--bad); color: #fff; font-size: 0.8rem; display: grid; place-items: center; text-shadow: none; }
+    .cell.right::after { content: '✓'; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--good); color: #fff; font-size: 0.8rem; display: grid; place-items: center; text-shadow: none; }
+    .leaf-card { background: #fff; border: 3px solid var(--line); border-radius: 24px; overflow: hidden; }
+    .leaf-card img { display: block; width: 100%; max-height: 300px; object-fit: contain; background: #fff; }
+    .leaf-card .lc-body { padding: 12px 14px; font-weight: 700; line-height: 1.6; font-size: 1.05rem; }
+
+    /* ---------- Gry zręcznościowe ---------- */
+    .arena {
+      position: relative; flex: 1; min-height: 380px; border-radius: 24px; overflow: hidden;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+      background: #14532d url('zdjecia/las.jpg') center / cover;
+      margin-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+    .band {
+      position: absolute; left: 0; right: 0; display: flex; align-items: center; padding: 0 12px;
+      border: 0; color: #fff; font-weight: 900; font-size: 1rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(90deg, var(--lc), transparent 70%); opacity: 0.92;
+      border-top: 2px dashed rgba(255, 255, 255, 0.5);
+    }
+    .band:first-child { border-top: 0; }
+    .band .bl { display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.25); padding: 4px 10px; border-radius: 999px; }
+    .band.flash-ok { animation: flashOk 0.7s ease; }
+    .band.flash-bad { animation: flashBad 0.7s ease; }
+    @keyframes flashOk { 0%, 100% { box-shadow: inset 0 0 0 0 #4ade80; } 40% { box-shadow: inset 0 0 0 6px #4ade80; background: rgba(74, 222, 128, 0.55); } }
+    @keyframes flashBad { 0%, 100% { box-shadow: inset 0 0 0 0 #f87171; } 40% { box-shadow: inset 0 0 0 6px #f87171; background: rgba(248, 113, 113, 0.55); } }
+    .faller {
+      position: absolute; width: 96px; display: flex; flex-direction: column; align-items: center; pointer-events: none;
+      transition: transform 0.35s ease, opacity 0.35s ease; z-index: 3;
+    }
+    .faller img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); }
+    .faller span { margin-top: 3px; background: #fff; border-radius: 999px; padding: 2px 9px; font-size: 0.85rem; font-weight: 900; white-space: nowrap; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+    .faller.small img { width: 64px; height: 64px; border-width: 3px; }
+    .faller.small span { font-size: 0.72rem; }
+    .score-pill {
+      position: absolute; top: 10px; right: 10px; z-index: 4; background: #fff; border-radius: 999px; padding: 6px 12px;
+      font-weight: 900; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+    .target-pill {
+      position: absolute; top: 10px; left: 10px; right: 90px; z-index: 4; display: flex; align-items: center; gap: 6px;
+      background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.95rem;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25); border: 3px solid var(--lc);
+    }
+    .basket {
+      position: absolute; bottom: 8px; width: 100px; height: 70px; z-index: 3; pointer-events: none;
+      display: flex; align-items: flex-end; justify-content: center; font-size: 3.6rem; line-height: 1;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+    }
+    .float-txt { position: absolute; z-index: 5; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.9s ease forwards; text-shadow: 0 2px 4px rgba(0,0,0,.5); color: #fff; }
+    @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+    .arcade-start {
+      position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; padding: 20px; text-align: center; background: rgba(20, 50, 31, 0.72); color: #fff;
+    }
+    .arcade-start h3 { margin: 0; font-size: 1.5rem; }
+    .arcade-start p { margin: 0; font-weight: 700; line-height: 1.5; max-width: 340px; }
+    .arcade-start .btn { max-width: 320px; }
+
+    /* ---------- Wynik ---------- */
+    .result { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 24px; }
+    .result .owl-big { width: 160px; }
+    .result h2 { font-size: 1.9rem; margin: 6px 0 0; }
+    .result-stars { display: flex; gap: 8px; font-size: 3.4rem; line-height: 1; }
+    .rs { color: #e5e7eb; }
+    .rs.on { color: var(--gold); text-shadow: 0 3px 0 #ca8a04; animation: starIn 0.5s ease both; animation-delay: var(--d); }
+    @keyframes starIn { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { transform: scale(1); } }
+    .result p { font-weight: 700; color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .reward-pop {
+      background: #fef9c3; border: 3px solid var(--gold); border-radius: 18px; padding: 12px 18px;
+      font-weight: 900; font-size: 1.1rem; animation: pop 0.5s ease; display: flex; align-items: center; gap: 10px;
+    }
+    .reward-pop .ic { font-size: 2rem; }
+    .result-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* źródła */
+    .info-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+    .info-card { background: #fff; border: 3px solid var(--line); border-radius: 22px; padding: 16px; }
+    .info-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .info-card p { margin: 0 0 8px; font-weight: 700; line-height: 1.55; color: #334155; }
+    .src-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .src-list li { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: #334155; }
+    .src-list img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex: none; }
+    .src-list a { color: var(--primary-dark); }
+
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (min-width: 600px) {
+      .owl-big { width: 150px; }
+      main { padding-left: 20px; padding-right: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    /* ===== Rośliny i zwierzęta – dodatki ===== */
+    :root { --zb: #d97706; --ok: #e11d48; --ol: #ca8a04; --wl: #0d9488; --ro: #16a34a; --mi: #dc2626; --ws: #7c3aed; }
+    body {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(253, 224, 71, 0.5), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(134, 239, 172, 0.45), transparent 35%),
+        linear-gradient(180deg, #fefce8 0%, #ecfccb 100%);
+      background-attachment: fixed;
+    }
+    .arena { background: #a16207 url('zdjecia/pole.jpg') center / cover; }
+    .btn { position: relative; overflow: hidden; }
+    .btn.locked { background: #dcfce7; color: var(--primary-dark); box-shadow: 0 5px 0 #bbf7d0; font-size: 1rem; }
+    .btn.locked .fill { position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 0%); background: rgba(22, 163, 74, 0.2); transition: width 0.2s linear; }
+    .btn.locked span { position: relative; }
+    .btn.ready { animation: ready 0.5s ease; }
+    @keyframes ready { 40% { transform: scale(1.04); } }
+    .row2 { display: flex; gap: 10px; }
+    .row2 .btn { margin-top: 0; }
+    .row2 .btn.soft { flex: 0 0 34%; }
+
+    /* teoria krok po kroku */
+    .steps { flex: 1; display: flex; gap: 5px; }
+    .steps i { flex: 1; height: 10px; border-radius: 999px; background: #dcfce7; }
+    .steps i.on { background: var(--primary); }
+    .steps i.done { background: #86efac; }
+    .th-card { background: #fff; border: 3px solid var(--line); border-radius: 26px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 24px rgba(22, 101, 52, 0.12); animation: slideIn 0.35s ease; }
+    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .th-step { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); }
+    .th-hint { font-size: 0.85rem; font-weight: 900; color: var(--muted); text-align: center; }
+    .modal-card { display: flex; flex-direction: column; gap: 12px; }
+    .modal-card .th-card { animation: none; box-shadow: none; }
+    .flips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .flips.three { grid-template-columns: repeat(3, 1fr); }
+    .flips.one { grid-template-columns: 1fr; }
+    .flip { position: relative; min-height: 92px; padding: 0; border: 0; background: none; perspective: 700px; }
+    .flip > span { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px; border-radius: 18px; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.5s ease; font-weight: 900; text-align: center; line-height: 1.25; }
+    .flip .ff { background: linear-gradient(160deg, var(--tc, #4ade80), var(--tc2, #16a34a)); color: #fff; font-size: 1.1rem; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.18); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .flip .ff::after { content: '👆 dotknij'; font-size: 0.68rem; opacity: 0.9; font-weight: 800; }
+    .flip .fb { background: #fff; border: 3px solid var(--tc, var(--good)); color: var(--ink); font-size: 1rem; transform: rotateY(180deg); box-shadow: 0 5px 0 var(--tc, var(--good)); }
+    .flip .fb small { font-size: 0.76rem; color: var(--muted); font-weight: 800; }
+    .flip .fb .in { display: block; }
+    .flip .fb .in small { display: block; }
+    .flip .fb img { display: block; margin: 0 auto 4px; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .flips.three .flip .fb { font-size: 0.9rem; padding: 6px; }
+    .flip.open .ff { transform: rotateY(-180deg); }
+    .flip.open .fb { transform: rotateY(0); }
+    .flip:not(.open) { animation: wiggle 2.6s ease-in-out infinite; }
+    .flip:nth-child(2) { animation-delay: 0.3s; } .flip:nth-child(3) { animation-delay: 0.6s; } .flip:nth-child(4) { animation-delay: 0.9s; }
+    @keyframes wiggle { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-3deg); } 95% { transform: rotate(3deg); } }
+
+    /* drzewko „rośliny uprawne” */
+    .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .tree-top { background: linear-gradient(160deg, #4ade80, #15803d); color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 18px; border-radius: 999px; box-shadow: 0 4px 0 #166534; }
+    .tree-stem { width: 4px; height: 14px; background: #86efac; }
+    .tree-kids { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; border-top: 4px solid #86efac; padding-top: 10px; }
+    .tree-kids.three { grid-template-columns: repeat(3, 1fr); }
+    .tree-kid { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-weight: 900; font-size: 0.78rem; line-height: 1.15; }
+    .tree-kid img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 4px solid var(--lc); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); }
+    .tree-kid b { color: var(--lc); font-size: 0.9rem; }
+
+    /* karta grupy roślin / zwierząt */
+    .grp { border-radius: 22px; overflow: hidden; border: 3px solid var(--lc); background: #fff; }
+    .grp-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--lc); color: #fff; font-weight: 900; font-size: 1.15rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .grp-head .use { margin-left: auto; white-space: nowrap; font-size: 0.72rem !important; background: rgba(255, 255, 255, 0.95); color: var(--lc); text-shadow: none; border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; }
+    .grp-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); gap: 0; overflow-x: auto; }
+    .grp-strip figure { margin: 0; position: relative; }
+    .grp-strip img { width: 100%; height: 86px; object-fit: cover; display: block; }
+    .grp-strip figcaption { position: absolute; left: 3px; right: 3px; bottom: 3px; background: rgba(255, 255, 255, 0.92); border-radius: 999px; font-size: 0.66rem; font-weight: 900; text-align: center; padding: 1px 2px; }
+    .grp p { margin: 0; padding: 10px 12px; font-weight: 700; line-height: 1.55; color: #1f2937; }
+    .fact { display: flex; gap: 10px; align-items: center; background: #ecfeff; border: 2px dashed #67e8f9; border-radius: 18px; padding: 8px 10px; font-weight: 700; line-height: 1.45; font-size: 0.95rem; }
+    .fact img { width: 70px; height: 70px; border-radius: 14px; object-fit: cover; flex: none; }
+    .fact b.tag { display: block; color: #0e7490; font-size: 0.8rem; }
+
+    /* oś czasu – historia chleba, pory roku */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-step { display: flex; align-items: center; gap: 10px; position: relative; padding: 6px 0; }
+    .tl-step:not(:last-child)::after { content: ''; position: absolute; left: 31px; top: 66px; bottom: -6px; width: 4px; background: #fde68a; }
+    .tl-ph { width: 66px; height: 66px; flex: none; border-radius: 50%; overflow: hidden; border: 4px solid #facc15; background: #fef9c3; display: grid; place-items: center; font-size: 2rem; position: relative; z-index: 1; }
+    .tl-ph img { width: 100%; height: 100%; object-fit: cover; }
+    .tl-txt { font-weight: 700; line-height: 1.4; }
+    .tl-txt b.cn { display: inline-block; background: #fde68a; color: #92400e; border-radius: 999px; padding: 0 8px; font-size: 0.8rem; margin-bottom: 2px; }
+    .seasons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .season { border-radius: 18px; overflow: hidden; background: #fff; border: 3px solid var(--lc); display: flex; flex-direction: column; }
+    .season img { width: 100%; height: 78px; object-fit: cover; display: block; }
+    .season .s-emo { height: 78px; display: grid; place-items: center; font-size: 2.6rem; background: var(--lc); }
+    .season h4 { margin: 0; padding: 6px 8px 0; font-size: 1rem; color: var(--lc); }
+    .season p { margin: 0; padding: 2px 8px 8px; font-size: 0.82rem; font-weight: 700; line-height: 1.35; }
+
+    /* łańcuch pokarmowy */
+    .chain { display: flex; align-items: flex-start; justify-content: center; gap: 2px; background: linear-gradient(90deg, #dcfce7, #fef9c3 55%, #fee2e2); border-radius: 20px; padding: 10px 6px; }
+    .link { flex: 1 1 0; min-width: 0; max-width: 92px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+    .link .ph { width: 100%; max-width: 72px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 4px solid var(--lc, #fff); background: #fff; display: grid; place-items: center; font-size: 1.8rem; font-weight: 900; color: #94a3b8; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); }
+    .link .ph img { width: 100%; height: 100%; object-fit: cover; }
+    .link .ph.q { border-style: dashed; border-color: #94a3b8; animation: pulse 1.2s ease-in-out infinite; }
+    .link .ph.q.now { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+    .link span { font-size: 0.74rem; font-weight: 900; line-height: 1.1; }
+    .link small { font-size: 0.6rem; font-weight: 800; color: #fff; background: var(--lc, #94a3b8); border-radius: 999px; padding: 1px 6px; line-height: 1.3; }
+    .arr { flex: none; align-self: center; margin-top: -18px; font-size: 1.3rem; font-weight: 900; color: #78716c; }
+
+    /* ułóż historię */
+    .slots { display: flex; flex-direction: column; gap: 6px; }
+    .slot { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 10px; border-radius: 16px; border: 3px dashed #fde68a; background: rgba(255, 255, 255, 0.7); font-weight: 800; font-size: 0.92rem; line-height: 1.3; }
+    .slot .cn { flex: none; min-width: 86px; text-align: center; background: #fde68a; color: #92400e; border-radius: 999px; padding: 3px 8px; font-weight: 900; font-size: 0.82rem; }
+    .slot.next { border-color: var(--primary); background: var(--primary-soft); }
+    .slot.filled { border-style: solid; border-color: var(--good); background: #fff; animation: pop 0.3s ease; }
+    .slot .mini { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex: none; }
+    .slot .memo { font-size: 1.4rem; flex: none; }
+    .scards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .scard { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 0 8px; border-radius: 18px; border: 3px solid var(--line); background: #fff; overflow: hidden; font-weight: 800; font-size: 0.85rem; line-height: 1.25; text-align: center; box-shadow: 0 4px 0 var(--line); }
+    .scard img { width: 100%; height: 74px; object-fit: cover; }
+    .scard .semo { width: 100%; height: 74px; display: grid; place-items: center; font-size: 2.4rem; background: #fef9c3; }
+    .scard span { padding: 0 6px; }
+    .scard.used { display: none; }
+    .scard.bad { animation: shake 0.45s ease; border-color: #fca5a5; }
+
+    /* emoji zamiast zdjęcia (produkty) */
+    .emo-ph { display: grid; place-items: center; background: #fef9c3; font-size: 2.6rem; }
+    .tile .emo-ph { flex: 1; min-height: 0; font-size: 2.6rem; }
+    .faller .emo-ph { width: 84px; height: 84px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); font-size: 2.6rem; }
+    .faller.small .emo-ph { width: 64px; height: 64px; font-size: 2rem; }
+    .photo-card .emo-ph { height: min(34vh, 250px); font-size: 6rem; }
+    .grp-btns.three .layer-btn { min-height: 58px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a class="pill back" href="./index.html" aria-label="Wróć do przyrody">← Wróć</a>
+      <span class="spacer"></span>
+      <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
+      <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
+      <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
+      <button class="pill" id="readBtn" aria-label="Włącz lub wyłącz czytanie na głos">🗣️</button>
+      <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
+    </header>
+    <main id="screen"></main>
+  </div>
+
+  <script src="../osiagniecia.js"></script>
+  <script>
+    /* ---------- Narzędzia ---------- */
+    const $ = (s, r = document) => r.querySelector(s);
+    const screen = $('#screen');
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    const src = id => CONFIG.img + id + '.jpg';
+    const credit = id => CREDITS[id] ? `📷 fot. ${CREDITS[id][0]}, ${CREDITS[id][1]}` : '';
+    const lc = l => `--lc:${GROUPS[l].color}`;
+    const lowerFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+
+    /* =====================================================================
+       ROŚLINY I ZWIERZĘTA – przyroda z Sówką Lulu (podręcznik cz. 1:
+       „Na polu”, „Historia chleba”, „Rośliny uprawne”, „Praca rolnika”,
+       „Rośliny i zwierzęta zależą od siebie”). Zdjęcia: zdjecia/ (Wikimedia
+       Commons, autorzy w CREDITS i w zdjecia/ZRODLA.md).
+       Silnik jak w warstwy-lasu.html, teoria krok po kroku jak w polski/gramatyka.html.
+       ===================================================================== */
+    const CONFIG = {
+      storageKey: 'nauka-3a-przyroda-rosliny-zwierzeta-v1',
+      img: 'zdjecia/',
+      intro: 'Hu hu! 🦉 Dziś idziemy <b>na pole</b>! Poznasz rośliny, które uprawia rolnik, dowiesz się, skąd się bierze chleb, a potem sprawdzimy, <b>kto co je</b> w przyrodzie. Zaczynamy?',
+      // tempo czytania (jak czyta uczeń 3 klasy): wolniej i przerwa po każdym zdaniu
+      rate: 0.9,
+      pauseMs: 550,
+      // ile czasu daje się na obejrzenie kroku teorii: sekundy na słowo i na zdanie
+      secPerWord: 0.45,
+      secPerSentence: 0.8
+    };
+
+    // grupy: rośliny uprawne (pl) i zwierzęta według pokarmu (zw)
+    const GROUPS = {
+      zb: { id: 'zb', kind: 'pl', name: 'Zbożowe', short: 'rośliny zbożowe', icon: '🌾', color: 'var(--zb)', use: 'ziarno', img: 'pszenica' },
+      ok: { id: 'ok', kind: 'pl', name: 'Okopowe', short: 'rośliny okopowe', icon: '🥔', color: 'var(--ok)', use: 'bulwy i korzenie', img: 'ziemniak' },
+      ol: { id: 'ol', kind: 'pl', name: 'Oleiste', short: 'rośliny oleiste', icon: '🌻', color: 'var(--ol)', use: 'nasiona na olej', img: 'slonecznik' },
+      wl: { id: 'wl', kind: 'pl', name: 'Włókniste', short: 'rośliny włókniste', icon: '🧵', color: 'var(--wl)', use: 'włókna', img: 'konopie' },
+      ro: { id: 'ro', kind: 'zw', name: 'Roślinożerne', short: 'zwierzęta roślinożerne', icon: '🌿', color: 'var(--ro)', use: 'jedzą rośliny', img: 'sarna' },
+      mi: { id: 'mi', kind: 'zw', name: 'Mięsożerne', short: 'zwierzęta mięsożerne', icon: '🥩', color: 'var(--mi)', use: 'jedzą mięso', img: 'wilk' },
+      ws: { id: 'ws', kind: 'zw', name: 'Wszystkożerne', short: 'zwierzęta wszystkożerne', icon: '🍽️', color: 'var(--ws)', use: 'jedzą wszystko', img: 'dzik' }
+    };
+    const PL_GROUPS = ['zb', 'ok', 'ol', 'wl'];
+    const ZW_GROUPS = ['ro', 'mi', 'ws'];
+
+    // kind: pl = roślina, zw = zwierzę, pr = produkt (emoji zamiast zdjęcia); g2 – druga grupa (len!)
+    const ITEMS = [
+      { id: 'pszenica', name: 'Pszenica', kind: 'pl', g: 'zb', note: 'Pszenica to zboże. Z jej ziaren robi się mąkę na chleb i bułki, płatki i kaszę mannę.' },
+      { id: 'zyto', name: 'Żyto', kind: 'pl', g: 'zb', note: 'Żyto to zboże. Z mąki żytniej piecze się ciemny chleb, a z ziaren robi się płatki.' },
+      { id: 'jeczmien', name: 'Jęczmień', kind: 'pl', g: 'zb', note: 'Jęczmień to zboże z długimi „wąsami” na kłosach. Robi się z niego kaszę jęczmienną i pęczak.' },
+      { id: 'owies', name: 'Owies', kind: 'pl', g: 'zb', note: 'Owies to zboże. Robi się z niego płatki owsiane i napój owsiany.' },
+      { id: 'kukurydza', name: 'Kukurydza', kind: 'pl', g: 'zb', note: 'Kukurydza też jest zbożem! Można ją prażyć (popcorn 🍿), gotować i konserwować. Robi się z niej płatki.' },
+      { id: 'ziemniak', name: 'Ziemniak', kind: 'pl', g: 'ok', note: 'Ziemniak to roślina okopowa. Jemy jego bulwy, które rosną pod ziemią.' },
+      { id: 'burak', name: 'Burak', kind: 'pl', g: 'ok', note: 'Burak to roślina okopowa. Jemy jego gruby korzeń, który rośnie w ziemi.' },
+      { id: 'rzepa', name: 'Rzepa', kind: 'pl', g: 'ok', note: 'Rzepa to roślina okopowa. Wykorzystujemy jej korzeń.' },
+      { id: 'marchew', name: 'Marchew', kind: 'pl', g: 'ok', note: 'Marchew to roślina okopowa. Pomarańczowa marchewka to jej korzeń!' },
+      { id: 'rzepak', name: 'Rzepak', kind: 'pl', g: 'ol', note: 'Rzepak to roślina oleista. Wiosną pola rzepaku są żółte, a z jego nasion robi się olej.' },
+      { id: 'slonecznik', name: 'Słonecznik', kind: 'pl', g: 'ol', note: 'Słonecznik to roślina oleista. Z jego nasion (pestek) robi się olej słonecznikowy.' },
+      { id: 'len', name: 'Len', kind: 'pl', g: 'ol', g2: 'wl', note: 'Len jest i <b>oleisty</b>, i <b>włóknisty</b>! Z nasion robi się olej lniany, a z łodyg włókna na nici i tkaniny.' },
+      { id: 'konopie', name: 'Konopie', kind: 'pl', g: 'wl', note: 'Konopie to roślina włóknista. Z ich włókien robi się sznurki i mocne liny.' },
+
+      { id: 'sarna', name: 'Sarna', kind: 'zw', g: 'ro', note: 'Sarna jest roślinożerna – skubie trawę, liście i pędy.' },
+      { id: 'zajac', name: 'Zając', kind: 'zw', g: 'ro', note: 'Zając jest roślinożerny – je trawę, zioła i korę.' },
+      { id: 'zubr', name: 'Żubr', kind: 'zw', g: 'ro', note: 'Żubr to największe zwierzę w Polsce, a je tylko rośliny: trawę, liście i korę.' },
+      { id: 'motyl', name: 'Motyl', kind: 'zw', g: 'ro', note: 'Motyl jest roślinożerny – pije słodki nektar z kwiatów.' },
+      { id: 'jelen', name: 'Jeleń', kind: 'zw', g: 'ro', note: 'Jeleń jest roślinożerny – je trawę, liście, pędy i żołędzie.' },
+      { id: 'myszolow', name: 'Myszołów', kind: 'zw', g: 'mi', note: 'Myszołów to ptak drapieżny – poluje na myszy. Jest mięsożerny.' },
+      { id: 'bocian', name: 'Bocian', kind: 'zw', g: 'mi', note: 'Bocian jest mięsożerny – łapie żaby, myszy i owady.' },
+      { id: 'kot', name: 'Kot', kind: 'zw', g: 'mi', note: 'Kot jest mięsożerny – poluje na myszy i ptaki.' },
+      { id: 'wilk', name: 'Wilk', kind: 'zw', g: 'mi', note: 'Wilk jest mięsożerny – poluje na sarny, jelenie i dziki.' },
+      { id: 'rys', name: 'Ryś', kind: 'zw', g: 'mi', note: 'Ryś to dziki kot z pędzelkami na uszach. Jest mięsożerny.' },
+      { id: 'kuna', name: 'Kuna', kind: 'zw', g: 'mi', note: 'Kuna jest mięsożerna – poluje m.in. na wiewiórki i ptaki.' },
+      { id: 'lis', name: 'Lis', kind: 'zw', g: 'mi', note: 'Lis jest mięsożerny – poluje na myszy i zające.' },
+      { id: 'puszczyk', name: 'Sowa', kind: 'zw', g: 'mi', note: 'Sowa (to puszczyk, tak jak ja! 🦉) nocą poluje na myszy. Jest mięsożerna.' },
+      { id: 'dzik', name: 'Dzik', kind: 'zw', g: 'ws', note: 'Dzik jest wszystkożerny – je żołędzie, korzonki, ale też dżdżownice i ślimaki.' },
+      { id: 'bazant', name: 'Bażant', kind: 'zw', g: 'ws', note: 'Bażant jest wszystkożerny – je ziarna, owoce i owady.' },
+      { id: 'niedzwiedz', name: 'Niedźwiedź', kind: 'zw', g: 'ws', note: 'Niedźwiedź jest wszystkożerny – je jagody, miód, ale też ryby i mięso.' },
+      { id: 'wiewiorka', name: 'Wiewiórka', kind: 'zw', g: 'ws', note: 'Wiewiórka jest wszystkożerna – je orzechy i nasiona, ale czasem też jajka ptaków.' },
+      { id: 'mysz', name: 'Mysz', kind: 'zw', g: 'ws', note: 'Mysz jest wszystkożerna – je ziarna zbóż, nasiona i owady.' },
+
+      { id: 'p-chleb', name: 'Chleb', kind: 'pr', g: 'zb', emoji: '🍞', note: 'Chleb piecze się z mąki, a mąkę robi się z ziaren zbóż.' },
+      { id: 'p-platki', name: 'Płatki', kind: 'pr', g: 'zb', emoji: '🥣', note: 'Płatki robi się ze zbóż: pszenicy, żyta, owsa i kukurydzy.' },
+      { id: 'p-popcorn', name: 'Popcorn', kind: 'pr', g: 'zb', emoji: '🍿', note: 'Popcorn to prażona kukurydza – a kukurydza to zboże.' },
+      { id: 'p-frytki', name: 'Frytki', kind: 'pr', g: 'ok', emoji: '🍟', note: 'Frytki robi się z ziemniaków – to roślina okopowa.' },
+      { id: 'p-sok', name: 'Sok marchwiowy', kind: 'pr', g: 'ok', emoji: '🥕', note: 'Sok marchwiowy robi się z korzeni marchwi – rośliny okopowej.' },
+      { id: 'p-olej', name: 'Olej', kind: 'pr', g: 'ol', emoji: '🫙', note: 'Olej tłoczy się z nasion roślin oleistych: rzepaku, słonecznika i lnu.' },
+      { id: 'p-pestki', name: 'Pestki', kind: 'pr', g: 'ol', emoji: '🌻', note: 'Pestki słonecznika to jego nasiona – tłoczy się z nich olej.' },
+      { id: 'p-nici', name: 'Nici', kind: 'pr', g: 'wl', emoji: '🧵', note: 'Nici robi się z włókien lnu – rośliny włóknistej.' },
+      { id: 'p-lina', name: 'Lina', kind: 'pr', g: 'wl', emoji: '🪢', note: 'Mocne liny i sznurki robi się z włókien konopi.' }
+    ];
+    const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+    const plants = ITEMS.filter(i => i.kind === 'pl');
+    const animals = ITEMS.filter(i => i.kind === 'zw');
+    const plantish = ITEMS.filter(i => i.kind !== 'zw');   // rośliny + produkty
+    const inGroup = (it, g) => it.g === g || it.g2 === g;
+
+    // pytania: co z czego powstaje
+    const PROD_Q = [
+      { s: 'Kasza manna powstaje z ___.', a: 'pszenicy', options: ['pszenicy', 'owsa', 'ziemniaków', 'rzepaku'], note: 'Z pszenicy jest kasza manna, a także mąka, chleb i płatki.' },
+      { s: 'Kaszę jęczmienną i pęczak robi się z ___.', a: 'jęczmienia', options: ['jęczmienia', 'kukurydzy', 'lnu', 'marchwi'], note: 'Nazwa podpowiada: kasza <b>jęczmienna</b> – z <b>jęczmienia</b>.' },
+      { s: 'Kasza gryczana powstaje z ___.', a: 'gryki', options: ['gryki', 'prosa', 'żyta', 'buraków'], note: 'Kasza <b>gryczana</b> – z <b>gryki</b>.' },
+      { s: 'Kasza jaglana powstaje z ___.', a: 'prosa', options: ['prosa', 'gryki', 'pszenicy', 'konopi'], note: 'Kasza jaglana to jedyna „podchwytliwa” – robi się ją z <b>prosa</b>.' },
+      { s: 'Napój owsiany robi się z ___.', a: 'owsa', options: ['owsa', 'słonecznika', 'ziemniaków', 'żyta'], note: 'Z owsa są płatki owsiane i napój owsiany 🥛.' },
+      { s: 'Popcorn to prażona ___.', a: 'kukurydza', options: ['kukurydza', 'pszenica', 'rzepa', 'marchew'], note: 'Kukurydzę można prażyć, gotować i konserwować.' },
+      { s: 'Olej tłoczy się z nasion ___.', a: 'rzepaku i słonecznika', options: ['rzepaku i słonecznika', 'ziemniaków i buraków', 'jęczmienia i owsa', 'marchwi i rzepy'], note: 'Rzepak, słonecznik i len to rośliny oleiste. Najzdrowszy jest olej tłoczony na zimno.' },
+      { s: 'Nici, sznurki i liny robi się z włókien ___.', a: 'lnu i konopi', options: ['lnu i konopi', 'pszenicy i żyta', 'buraków i rzepy', 'kukurydzy'], note: 'Len i konopie to rośliny włókniste.' },
+      { s: 'Otręby to resztki ziaren po zmieleniu mąki. Mają dużo ___.', a: 'błonnika i witamin z grupy B', options: ['błonnika i witamin z grupy B', 'cukru', 'soli', 'oleju'], note: 'Otręby dodaje się do chleba i różnych potraw – są bardzo zdrowe.' },
+      { s: 'Frytki, kopytka i placki robi się z ___.', a: 'ziemniaków', options: ['ziemniaków', 'buraków', 'owsa', 'lnu'], note: 'Ziemniak to roślina okopowa – można z niego zrobić mnóstwo potraw!' }
+    ];
+
+    // pytania: praca rolnika przez cały rok
+    const FARM_Q = [
+      { s: 'Orka to ___.', a: 'przekopanie i spulchnienie gleby', options: ['przekopanie i spulchnienie gleby', 'koszenie zboża', 'pieczenie chleba', 'naprawa traktora'], note: 'Po zimie rolnik orze pole, żeby rośliny dobrze w nim rosły.' },
+      { s: 'Wiosną rolnicy sieją zboża ___.', a: 'jare', options: ['jare', 'ozime', 'zimowe', 'nocne'], note: 'Zboża <b>jare</b> siejemy wiosną i zbieramy po kilku miesiącach.' },
+      { s: 'Zboża ozime rolnicy sieją ___.', a: 'jesienią', options: ['jesienią', 'wiosną', 'latem', 'w każdy poniedziałek'], note: 'Zboża <b>ozime</b> siejemy jesienią – przezimują w ziemi i zbierzemy je latem.' },
+      { s: 'Żniwa, czyli koszenie i zbieranie zbóż, są ___.', a: 'latem', options: ['latem', 'zimą', 'wiosną', 'jesienią'], note: 'Lato to czas żniw – na pola wyjeżdżają kombajny.' },
+      { s: 'Do koszenia zboża używa się ___.', a: 'kombajnu', options: ['kombajnu', 'pługa', 'roweru', 'grabi'], note: 'Kombajn kosi zboże i od razu oddziela ziarno.' },
+      { s: 'Jesienią z pól zbiera się ___.', a: 'ziemniaki i buraki', options: ['ziemniaki i buraki', 'kwitnący rzepak', 'śnieg', 'zboża jare'], note: 'Jesienią są wykopki – zbiór ziemniaków i buraków.' },
+      { s: 'Zimą rolnicy ___.', a: 'czyszczą i naprawiają maszyny', options: ['czyszczą i naprawiają maszyny', 'zbierają zboże', 'sadzą ziemniaki', 'koszą łąki'], note: 'Zima to czas przygotowań do wiosny.' },
+      { s: 'Ziemniaki sadzi się ___.', a: 'wiosną', options: ['wiosną', 'jesienią', 'zimą', 'w czasie żniw'], note: 'Wiosną rolnik sadzi bulwy ziemniaków, a jesienią je wykopuje.' },
+      { s: 'Słowo „rolnik” pochodzi od słowa ___.', a: 'rola', options: ['rola', 'rolka', 'rower', 'król'], note: '<b>Rola</b> to dawne słowo oznaczające glebę, ziemię.' },
+      { q: 'Prawda czy fałsz? Rolnik ma najwięcej pracy zimą.', a: 'Fałsz', options: ['Prawda', 'Fałsz'], note: 'Najwięcej pracy rolnik ma wiosną, latem i jesienią. Zimą naprawia maszyny.' },
+      { q: 'Prawda czy fałsz? Kombajny i traktory to maszyny rolnicze.', a: 'Prawda', options: ['Prawda', 'Fałsz'], note: 'Tak! Rolnik używa też pługa, siewnika i przyczepy.' },
+      { q: 'Prawda czy fałsz? Żniwa odbywają się jesienią.', a: 'Fałsz', options: ['Prawda', 'Fałsz'], note: 'Żniwa są <b>latem</b>. Jesienią zbiera się ziemniaki i buraki.' }
+    ];
+
+    // łańcuchy pokarmowe: [id, podpis]; ukryte – które ogniwa trzeba odgadnąć
+    const CHAINS = [
+      { links: [['trawa', 'Trawa'], ['sarna', 'Sarna'], ['wilk', 'Wilk']], hide: [2], note: 'Sarna zjada trawę, a wilk poluje na sarnę.' },
+      { links: [['pszenica', 'Zboże'], ['mysz', 'Mysz'], ['myszolow', 'Myszołów']], hide: [1], note: 'Mysz zjada ziarna zboża, a myszołów poluje na mysz.' },
+      { links: [['leszczyna', 'Orzechy'], ['wiewiorka', 'Wiewiórka'], ['kuna', 'Kuna'], ['wilk', 'Wilk']], hide: [0, 2], note: 'Wiewiórka zjada orzechy, kuna poluje na wiewiórkę, a wilk na kunę.' },
+      { links: [['trawa', 'Trawa'], ['zajac', 'Zając'], ['lis', 'Lis']], hide: [1, 2], note: 'Zając skubie trawę, a lis poluje na zająca.' },
+      { links: [['pszenica', 'Zboże'], ['mysz', 'Mysz'], ['puszczyk', 'Sowa']], hide: [0, 2], note: 'Mysz zjada ziarna zboża, a sowa nocą poluje na mysz.' }
+    ];
+    const ACC = { Trawa: 'trawę', Sarna: 'sarnę', 'Zboże': 'zboże', Mysz: 'mysz', Orzechy: 'orzechy', 'Wiewiórka': 'wiewiórkę', Kuna: 'kunę', 'Zając': 'zająca' };   // kogo? co?
+    const FOOD_PLANTS = [['trawa', 'Trawa'], ['pszenica', 'Zboże'], ['leszczyna', 'Orzechy']];
+    const CHAIN_Q = [
+      { s: 'Rośliny nazywamy producentami, bo ___.', a: 'same wytwarzają pokarm', options: ['same wytwarzają pokarm', 'polują na zwierzęta', 'jedzą grzyby', 'mieszkają w lesie'], note: 'Rośliny same produkują pokarm. Zwierzęta muszą jeść inne organizmy.' },
+      { s: 'Grzyby i bakterie, które rozkładają martwe części roślin i zwierząt, to ___.', a: 'destruenci', options: ['destruenci', 'producenci', 'drapieżniki', 'rolnicy'], note: 'Destruenci to „sprzątacze przyrody” – dzięki nim ziemia jest żyzna.' },
+      { s: 'Łańcuch pokarmowy zaczyna się zwykle od ___.', a: 'rośliny', options: ['rośliny', 'wilka', 'sowy', 'kamienia'], note: 'Na początku jest roślina, potem zwierzę roślinożerne, a potem mięsożerne.' },
+      { s: 'Gdy w łańcuchu zabraknie jednego ogniwa, ___.', a: 'równowaga w przyrodzie zostaje zaburzona', options: ['równowaga w przyrodzie zostaje zaburzona', 'nic się nie dzieje', 'rośnie więcej grzybów', 'zaczyna padać śnieg'], note: 'Gdyby zniknęły myszy, myszołów i sowa nie miałyby co jeść.' },
+      { s: 'Strzałka w łańcuchu pokarmowym pokazuje, ___.', a: 'kto jest czyim pokarmem', options: ['kto jest czyim pokarmem', 'kto jest najszybszy', 'kto jest największy', 'kto gdzie mieszka'], note: 'Trawa → sarna: sarna je trawę. Sarna → wilk: wilk je sarnę.' }
+    ];
+
+    // historia: ułóż po kolei (najpierw, potem, następnie, w końcu)
+    const STORIES = [
+      { title: 'Jak powstaje chleb? 🍞', conn: ['Najpierw', 'Potem', 'Następnie', 'Potem', 'Następnie', 'W końcu'],
+        steps: [['orka', '🚜', 'rolnik orze pole i sieje zboże.'], ['kombajn', '🌾', 'latem kombajn kosi zboże i zbiera ziarno.'], ['maka', '🏭', 'w młynie ziarno miele się na mąkę.'],
+          ['piekarz', '👩‍🍳', 'piekarz robi ciasto z mąki, wody i drożdży.'], [null, '🔥', 'chleb piecze się w gorącym piecu.'], ['chleb', '🛒', 'chleb trafia do sklepu, a my jemy pyszne kanapki!']] },
+      { title: 'Od bulwy do frytek 🍟', conn: ['Najpierw', 'Potem', 'Następnie', 'Potem', 'W końcu'],
+        steps: [['ziemniak', '🌱', 'wiosną rolnik sadzi bulwy ziemniaków.'], [null, '☀️', 'latem ziemniaki rosną i kwitną.'], ['orka', '🚜', 'jesienią są wykopki – maszyna wyciąga ziemniaki z ziemi.'],
+          [null, '🔪', 'w domu myjemy, obieramy i kroimy ziemniaki.'], [null, '🍟', 'smażymy pyszne frytki!']] }
+    ];
+
+    // co można zrobić? – dotknij wszystkiego, co pasuje
+    const MULTI = [
+      { q: 'Co otrzymujemy ze <b>zbóż</b>? Dotknij wszystkiego, co pasuje.',
+        good: [['🍞', 'Chleb i bułki'], ['🥣', 'Płatki śniadaniowe'], ['🍚', 'Kaszę'], ['🌾', 'Mąkę'], ['🍿', 'Popcorn'], ['🥛', 'Napój owsiany']],
+        bad: [['🍟', 'Frytki'], ['🧵', 'Nici'], ['🥕', 'Sok marchwiowy']],
+        note: 'Ze zbóż jest mąka (a z niej chleb i bułki), płatki, kasze i napój owsiany. Popcorn to prażona kukurydza.' },
+      { q: 'Co można zrobić z <b>ziemniaka</b>? Dotknij wszystkiego, co pasuje.',
+        good: [['🍟', 'Frytki'], ['🥟', 'Kopytka'], ['🥞', 'Placki ziemniaczane'], ['🍲', 'Kartoflankę (zupę)'], ['🥣', 'Purée'], ['🔥', 'Pieczone ziemniaki w mundurkach'], ['🐷', 'Zabawne zwierzątko z zapałek']],
+        bad: [['🍞', 'Chleb razowy'], ['🍿', 'Popcorn'], ['🪢', 'Sznurek']],
+        note: 'Ziemniaki „w mundurkach” to ziemniaki pieczone w skórce, np. w ognisku. A z ziemniaka i zapałek można zrobić prosiaczka! 🐷' },
+      { q: 'Co daje nam <b>len</b>? Dotknij wszystkiego, co pasuje.',
+        good: [['🫙', 'Olej lniany'], ['🟤', 'Siemię lniane (nasiona)'], ['🧵', 'Nici'], ['👕', 'Lniane ubrania i obrusy']],
+        bad: [['🍟', 'Frytki'], ['🍚', 'Kaszę mannę'], ['🍿', 'Popcorn']],
+        note: 'Len jest i oleisty (nasiona → olej, siemię), i włóknisty (łodygi → nici, tkaniny).' }
+    ];
+
+    const LEVELS = [
+      { id: 'plants', icon: '🌾', name: 'Rośliny uprawne', desc: 'Zbożowe, okopowe, oleiste, włókniste', type: 'photo', pool: () => shuffle(plants).slice(0, 10) },
+      { id: 'products', icon: '🍞', name: 'Co z czego powstaje?', desc: 'Kasze, płatki, olej, sznurek', type: 'text', pool: () => shuffle(PROD_Q).slice(0, 8) },
+      { id: 'drop', icon: '🎮', name: 'Spadające plony', desc: 'Gra: dotknij właściwej grupy!', type: 'drop', arcade: true },
+      { id: 'bread', icon: '🥖', name: 'Historia chleba', desc: 'Najpierw, potem, następnie, w końcu', type: 'order' },
+      { id: 'multi', icon: '🥔', name: 'Co można zrobić?', desc: 'Zboża, ziemniaki i len', type: 'multi' },
+      { id: 'farmer', icon: '🚜', name: 'Rok rolnika', desc: 'Praca na polu przez cały rok', type: 'text', pool: () => shuffle(FARM_Q).slice(0, 8) },
+      { id: 'diet', icon: '🦌', name: 'Kto co je?', desc: 'Roślinożerne, mięsożerne, wszystkożerne', type: 'photo', pool: () => shuffle(animals).slice(0, 10) },
+      { id: 'catch', icon: '🧺', name: 'Głodny koszyk', desc: 'Gra: łap tylko jedną grupę zwierząt', type: 'catch', arcade: true },
+      { id: 'chain', icon: '🔗', name: 'Łańcuchy pokarmowe', desc: 'Kto kogo zjada?', type: 'chain' },
+      { id: 'pick', icon: '🔍', name: 'Znajdź wszystkie', desc: 'Rośliny i zwierzęta z jednej grupy', type: 'pick' },
+      { id: 'boss', icon: '👑', name: 'Wielki sprawdzian', desc: 'Wszystko z pola i lasu', type: 'photo', boss: true }
+    ];
+
+    /* ---------- Teoria „Przypomnij sobie” – kroki z kartami do odwracania ----------
+       fl(przód, tył, grupa). Za pierwszym razem „Dalej” odblokowuje się po
+       odwróceniu wszystkich kart i czasie na przeczytanie. */
+    const gc = g => `--lc:${GROUPS[g].color};--tc:${GROUPS[g].color};--tc2:${GROUPS[g].color}`;
+    const fl = (f, b, g) => `<button class="flip" style="${g ? gc(g) : ''}"><span class="ff">${f}</span><span class="fb"><span class="in">${b}</span></span></button>`;
+    const hint = '<div class="th-hint no-read">👆 Dotknij każdej karty, żeby ją odwrócić</div>';
+    const strip = ids => `<div class="grp-strip no-read">${ids.map(([id, n]) => `<figure><img src="${src(id)}" alt="" loading="lazy" /><figcaption>${n || ITEM[id].name}</figcaption></figure>`).join('')}</div>`;
+    const grp = (g, text, ids) => `<div class="grp" style="${gc(g)}"><div class="grp-head">${GROUPS[g].icon} <span>Rośliny ${GROUPS[g].name.toLowerCase()}</span><span class="use no-read">${GROUPS[g].use}</span></div>${strip(ids)}<p>${text}</p></div>`;
+    const zgrp = (g, text, ids) => `<div class="grp" style="${gc(g)}"><div class="grp-head">${GROUPS[g].icon} <span>Zwierzęta ${GROUPS[g].name.toLowerCase()}</span><span class="use no-read">${GROUPS[g].use}</span></div>${strip(ids)}<p>${text}</p></div>`;
+    const fact = (id, text) => `<div class="fact"><img src="${src(id)}" alt="" /><div><b class="tag">🤓 Ale to ciekawe!</b>${text}</div></div>`;
+    const tree = (top, gs) => `<div class="tree no-read"><div class="tree-top">${top}</div><div class="tree-stem"></div>
+      <div class="tree-kids ${gs.length === 3 ? 'three' : ''}">${gs.map(g => `<div class="tree-kid" style="${gc(g)}"><img src="${src(GROUPS[g].img)}" alt="" /><b>${GROUPS[g].icon} ${GROUPS[g].name}</b>${GROUPS[g].use}</div>`).join('')}</div></div>`;
+    const chainHTML = (links, roles) => `<div class="chain no-read">${links.map(([id, n], i) => `${i ? '<span class="arr">→</span>' : ''}<div class="link" style="--lc:${roles ? roleColor(id) : '#fff'}"><div class="ph"><img src="${src(id)}" alt="" /></div><span>${n}</span>${roles ? `<small>${roleName(id)}</small>` : ''}</div>`).join('')}</div>`;
+    const roleName = id => ITEM[id] && ITEM[id].kind === 'zw' ? GROUPS[ITEM[id].g].name.toLowerCase() : 'roślina';
+    const roleColor = id => ITEM[id] && ITEM[id].kind === 'zw' ? GROUPS[ITEM[id].g].color : '#65a30d';
+    const timeline = st => `<div class="timeline">${st.steps.map((s, i) => `<div class="tl-step"><div class="tl-ph no-read">${s[0] ? `<img src="${src(s[0])}" alt="" />` : s[1]}</div><div class="tl-txt"><b class="cn">${st.conn[i]}</b> ${s[2]}</div></div>`).join('')}</div>`;
+
+    const THEORY = {
+      plants: { title: 'Rośliny uprawne', steps: [
+        `<h2 class="th-title">🚜 Co rośnie na polu?</h2>
+         <p class="th-p">Rolnik uprawia na polach rośliny, które dają nam jedzenie, olej i materiały na ubrania. To <b>rośliny uprawne</b>. Dzielimy je na cztery grupy – zależnie od tego, <b>co z nich bierzemy</b>.</p>
+         ${tree('🌱 Rośliny uprawne', PL_GROUPS)}
+         ${hint}<div class="flips">${fl('🌾 Zbożowe', 'uprawiamy dla <b>ziarna</b>', 'zb')}${fl('🥔 Okopowe', 'dla <b>bulw i korzeni</b>', 'ok')}${fl('🌻 Oleiste', 'dla <b>nasion</b>, z których jest olej', 'ol')}${fl('🧵 Włókniste', 'dla <b>włókien</b> na nici i tkaniny', 'wl')}</div>`,
+        `<h2 class="th-title">🌾 Rośliny zbożowe</h2>
+         ${grp('zb', 'Pszenica, żyto, jęczmień, owies i kukurydza to <b>rośliny zbożowe</b>. Uprawia się je na <b>ziarno</b>. Z ziaren mieli się mąkę, a z mąki piecze się chleb.', [['pszenica'], ['zyto'], ['jeczmien'], ['owies'], ['kukurydza']])}
+         <p class="th-p">Zboża siane wiosną to <b>zboża jare</b>. Zboża siane jesienią to <b>zboża ozime</b> – przezimują w ziemi.</p>
+         ${hint}<div class="flips">${fl('Sieję wiosną', 'zboża <b>jare</b>', 'zb')}${fl('Sieję jesienią', 'zboża <b>ozime</b>', 'zb')}</div>`,
+        `<h2 class="th-title">🥔 Rośliny okopowe</h2>
+         ${grp('ok', 'Do roślin okopowych należą ziemniaki, buraki, rzepa i marchew. Jemy ich <b>części podziemne</b>: bulwy i korzenie.', [['ziemniak'], ['burak'], ['rzepa'], ['marchew']])}
+         ${hint}<div class="flips">${fl('🥔 ziemniak', `<img src="${src('ziemniak')}" alt="" /><b>ziemniak</b><small>jemy bulwy</small>`, 'ok')}${fl('🥕 marchew', `<img src="${src('marchew')}" alt="" /><b>marchew</b><small>jemy korzeń</small>`, 'ok')}${fl('🟣 burak', `<img src="${src('burak')}" alt="" /><b>burak</b><small>jemy korzeń</small>`, 'ok')}${fl('⚪ rzepa', `<img src="${src('rzepa')}" alt="" /><b>rzepa</b><small>jemy korzeń</small>`, 'ok')}</div>
+         ${fact('skorzonera', 'Skorzonera to warzywo z długim, czarnym korzeniem. Smakuje jak szparagi i ma dużo witamin, potasu i magnezu.')}`,
+        `<h2 class="th-title">🌻 Oleiste i 🧵 włókniste</h2>
+         ${grp('ol', 'Rośliny <b>oleiste</b> uprawia się dla nasion, z których tłoczy się olej. To rzepak, słonecznik i len. Najzdrowszy jest olej tłoczony na zimno.', [['rzepak'], ['slonecznik'], ['len']])}
+         ${grp('wl', 'Rośliny <b>włókniste</b> to len i konopie. Z ich włókien robi się nici, sznurki, liny i tkaniny.', [['len'], ['konopie']])}
+         ${hint}<div class="flips">${fl('Gdzie jest len?', '<b>w dwóch grupach!</b><small>oleisty i włóknisty</small>', 'wl')}${fl('🪢 lina', 'z włókien <b>konopi</b>', 'wl')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: zapytaj, <b>co bierzemy z rośliny</b>. Ziarno? – <b>zbożowa</b>. To, co rośnie pod ziemią? – <b>okopowa</b>. Olej? – <b>oleista</b>. Nitkę? – <b>włóknista</b>.</div>`
+      ] },
+      products: { title: 'Co z czego powstaje?', steps: [
+        `<h2 class="th-title">🍞 Co dają nam zboża?</h2>
+         <p class="th-p">Z ziaren zbóż mieli się <b>mąkę</b>, a z niej piecze się chleb i bułki. Ze zbóż robi się też <b>płatki</b>: pszenne, żytnie, owsiane i kukurydziane.</p>
+         <img class="th-img no-read" src="${src('kasza')}" alt="Kasza gryczana" />
+         <p class="th-p">Z różnych zbóż powstają różne <b>kasze</b>. Odwróć karty i sprawdź, z czego jest każda kasza!</p>
+         ${hint}<div class="flips">${fl('kasza manna', 'z <b>pszenicy</b>', 'zb')}${fl('kasza jęczmienna i pęczak', 'z <b>jęczmienia</b>', 'zb')}${fl('kasza gryczana', 'z <b>gryki</b>', 'zb')}${fl('kasza jaglana', 'z <b>prosa</b>', 'zb')}</div>`,
+        `<h2 class="th-title">🥛 Owies, kukurydza i otręby</h2>
+         <p class="th-p">Z owsa robi się płatki i <b>napój owsiany</b>. Kukurydzę możemy prażyć, gotować i konserwować.</p>
+         <p class="th-p">Gdy miele się ziarno na mąkę, zostają <b>otręby</b>. Mają dużo błonnika i witamin z grupy B, więc dodaje się je do chleba i potraw.</p>
+         ${hint}<div class="flips">${fl('🍿 popcorn', 'prażona <b>kukurydza</b>', 'zb')}${fl('otręby', 'dużo <b>błonnika</b> i witamin B', 'zb')}</div>
+         ${fact('amarantus', 'Amarantus to najstarsze uprawiane zboże na świecie. Hiszpanie przywieźli go do Europy z Ameryki Południowej. W Azji mówią na niego „królewskie ziarno”. Ma pięć razy więcej żelaza niż pszenica!')}`,
+        `<h2 class="th-title">🫙 Olej, sznurki i frytki</h2>
+         <p class="th-p">Z nasion rzepaku, słonecznika i lnu tłoczy się <b>olej</b>. Z włókien lnu i konopi robi się <b>nici, sznurki i liny</b>. A z ziemniaków – frytki, placki i kopytka!</p>
+         ${hint}<div class="flips">${fl('🫙 olej', 'z <b>rzepaku</b>, <b>słonecznika</b>, <b>lnu</b>', 'ol')}${fl('🧵 nici', 'z włókien <b>lnu</b>', 'wl')}${fl('🪢 sznurki i liny', 'z <b>konopi</b> i lnu', 'wl')}${fl('🍟 frytki', 'z <b>ziemniaków</b>', 'ok')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: nazwa często podpowiada! Kasza <b>jęczmienna</b> – z jęczmienia, kasza <b>gryczana</b> – z gryki, płatki <b>owsiane</b> – z owsa. Uważaj tylko na kaszę <b>jaglaną</b> – ona jest z prosa.</div>`
+      ] },
+      bread: { title: 'Historia chleba', steps: [
+        `<h2 class="th-title">🥖 Jak powstaje chleb?</h2>
+         <p class="th-p">Zanim chleb trafi na stół, ziarno przechodzi długą drogę – z pola, przez młyn i piekarnię, aż do sklepu.</p>
+         ${timeline(STORIES[0])}`,
+        `<h2 class="th-title">🗣️ Jak opowiadać po kolei?</h2>
+         <p class="th-p">Gdy opowiadamy, co dzieje się po kolei, pomagają nam słowa: <b>najpierw</b>, <b>potem</b>, <b>następnie</b> i <b>w końcu</b>.</p>
+         ${hint}<div class="flips">${fl('najpierw', '<b>1.</b> to, co jest na samym początku')}${fl('potem', '<b>2.</b> to, co dzieje się dalej')}${fl('następnie', '<b>3.</b> kolejna rzecz')}${fl('w końcu', '<b>ostatnia</b> rzecz – koniec historii')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: zawsze zaczynaj od <b>pola</b> – nie da się upiec chleba, zanim nie urośnie zboże!</div>`
+      ] },
+      multi: { title: 'Co można zrobić z roślin?', steps: [
+        `<h2 class="th-title">🥔 Co można zrobić z ziemniaka?</h2>
+         <p class="th-p">O, ho! Mnóstwo różnych rzeczy! Zupę <b>kartoflankę</b>, <b>kopytka</b>, frytki, płatki ziemniaczane, <b>placki</b> i purée z masłem. A ziemniaki pieczone w ognisku mają chrupiącą skórkę.</p>
+         ${hint}<div class="flips">${fl('kartoflanka', 'zupa z <b>ziemniaków</b>', 'ok')}${fl('w mundurkach', 'pieczone <b>w skórce</b>', 'ok')}${fl('purée', 'czytamy <b>piure</b> – gniecione ziemniaki', 'ok')}${fl('🐷 z zapałkami?', 'zabawne <b>zwierzątko</b> z ziemniaka!', 'ok')}</div>`,
+        `<h2 class="th-title">🌾 Zboża i 🟤 len</h2>
+         <p class="th-p">Ze zbóż mamy mąkę, chleb, bułki, płatki, kasze, popcorn i napój owsiany. A len daje nam aż dwie rzeczy: z nasion <b>olej i siemię lniane</b>, a z łodyg <b>włókna</b> na nici i lniane ubrania.</p>
+         <p class="th-p">Ciekawe doświadczenie: połóż pestki słonecznika między dwiema serwetkami i dociśnij wałkiem. Na serwetce zobaczysz tłuste plamki – to <b>olej</b>!</p>
+         ${hint}<div class="flips">${fl('siemię lniane', '<b>nasiona</b> lnu', 'wl')}${fl('tłusta plamka', 'z nasion wyszedł <b>olej</b>', 'ol')}</div>`
+      ] },
+      farmer: { title: 'Rok rolnika', steps: [
+        `<h2 class="th-title">🚜 Praca rolnika przez cały rok</h2>
+         <div class="seasons no-read">
+           <div class="season" style="--lc:#16a34a"><img src="${src('orka')}" alt="" /><h4>🌷 Wiosna</h4><p>orka, siew zbóż jarych, marchwi, buraków; sadzenie ziemniaków</p></div>
+           <div class="season" style="--lc:#d97706"><img src="${src('kombajn')}" alt="" /><h4>☀️ Lato</h4><p>żniwa – kombajn kosi zboże</p></div>
+           <div class="season" style="--lc:#ea580c"><img src="${src('ziemniak')}" alt="" /><h4>🍂 Jesień</h4><p>wykopki ziemniaków i buraków, nawożenie, siew zbóż ozimych</p></div>
+           <div class="season" style="--lc:#2563eb"><div class="s-emo">🔧</div><h4>❄️ Zima</h4><p>czyszczenie i naprawa maszyn</p></div>
+         </div>
+         <p class="th-p"><b>Wiosną</b> rolnik przekopuje i spulchnia glebę – to <b>orka</b>. Sieje zboża jare, marchew, pietruszkę i buraki, a do ziemi sadzi bulwy ziemniaków. <b>Latem</b> są <b>żniwa</b> – kombajny koszą zboża. <b>Jesienią</b> rolnik zbiera ziemniaki i buraki, nawozi glebę i sieje zboża ozime. <b>Zimą</b> czyści i naprawia maszyny.</p>`,
+        `<h2 class="th-title">🧑‍🌾 Kim jest rolnik?</h2>
+         <p class="th-p"><b>Rolnik</b> albo <b>rolniczka</b> to osoba, która uprawia pole. W pracy pomagają jej maszyny rolnicze: traktor, pług i kombajn. Nazwa „rolnik” pochodzi od dawnego słowa <b>„rola”</b>, czyli gleba, ziemia.</p>
+         ${hint}<div class="flips">${fl('🌷 wiosną', 'orka i <b>siew</b>', 'ro')}${fl('☀️ latem', '<b>żniwa</b>', 'zb')}${fl('🍂 jesienią', '<b>wykopki</b> i zboża ozime', 'ok')}${fl('❄️ zimą', 'naprawa <b>maszyn</b>', 'wl')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: <b>żniwa</b> są latem, a <b>wykopki</b> (ziemniaki!) – jesienią. Najmniej pracy na polu jest zimą.</div>`
+      ] },
+      diet: { title: 'Kto co je?', steps: [
+        `<h2 class="th-title">🌿 Rośliny – producenci</h2>
+         <p class="th-p">W przyrodzie wszystko jest ze sobą połączone. Każdy organizm potrzebuje pożywienia. <b>Rośliny</b> same wytwarzają pokarm – dlatego nazywamy je <b>producentami</b>.</p>
+         ${strip([['borowka', 'Borówka'], ['trawa', 'Trawa'], ['pszenica', 'Zboże'], ['leszczyna', 'Leszczyna']])}
+         <p class="th-p">Zwierzęta nie umieją same zrobić pokarmu. Muszą jeść inne organizmy. Dzielimy je na trzy grupy.</p>
+         ${tree('🐾 Zwierzęta', ZW_GROUPS)}
+         ${hint}<div class="flips one">${fl('Dlaczego rośliny to producenci?', 'bo <b>same wytwarzają pokarm</b>', 'ro')}</div>`,
+        `<h2 class="th-title">🐾 Trzy grupy zwierząt</h2>
+         ${zgrp('ro', 'Zwierzęta <b>roślinożerne</b> jedzą rośliny: sarna, zając, żubr, motyl i jeleń.', [['sarna'], ['zajac'], ['zubr'], ['motyl'], ['jelen']])}
+         ${zgrp('mi', 'Zwierzęta <b>mięsożerne</b> jedzą mięso – zjadają inne zwierzęta: myszołów, bocian, kot, wilk, ryś, kuna, sowa i lis.', [['myszolow'], ['bocian'], ['kot'], ['wilk'], ['rys'], ['kuna'], ['puszczyk', 'Sowa'], ['lis']])}
+         ${zgrp('ws', 'Zwierzęta <b>wszystkożerne</b> jedzą i rośliny, i mięso: dzik, bażant, niedźwiedź, wiewiórka i mysz.', [['dzik'], ['bazant'], ['niedzwiedz'], ['wiewiorka'], ['mysz']])}
+         ${hint}<div class="flips three">${fl('🐰 zając', '<b>zając</b><small>roślinożerny</small>', 'ro')}${fl('🐺 wilk', '<b>wilk</b><small>mięsożerny</small>', 'mi')}${fl('🐻 niedźwiedź', '<b>niedźwiedź</b><small>wszystkożerny</small>', 'ws')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: skubie trawę i liście? – <b>roślinożerne</b>. Poluje i ma ostre zęby lub szpony? – <b>mięsożerne</b>. Je, co znajdzie: owoce, orzechy, ale też owady czy jajka? – <b>wszystkożerne</b>.</div>`
+      ] },
+      chain: { title: 'Łańcuchy pokarmowe', steps: [
+        `<h2 class="th-title">🔗 Kto kogo zjada?</h2>
+         <p class="th-p">Rośliny i zwierzęta tworzą <b>łańcuchy pokarmowe</b>. Jedne są pożywieniem drugich. Strzałka pokazuje, <b>kto jest czyim pokarmem</b>.</p>
+         ${chainHTML(CHAINS[0].links, true)}
+         ${chainHTML(CHAINS[1].links, true)}
+         <p class="th-p">Na początku jest zwykle <b>roślina</b>. Zjada ją <b>zwierzę roślinożerne</b>, a to zwierzę jest pokarmem dla <b>mięsożernego</b>.</p>
+         ${hint}<div class="flips">${fl('trawa → ?', `<img src="${src('sarna')}" alt="" /><b>sarna</b>`, 'ro')}${fl('sarna → ?', `<img src="${src('wilk')}" alt="" /><b>wilk</b>`, 'mi')}${fl('zboże → ?', `<img src="${src('mysz')}" alt="" /><b>mysz</b>`, 'ws')}${fl('mysz → ?', `<img src="${src('myszolow')}" alt="" /><b>myszołów</b>`, 'mi')}</div>`,
+        `<h2 class="th-title">⚖️ Równowaga w przyrodzie</h2>
+         <p class="th-p">Łańcuch może być dłuższy: orzechy zjada wiewiórka, wiewiórkę – kuna, a kunę – wilk.</p>
+         ${chainHTML(CHAINS[2].links, true)}
+         <p class="th-p">W przyrodzie nie może zabraknąć <b>żadnego ogniwa</b>. Gdyby zniknęły myszy, myszołów nie miałby co jeść – i <b>równowaga zostaje zaburzona</b>.</p>
+         ${fact('muchomor', 'Bardzo ważne są też <b>grzyby i bakterie</b>. To <b>destruenci</b> – rozkładają martwe części roślin i zwierząt i zamieniają je w żyzną ziemię.')}
+         ${hint}<div class="flips">${fl('grzyby i bakterie', '<b>destruenci</b>', 'wl')}${fl('rośliny', '<b>producenci</b>', 'ro')}</div>
+         <div class="th-tip">🦉 Sztuczka Sówki: łańcuch czytaj od rośliny. Kto je roślinę? Kto zjada tego, kto je roślinę? Strzałka zawsze idzie <b>do tego, kto je</b>.</div>`
+      ] }
+    };
+
+    // autorzy zdjęć: [autor, licencja, strona pliku]
+    const CREDITS = {
+      "owies":["Rosendahl","Public domain","https://commons.wikimedia.org/wiki/File:Oats_closeup.jpg"],
+      "zubr":["Charles J. Sharp","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:European_bison_(Bison_bonasus)_male_Bia%C5%82owieza.jpg"],
+      "motyl":["Didier Descouens","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Paon-du-jour_MHNT_CUT_2013_3_14_Cahors.jpg"],
+      "myszolow":["caroline legg","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Common_Buzzard_by_caroline_legg_(cropped).jpg"],
+      "bocian":["Carlos Delgado","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Ciconia_ciconia_-_01.jpg"],
+      "pszenica":["A S M Jobaer","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Wheat_ear_close-up_in_a_field_Bangladesh_02.jpg"],
+      "zyto":["Rasbak","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Rogge_aar_Secale_cereale_(4%C3%973).jpg"],
+      "jeczmien":["Lucash","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Barley_in_Slovenia.jpg"],
+      "kukurydza":["Willis Lam","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:White_Corn_on_the_Cob_with_husk_(27000745034).jpg"],
+      "ziemniak":["DenesFeri","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Solanales_-_Solanum_tuberosum_-_5.jpg"],
+      "rzepa":["HaJunkiyada","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Turnip.jpg"],
+      "marchew":["Jonathunder","GFDL 1.2","https://commons.wikimedia.org/wiki/File:BunchCarrots.jpg"],
+      "rzepak":["Richard Bartz, Munich aka Makro Freak","CC BY-SA 2.5","https://commons.wikimedia.org/wiki/File:Rapsfeld_Rapeseed_Brassica_napus.jpg"],
+      "slonecznik":["Fir0002","GFDL 1.2","https://commons.wikimedia.org/wiki/File:Sunflower_sky_backdrop.jpg"],
+      "len":["H. Zell","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Linum_usitatissimum_001.JPG"],
+      "konopie":["Nabokov","Public domain","https://commons.wikimedia.org/wiki/File:Hemp_plants-cannabis_sativa-field.JPG"],
+      "maka":["Veganbaking.net from USA","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:All-Purpose_Flour_(4107895947).jpg"],
+      "chleb":["3268zauber","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Korb_mit_Br%C3%B6tchen.JPG"],
+      "kot":["Marko Milivojevic (Pixnio)","CC0","https://commons.wikimedia.org/wiki/File:Domestic_shorthair_cat_portrait_in_grass.jpg"],
+      "niedzwiedz":["Charles J. Sharp","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Eurasian_brown_bear_(Ursus_arctos_arctos)_female_1.jpg"],
+      "bazant":["Charles J. Sharp","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Common_pheasant_(Phasianus_colchicus)_male_3.jpg"],
+      "amarantus":["Jebulon","Public domain","https://commons.wikimedia.org/wiki/File:Amaranthus_caudatus_JdP.jpg"],
+      "skorzonera":["autor w opisie pliku","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Schwarzwurzeln.jpg"],
+      "kasza":["Andrey Korzun","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Buckwheat_and_products_from_it_01.jpg"],
+      "burak":["Ramesh NG","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Beetroot_on_plate.jpg"],
+      "trawa":["Sandra Aceng","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Close-Up_of_Green_Grass_Blades.jpg"],
+      "orka":["Richard Schmidt","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Tractor_ploughing_the_field_-_geograph.org.uk_-_272849.jpg"],
+      "piekarz":["Shixart1985","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Baker_woman%27s_hands_kneading_bread_dough.jpg"],
+      "rys":["David Castor","Public domain","https://commons.wikimedia.org/wiki/File:Lynx_lynx-4.JPG"],
+      "kombajn":["Dan Kollmann","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Combine_in_wheat_field.jpg"],
+      "pole":["Nyttend","Public domain","https://commons.wikimedia.org/wiki/File:Ripe_wheat_on_Menokin_Road.jpg"],
+      "sarna":["Henryk Bielamowicz","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Przysieki,_sarny_(HB1).jpg"],
+      "wilk":["User:Mas3cf","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg"],
+      "zajac":["Jean-Jacques Boujot from Paris, France","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Lepus_europaeus_(Causse_M%C3%A9jean,_Loz%C3%A8re)-cropped.jpg"],
+      "jelen":["Lviatour","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Cervus_elaphus_Luc_Viatour_6.jpg"],
+      "dzik":["Jerzy Strzelecki","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Locha(js).jpg"],
+      "wiewiorka":["Mareckr Marek Rykiel","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Squirrel_by_mareckr.jpg"],
+      "mysz":["Hans Hillewaert","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Apodemus_sylvaticus_(Sardinia).jpg"],
+      "kuna":["caroline legg","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Pine_Marten_(48173751702).jpg"],
+      "lis":["ClaudiaTen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_(cropped).jpg"],
+      "puszczyk":["Martin Mecnarowski","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Strix_aluco_3_(Martin_Mecnarowski).jpg"],
+      "leszczyna":["Anne Burgess","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Hazel_Nuts_(Corylus_avellana)_-_geograph.org.uk_-_6562241.jpg"],
+      "borowka":["Rosa-Maria Rinkl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Heidelbeeren_im_Wald.JPG"],
+      "muchomor":["Onderwijsgek","CC BY-SA 3.0 nl","https://commons.wikimedia.org/wiki/File:Amanita_muscaria_3_vliegenzwammen_op_rij.jpg"]
+    };
+
+    const MAX_STARS = LEVELS.length * 3;
+    const REWARDS = [
+      { frac: 0.15, id: 'glasses', name: 'okulary', icon: '👓' },
+      { frac: 0.35, id: 'scarf', name: 'szalik', icon: '🧣' },
+      { frac: 0.6, id: 'hat', name: 'słomkowy kapelusz', icon: '🎓' },
+      { frac: 0.85, id: 'crown', name: 'złota korona', icon: '👑' }
+    ].map(r => ({ ...r, at: Math.max(1, Math.round(r.frac * MAX_STARS)) }));
+    const PRAISE = ['Super!', 'Brawo!', 'Hu hu! Świetnie!', 'Ekstra!', 'Tak jest! 🎉', 'Prawdziwa przyrodniczka! 🌾', 'Wow, pięknie!', 'Doskonale!'];
+
+
+    /* ---------- Stan i zapis ---------- */
+    function defaultState() { return { stars: {}, found: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true }; }
+    function loadState() {
+      try {
+        const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        if (s) return Object.assign(defaultState(), s);
+      } catch (e) {}
+      return defaultState();
+    }
+    function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); } catch (e) {} }
+    const state = loadState();
+
+    const totalStars = () => LEVELS.reduce((s, l) => s + (state.stars[l.id] || 0), 0);
+    const accessories = () => REWARDS.filter(r => totalStars() >= r.at).map(r => r.id);
+    const unlocked = i => i === 0 || !!state.stars[LEVELS[i - 1].id];
+
+    function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); }
+    function bumpStreak() {
+      const t = dayStr(new Date()), s = state.streak;
+      if (s.last === t) return;
+      s.count = s.last === yesterdayStr() ? s.count + 1 : 1;
+      s.last = t;
+    }
+    const currentStreak = () => state.streak.last === dayStr(new Date()) || state.streak.last === yesterdayStr() ? state.streak.count : 0;
+
+
+    /* ---------- Dźwięki ---------- */
+    let actx = null;
+    function tone(freqs, dur = 0.1, type = 'sine', vol = 0.15) {
+      if (!state.sfx) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        freqs.forEach((f, i) => {
+          const o = actx.createOscillator(), g = actx.createGain(), st = t0 + i * dur;
+          o.type = type; o.frequency.value = f;
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(vol, st + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur * 1.6);
+          o.connect(g).connect(actx.destination);
+          o.start(st); o.stop(st + dur * 1.7);
+        });
+      } catch (e) {}
+    }
+    const sfx = { good: () => tone([660, 990], 0.09), bad: () => tone([240, 180], 0.12, 'triangle'), tap: () => tone([520], 0.04, 'sine', 0.07), flip: () => tone([440, 660], 0.06, 'sine', 0.08), win: () => tone([523, 659, 784, 1047], 0.12), lose: () => tone([392, 330, 262], 0.16, 'triangle') };
+
+    /* ---------- Czytanie na głos ----------
+       Tempo jak u ucznia 3 klasy: wolniej (CONFIG.rate) i przerwa po każdym
+       zdaniu (CONFIG.pauseMs). Tekst dzielimy na zdania i czytamy po kolei. */
+    let plVoice = null, sayBtn = null, sayToken = 0, sayTimer = null;
+    function pickVoice() {
+      if (!window.speechSynthesis) return;
+      const pl = speechSynthesis.getVoices().filter(v => /^pl/i.test(v.lang));
+      plVoice = pl.find(v => /Google|Natural|Online|Neural|Siri|Zosia|Ewa/i.test(v.name)) || pl.find(v => /Paulina|Zofia|Marek/i.test(v.name)) || pl[0] || null;
+    }
+    if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+    function plain(html) {
+      const d = document.createElement('div');
+      d.innerHTML = String(html).replace(/___/g, ' … ');
+      d.querySelectorAll('.no-read, .say-mini, .letter, .fb, .ff').forEach(e => e.remove());
+      d.querySelectorAll('.blank:not(.filled)').forEach(e => { e.textContent = ' … '; });
+      d.querySelectorAll('h2, h3, p, li, .th-tip, .th-rule, .quiz-opt, .q-text, .q-num').forEach(e => e.append(/[.!?:…]\s*$/.test(e.textContent) ? ' ' : '. '));
+      return d.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
+        .replace(/→|←|↓|↑|✕|✓|„|”/g, ' ').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
+    }
+    // dzielimy tylko na prawdziwe zdania: po . ! ? … i gdy dalej jest wielka litera
+    // („kto? co?” i dwukropki zostają w jednym kawałku); krótkie kawałki doklejamy do następnego
+    function sentences(t) {
+      const raw = t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+      const out = [];
+      for (const s of raw) { if (out.length && out[out.length - 1].length < 28) out[out.length - 1] += ' ' + s; else out.push(s); }
+      return out;
+    }
+    function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
+    let sayQueue = [];
+    function stopSpeak() { sayToken++; sayQueue = []; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    // append = true: nie przerywaj tego, co Sówka czyta – dopisz na koniec (np. odwrócona karta)
+    function speak(text, btn, append) {
+      if (!window.speechSynthesis || !text) return;
+      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...sentences(text)); return; }
+      stopSpeak();
+      const my = sayToken;
+      sayQueue = sentences(text);
+      markSaying(btn);
+      const next = () => {
+        if (my !== sayToken) return;
+        if (!sayQueue.length) { markSaying(null); return; }
+        const u = new SpeechSynthesisUtterance(sayQueue.shift());
+        u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
+        u.rate = CONFIG.rate; u.pitch = 1.05;
+        let done = false;
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs); };
+        u.onend = u.onerror = go;
+        try { speechSynthesis.speak(u); } catch (e) { go(); }
+      };
+      next();
+    }
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-say]');
+      if (!b) return;
+      if (sayBtn === b) { stopSpeak(); return; }
+      const el = document.querySelector(b.dataset.say);
+      const ex = b.dataset.extra ? document.querySelector(b.dataset.extra) : null;
+      if (el) speak(plain(el.innerHTML + (ex ? '. ' + ex.innerHTML : '')), b);
+    });
+    const sayMini = (sel, extra) => `<button class="say-mini" data-say="${sel}" ${extra ? `data-extra="${extra}"` : ''} aria-label="Przeczytaj na głos">🔊</button>`;
+
+    /* ---------- Sówka Lulu (leśna, brązowa) ---------- */
+    function owlSVG(mood) {
+      const acc = accessories();
+      const eyes = mood === 'happy'
+        ? `<path d="M31 64 q13 -13 26 0 M63 64 q13 -13 26 0" stroke="#1e1b4b" stroke-width="5" fill="none" stroke-linecap="round"/>`
+        : `<circle cx="44" cy="62" r="14" fill="#fff"/><circle cx="76" cy="62" r="14" fill="#fff"/>
+           <circle cx="46" cy="63" r="7" fill="#1e1b4b"/><circle cx="78" cy="63" r="7" fill="#1e1b4b"/>
+           <circle cx="48.5" cy="60" r="2.3" fill="#fff"/><circle cx="80.5" cy="60" r="2.3" fill="#fff"/>
+           ${mood === 'sad' ? '<path d="M32 44 l20 5 M88 44 l-20 5" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>' : ''}`;
+      const scarf = acc.includes('scarf')
+        ? `<rect x="24" y="84" width="72" height="12" rx="6" fill="#16a34a"/><rect x="70" y="90" width="12" height="28" rx="4" fill="#15803d"/>
+           <path d="M70 104 h12 M70 110 h12" stroke="#86efac" stroke-width="2"/>` : '';
+      const glasses = acc.includes('glasses')
+        ? `<circle cx="44" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <circle cx="76" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <path d="M58 60 q2 -3 4 0" stroke="#1e1b4b" stroke-width="3.5" fill="none"/>` : '';
+      const crown = acc.includes('crown')
+        ? `<polygon points="36,40 37,12 49,27 60,5 71,27 83,12 84,40" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" stroke-linejoin="round"/>
+           <circle cx="60" cy="30" r="4" fill="#ef4444"/><circle cx="45" cy="33" r="3" fill="#3b82f6"/><circle cx="75" cy="33" r="3" fill="#22c55e"/>` : '';
+      const hat = acc.includes('hat') && !acc.includes('crown')
+        ? `<path d="M44 34 v10 q16 7 32 0 v-10z" fill="#3f6212"/>
+           <polygon points="26,30 60,16 94,30 60,44" fill="#365314"/>
+           <path d="M60 30 L90 33 V48" stroke="#facc15" stroke-width="3" fill="none"/><circle cx="90" cy="50" r="4" fill="#facc15"/>` : '';
+      return `<svg class="owl-svg" viewBox="0 0 120 135" aria-hidden="true">
+        <ellipse cx="60" cy="131" rx="34" ry="4" fill="rgba(20,50,31,0.14)"/>
+        <polygon points="26,46 19,14 47,32" fill="#78350f"/>
+        <polygon points="94,46 101,14 73,32" fill="#78350f"/>
+        <ellipse cx="60" cy="80" rx="42" ry="46" fill="#b45309"/>
+        <ellipse cx="21" cy="92" rx="11" ry="24" fill="#78350f" transform="rotate(14 21 92)"/>
+        <ellipse cx="99" cy="92" rx="11" ry="24" fill="#78350f" transform="rotate(-14 99 92)"/>
+        <ellipse cx="60" cy="98" rx="26" ry="27" fill="#fef3c7"/>
+        <path d="M48 96 q5 5 10 0 M62 96 q5 5 10 0 M55 107 q5 5 10 0" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+        ${eyes}
+        <polygon points="54,73 66,73 60,84" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" stroke-linejoin="round"/>
+        <ellipse cx="47" cy="126" rx="8" ry="4.5" fill="#f59e0b"/><ellipse cx="73" cy="126" rx="8" ry="4.5" fill="#f59e0b"/>
+        ${scarf}${glasses}${hat}${crown}
+      </svg>`;
+    }
+
+    function owlSay(html, mood) {
+      const b = $('#bubble');
+      if (b) { b.innerHTML = html; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+      const o = $('#owl');
+      if (o) {
+        o.innerHTML = owlSVG(mood);
+        o.classList.remove('jump', 'shake'); void o.offsetWidth;
+        if (mood === 'happy') o.classList.add('jump');
+        if (mood === 'sad') o.classList.add('shake');
+      }
+    }
+
+    function confetti() {
+      const colors = ['#16a34a', '#facc15', '#ea580c', '#d6a06a', '#4ade80', '#a16207'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+
+    function markFound(id) { state.found[id] = true; }
+
+    /* ---------- Górny pasek ---------- */
+    function updateTopbar() {
+      $('#starCount').textContent = totalStars();
+      $('#streakCount').textContent = currentStreak();
+      $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+      $('#readBtn').textContent = state.read ? '🗣️' : '🤐';
+      $('#readBtn').title = state.read ? 'Sówka czyta na głos' : 'Czytanie wyłączone';
+    }
+    $('#readBtn').addEventListener('click', () => {
+      state.read = !state.read; save(); updateTopbar();
+      if (state.read) speak('Hu hu! Będę czytać na głos.'); else stopSpeak();
+    });
+    $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
+
+    /* ---------- Pętla gier zręcznościowych ---------- */
+    let raf = null, keyHandler = null, timers = [];
+    function stopGame() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null; keyHandler = null;
+      timers.forEach(clearTimeout); timers = [];
+    }
+    function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
+    function gameLoop(step) {
+      let last = performance.now();
+      const f = now => {
+        const dt = Math.min(50, now - last); last = now;
+        if (step(dt) !== false) raf = requestAnimationFrame(f);
+      };
+      raf = requestAnimationFrame(f);
+    }
+    document.addEventListener('keydown', e => { if (keyHandler) keyHandler(e); });
+
+    /* =====================================================================
+       MAPA
+       ===================================================================== */
+    function renderMap() {
+      stopGame(); stopSpeak();
+      document.body.classList.remove('in-level');
+      updateTopbar();
+      const tot = totalStars();
+      const next = REWARDS.find(r => tot < r.at);
+      const prevAt = [...REWARDS].reverse().find(r => tot >= r.at)?.at || 0;
+      const pct = next ? Math.round((tot - prevAt) / (next.at - prevAt) * 100) : 100;
+      const cur = LEVELS.findIndex((l, i) => unlocked(i) && !state.stars[l.id]);
+
+      let greet;
+      if (tot === 0) greet = CONFIG.intro;
+      else if (tot === MAX_STARS) greet = 'Hu hu! Znasz rośliny z pola i wiesz, kto co je w przyrodzie! 🏆 Możesz wracać do ulubionych zadań, kiedy tylko chcesz.';
+      else if (cur >= 0) greet = `Witaj z powrotem na polu! 🌾 Dziś czeka na Ciebie: <b>${LEVELS[cur].name}</b>. Dasz radę! 💪`;
+      else greet = 'Wszystkie zadania odblokowane! Zagraj jeszcze raz tam, gdzie brakuje Ci gwiazdek ⭐.';
+
+      const node = (l, i) => {
+        const s = state.stars[l.id] || 0, un = unlocked(i);
+        const cls = (!un ? 'locked' : i === cur ? 'current' : s ? 'done' : '') + (l.arcade ? ' arcade' : '');
+        return `<button class="node ${cls}" data-level="${i}" ${un ? '' : 'disabled'} style="--off:${[0, 1, 2, 1][i % 4]}">
+          <span class="node-icon">${un ? l.icon : '🔒'}</span>
+          <span class="node-body"><span class="node-num">${l.boss ? 'Finał' : l.arcade ? 'Gra zręcznościowa' : `Zadanie ${i + 1}`}</span>
+            <span class="node-name">${l.name}</span><span class="node-desc">${l.desc}</span></span>
+          <span class="node-stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></span>
+          ${i === cur ? '<span class="here">🦉 Tu jesteś!</span>' : ''}
+        </button>`;
+      };
+
+      const albumItems = [...PL_GROUPS, ...ZW_GROUPS].map(g => ITEMS.filter(i => i.kind !== 'pr' && i.g === g)).flat();
+      const foundN = albumItems.filter(i => state.found[i.id]).length;
+      const album = albumItems.map(i => {
+        const got = !!state.found[i.id];
+        return `<div class="album-item ${got ? '' : 'locked'}" style="${lc(i.g)}" title="${got ? i.name : '???'}">
+          <div class="ph">${got ? `<img src="${src(i.id)}" alt="${i.name}" loading="lazy" />` : '?'}</div>
+          <span>${got ? i.name : '???'}</span></div>`;
+      }).join('');
+
+      screen.innerHTML = `
+        <section class="hero">
+          <div class="owl-big">${owlSVG(tot === MAX_STARS ? 'happy' : '')}</div>
+          <div class="bubble">${greet}</div>
+        </section>
+        <div class="reward-bar">
+          ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
+          <div class="bar"><div style="width:${pct}%"></div></div>
+        </div>
+        <h2 class="section-title">🗺️ Polna ścieżka</h2>
+        <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
+        <h2 class="section-title">📸 Mój zielnik i zwierzyniec</h2>
+        <p class="muted">Każda roślina i każde zwierzę, które dobrze przypiszesz do grupy, trafia do albumu. Masz ${foundN} z ${albumItems.length}.</p>
+        <div class="album">${album}</div>
+        <button class="info-btn" id="srcBtn">📷 Skąd są zdjęcia?</button>
+        <button class="link-btn danger" id="resetBtn">Zacznij od nowa (dla rodzica)</button>`;
+
+      screen.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => startLevel(+b.dataset.level)));
+      $('#srcBtn').addEventListener('click', renderSources);
+      $('#resetBtn').addEventListener('click', () => {
+        if (confirm('Usunąć wszystkie gwiazdki i album w tej grze?')) {
+          try { localStorage.removeItem(CONFIG.storageKey); } catch (e) {}
+          location.reload();
+        }
+      });
+      window.scrollTo(0, 0);
+    }
+
+    function renderSources() {
+      const NAMES = { pole: 'Pole pszenicy', trawa: 'Trawa', orka: 'Orka', kombajn: 'Kombajn', maka: 'Mąka', chleb: 'Chleb i bułki', piekarz: 'Ciasto na chleb', kasza: 'Kasza gryczana', amarantus: 'Amarantus', skorzonera: 'Skorzonera', leszczyna: 'Orzechy laskowe', borowka: 'Borówka', muchomor: 'Muchomor' };
+      const ids = Object.keys(CREDITS);
+      screen.innerHTML = `
+        <div class="info-wrap">
+          <section class="hero">
+            <div class="owl-mini">${owlSVG('happy')}</div>
+            <div class="bubble">Wszystkie zdjęcia zrobili prawdziwi fotografowie i podzielili się nimi za darmo w Wikimedia Commons. Dziękujemy! 💚</div>
+          </section>
+          <div class="info-card">
+            <h3>📷 Autorzy zdjęć</h3>
+            <ul class="src-list">${ids.map(id => `<li><img src="${src(id)}" alt="" loading="lazy" />
+              <span>${ITEM[id] ? ITEM[id].name : NAMES[id] || id} – ${CREDITS[id][0]}, <a href="${CREDITS[id][2]}" target="_blank" rel="noopener">${CREDITS[id][1]}</a></span></li>`).join('')}</ul>
+          </div>
+          <button class="btn" id="backMapBtn">← Wróć do mapy</button>
+        </div>`;
+      $('#backMapBtn').addEventListener('click', renderMap);
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       POZIOMY – wspólne
+       ===================================================================== */
+    let session = null;
+
+    function startLevel(idx, skipTheory) {
+      stopGame(); stopSpeak();
+      const lvl = LEVELS[idx];
+      session = { idx, lvl, mistakes: 0, total: 0, solved: 0, queue: [] };
+      document.body.classList.add('in-level');
+      const run = () => { stopGame(); stopSpeak(); ({ photo: startQueue, text: startQueue, drop: startDrop, catch: startCatch, pick: startPick, multi: startMulti, order: startOrder, chain: startChain })[lvl.type](); };
+      if (THEORY[lvl.id] && !skipTheory) renderTheory(run); else run();
+    }
+
+    /* ---------- Teoria krok po kroku ----------
+       Pierwszy raz: „Dalej” jest zablokowane, dopóki dziecko nie odwróci
+       wszystkich kart i nie minie czas na przeczytanie kroku. */
+    function readMs(html) {
+      const t = plain(html);
+      const words = t.split(/\s+/).filter(Boolean).length, sents = Math.max(1, sentences(t).length);
+      return Math.min(30000, Math.max(3000, (words * CONFIG.secPerWord + sents * CONFIG.secPerSentence) * 1000));
+    }
+    function bindFlips(root, onFlip) {
+      root.querySelectorAll('.flip').forEach(f => f.addEventListener('click', () => {
+        const first = !f.classList.contains('open');
+        f.classList.add('open'); sfx.flip();
+        // pytanie z przodu („Jaki pies?”) czytamy razem z odpowiedzią; wyraz z luką („k_yk”, „leka…”) – tylko gotowy wyraz z tyłu
+        const front = plain(f.querySelector('.ff').innerHTML), back = plain(f.querySelector('.fb').innerHTML);
+        if (state.read && first) speak((/\?/.test(front) ? front + ' ' : '') + back + '.', null, true);
+        if (first && onFlip) onFlip();
+      }));
+    }
+    function renderTheory(run) {
+      const id = session.lvl.id, th = THEORY[id], n = th.steps.length;
+      const seen = !!state.seen[id];
+      const passed = new Set();   // kroki już zaliczone w tej wizycie – po powrocie nie blokujemy
+      let step = 0;
+      const render = () => {
+        stopGame(); stopSpeak();
+        const last = step === n - 1, free = seen || passed.has(step);
+        screen.innerHTML = `
+          <section class="level">
+            <div class="level-top">
+              <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+              <div class="steps no-read">${th.steps.map((_, i) => `<i class="${i === step ? 'on' : i < step ? 'done' : ''}"></i>`).join('')}</div>
+              <div class="level-badge">${session.lvl.icon}</div>
+            </div>
+            <div class="guide"><div class="owl-mini" id="owl">${owlSVG('happy')}</div><div class="bubble" id="bubble">${step === 0 ? `📖 Przypomnij sobie: <b>${th.title}</b>. Obejrzyj każdy krok!` : last ? 'Ostatni krok – i zaczynamy zadania! 💪' : `Krok ${step + 1} z ${n}. Czytamy dalej! 👀`}</div></div>
+            <div class="th-card" id="theory"><div class="th-step no-read">Krok ${step + 1} z ${n}</div>${th.steps[step]}</div>
+            <div class="theory-actions">
+              <button class="btn soft" id="readTh" data-say="#theory">🔊 Przeczytaj mi</button>
+              <div class="row2" style="margin-top:12px">
+                ${step > 0 ? '<button class="btn soft" id="prevTh">← Wstecz</button>' : ''}
+                <button class="btn" id="goTh"><span class="fill"></span><span id="goLbl"></span></button>
+              </div>
+              ${seen ? '<button class="btn soft" id="skipTh">⏭ Znam to – od razu do zadań</button>' : ''}
+            </div>
+          </section>`;
+        const go = $('#goTh'), lbl = $('#goLbl');
+        const card = $('#theory');
+        const nFlips = card.querySelectorAll('.flip').length;
+        const need = free ? 0 : readMs(card.innerHTML);
+        const t0 = Date.now();
+        const goText = last ? 'Rozumiem – zaczynamy! →' : 'Dalej →';
+        const check = () => {
+          const left = card.querySelectorAll('.flip:not(.open)').length;
+          const el = Date.now() - t0;
+          const ok = free || (left === 0 && el >= need);
+          if (ok) {
+            if (go.classList.contains('locked') || !go.dataset.ready) { go.classList.remove('locked'); go.classList.add('ready'); go.dataset.ready = '1'; go.disabled = false; lbl.textContent = goText; }
+            return true;
+          }
+          go.classList.add('locked'); go.disabled = true;
+          go.style.setProperty('--p', Math.min(100, Math.round(((el / need) * (nFlips ? 0.5 : 1) + (nFlips ? (nFlips - left) / nFlips * 0.5 : 0)) * 100)) + '%');
+          lbl.textContent = left ? `👆 Odwróć karty (zostało ${left})` : '⏳ Przeczytaj spokojnie…';
+          return false;
+        };
+        bindFlips(card, check);
+        if (!check()) { const iv = setInterval(() => { if (check()) clearInterval(iv); }, 200); timers.push(iv); }
+        go.addEventListener('click', () => {
+          if (!check()) return;
+          sfx.tap(); passed.add(step);
+          if (last) { state.seen[id] = true; save(); run(); } else { step++; render(); }
+        });
+        if ($('#prevTh')) $('#prevTh').addEventListener('click', () => { passed.add(step); step--; render(); });
+        if ($('#skipTh')) $('#skipTh').addEventListener('click', run);
+        $('#quitBtn').addEventListener('click', renderMap);
+        window.scrollTo(0, 0);
+        if (state.read) speak(plain(card.innerHTML), $('#readTh'));
+      };
+      render();
+    }
+    function openTheory() {
+      stopSpeak();
+      const th = THEORY[session.lvl.id];
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = `<div class="modal-card"><div id="theoryM" style="display:flex;flex-direction:column;gap:12px">${th.steps.map(s => `<div class="th-card">${s}</div>`).join('')}</div>
+        <button class="btn soft" data-say="#theoryM">🔊 Przeczytaj mi</button><button class="btn" id="closeTh" style="margin-top:0">Wracam do zadania →</button></div>`;
+      m.querySelectorAll('.flip').forEach(f => f.classList.add('open'));
+      m.querySelectorAll('.th-hint').forEach(f => f.remove());
+      document.body.appendChild(m);
+      bindFlips(m);
+      const close = () => { stopSpeak(); m.remove(); };
+      m.querySelector('#closeTh').addEventListener('click', close);
+      m.addEventListener('click', e => { if (e.target === m) close(); });
+    }
+
+    function shell(bubble, opts = {}) {
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            ${opts.hearts ? `<div class="hearts" id="hearts"></div><span class="spacer" style="flex:1"></span>` : '<div class="progress"><div class="progress-fill" id="progFill"></div></div>'}
+            ${THEORY[session.lvl.id] ? '<button class="icon-btn" id="thBtn" aria-label="Przypomnij sobie teorię" title="Przypomnij sobie">📖</button>' : ''}
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          ${opts.noGuide ? '' : `<div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">${bubble}</div>${sayMini('#bubble')}</div>`}
+          <div class="task" id="task"></div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', () => {
+        if (opts.hearts || confirm('Przerwać zadanie? Gwiazdki dostaniesz, gdy dojdziesz do końca.')) renderMap();
+      });
+      if ($('#thBtn')) $('#thBtn').addEventListener('click', openTheory);
+      window.scrollTo(0, 0);
+    }
+    function setProgress(frac) { const p = $('#progFill'); if (p) p.style.width = Math.round(frac * 100) + '%'; }
+
+    function starsFor(mistakes, total) {
+      const r = total ? mistakes / total : 0;
+      return r <= 0.1 ? 3 : r <= 0.3 ? 2 : 1;
+    }
+
+    function finishLevel(stars, line) {
+      stopGame();
+      const prev = state.stars[session.lvl.id] || 0;
+      state.stars[session.lvl.id] = Math.max(prev, stars);
+      bumpStreak();
+      save();
+      if (window.Odznaki) Odznaki.sprawdz();
+      const tot = totalStars();
+      const newReward = REWARDS.find(r => r.at > tot - (state.stars[session.lvl.id] - prev) && r.at <= tot);
+      const nextIdx = session.idx + 1 < LEVELS.length ? session.idx + 1 : -1;
+
+      document.body.classList.add('in-level');
+      screen.innerHTML = `
+        <section class="result">
+          <div class="owl-big">${owlSVG(stars >= 2 ? 'happy' : '')}</div>
+          <h2>${stars === 3 ? 'Rewelacja!' : stars === 2 ? 'Bardzo dobrze!' : 'Dobra robota!'}</h2>
+          <p>${line}</p>
+          <div class="result-stars">
+            ${[0, 1, 2].map(i => `<span class="rs ${i < stars ? 'on' : ''}" style="--d:${i * 0.15}s">★</span>`).join('')}
+          </div>
+          ${newReward ? `<div class="reward-pop"><span class="ic">${newReward.icon}</span><span>Sówka dostaje: <b>${newReward.name}</b>!</span></div>` : ''}
+          ${stars < 3 ? '<p>Zagraj jeszcze raz po 3 ⭐ i odznakę 🏅</p>' : ''}
+          <div class="result-actions">
+            ${nextIdx > 0 ? '<button class="btn" id="nextBtn">Dalej: ' + LEVELS[nextIdx].icon + ' ' + LEVELS[nextIdx].name + ' →</button>' : ''}
+            <button class="btn soft" id="againBtn">🔁 Jeszcze raz</button>
+            <button class="btn soft" id="toMapBtn">🗺️ Mapa</button>
+          </div>
+        </section>`;
+      $('#toMapBtn').addEventListener('click', renderMap);
+      $('#againBtn').addEventListener('click', () => startLevel(session.idx, true));
+      if (nextIdx > 0) $('#nextBtn').addEventListener('click', () => startLevel(nextIdx));
+      sfx.win();
+      if (stars >= 2) confetti();
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       KOLEJKA ZADAŃ: zdjęcie → grupa, zdanie z luką, pytanie
+       Błędne zadanie wraca raz na koniec kolejki.
+       ===================================================================== */
+    function startQueue() {
+      const lvl = session.lvl;
+      if (lvl.boss) {
+        session.queue = shuffle([
+          ...shuffle(plants).slice(0, 4).map(item => ({ type: 'photo', item })),
+          ...shuffle(animals).slice(0, 4).map(item => ({ type: 'photo', item })),
+          ...shuffle(PROD_Q).slice(0, 2).map(q => ({ type: 'text', ...q })),
+          ...shuffle(FARM_Q).slice(0, 2).map(q => ({ type: 'text', ...q })),
+          ...shuffle(CHAIN_Q).slice(0, 2).map(q => ({ type: 'text', ...q }))
+        ]);
+      } else if (lvl.type === 'photo') session.queue = lvl.pool().map(item => ({ type: 'photo', item }));
+      else session.queue = lvl.pool().map(q => ({ type: 'text', ...q }));
+      session.total = session.queue.length;
+      shell('');
+      nextTask();
+    }
+
+    function nextTask() {
+      if (!session.queue.length) {
+        return finishLevel(starsFor(session.mistakes, session.total),
+          `Błędów: ${session.mistakes} na ${session.total} ${session.total >= 5 ? 'zadań' : 'zadania'}.`);
+      }
+      const span = session.span || session.total;
+      setProgress(((session.offset || 0) + session.solved) / span);
+      const t = session.queue.shift();
+      if (t.type === 'photo') renderPhotoTask(t); else renderTextTask(t);
+      window.scrollTo(0, 0);
+    }
+
+    function answered(t, ok, noteHTML) {
+      if (ok) { session.solved++; sfx.good(); }
+      else {
+        session.mistakes++; sfx.bad();
+        if (!t.again) session.queue.push({ ...t, again: true }); else session.solved++;
+      }
+      const wrap = $('#feedbackWrap');
+      wrap.innerHTML = `
+        ${ok ? '' : '<div class="feedback-head bad">To zadanie wróci jeszcze na końcu 🔁</div>'}
+        <div class="note">💡 ${noteHTML}</div>
+        <button class="btn" id="nextQBtn">${session.queue.length ? 'Dalej →' : 'Zobacz wynik →'}</button>`;
+      $('#nextQBtn').addEventListener('click', nextTask);
+      later(() => $('#nextQBtn')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+    }
+
+    const phHTML = it => it.emoji ? `<div class="emo-ph">${it.emoji}</div>` : `<img src="${src(it.id)}" alt="" />`;
+    function groupButtons(keys) {
+      return `<div class="layers grp-btns ${keys.length === 3 ? 'three' : ''}" id="opts">${keys.map(g => `
+        <button class="layer-btn" data-l="${g}" style="${lc(g)}"><span class="lic">${GROUPS[g].icon}</span>${GROUPS[g].name}<span class="floor">${GROUPS[g].use}</span></button>`).join('')}</div>`;
+    }
+
+    function renderPhotoTask(t) {
+      const it = t.item, pl = it.kind !== 'zw';
+      const keys = pl ? PL_GROUPS : ZW_GROUPS;
+      const task = $('#task');
+      task.innerHTML = `
+        <div class="photo-card">
+          ${it.emoji ? `<div class="emo-ph">${it.emoji}</div>` : `<img src="${src(it.id)}" alt="${it.name}" />`}
+          <div class="photo-name">${it.name}</div>
+          <div class="credit">${credit(it.id)}</div>
+        </div>
+        <div class="q-line" id="qline">${pl ? `${it.name} – do jakiej grupy roślin należy?` : `${it.name} – co je to zwierzę?`}</div>
+        ${groupButtons(keys)}
+        <div id="feedbackWrap"></div>`;
+      owlSay(pl ? 'Co bierzemy z tej rośliny? 🤔' : 'Czym się żywi to zwierzę? 🤔');
+      let done = false;
+      task.querySelectorAll('.layer-btn').forEach(btn => btn.addEventListener('click', () => {
+        if (done) return; done = true;
+        const ok = inGroup(it, btn.dataset.l);
+        task.querySelectorAll('.layer-btn').forEach(b => {
+          b.disabled = true;
+          if (inGroup(it, b.dataset.l)) b.classList.add('ok');
+          else if (b === btn) b.classList.add('bad');
+          else b.classList.add('dim');
+        });
+        if (ok) { markFound(it.id); save(); owlSay(pick(PRAISE) + (it.g2 ? ' Len pasuje do dwóch grup!' : ''), 'happy'); }
+        else owlSay(`Prawie! ${it.name} – ${it.g2 ? 'rośliny oleiste i włókniste' : GROUPS[it.g].short} 💪`, 'sad');
+        answered(t, ok, it.note);
+      }));
+    }
+
+    function renderTextTask(t) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const opts = shuffle(t.options);
+      const task = $('#task');
+      const sentence = t.s ? t.s.replace('___', '<span class="blank" id="blank">&nbsp;?&nbsp;</span>') : t.q;
+      task.innerHTML = `
+        <div class="q-card">
+          ${sayMini('#qtext', '#qopts')}
+          <div class="q-num">${t.s ? 'Dokończ zdanie' : 'Pytanie'}</div>
+          <div class="q-text" id="qtext">${sentence}</div>
+        </div>
+        <div class="quiz-opts" id="qopts">
+          ${opts.map((o, i) => `<button class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span><span>${o}</span></button>`).join('')}
+        </div>
+        <div id="feedbackWrap"></div>`;
+      owlSay(t.s ? 'Wybierz, jak skończyć zdanie ✏️' : 'Przeczytaj pytanie i wybierz odpowiedź.');
+      let done = false;
+      task.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => {
+        if (done) return; done = true;
+        const ok = opts[+btn.dataset.i] === t.a;
+        task.querySelectorAll('.quiz-opt').forEach(b => {
+          b.disabled = true;
+          if (opts[+b.dataset.i] === t.a) b.classList.add('ok');
+          else if (b === btn) b.classList.add('bad');
+          else b.classList.add('dim');
+        });
+        const bl = $('#blank'); if (bl) { bl.textContent = t.a; bl.classList.add('filled'); }
+        if (ok) owlSay(pick(PRAISE), 'happy'); else owlSay('Prawie! Zobacz poprawną odpowiedź 💪', 'sad');
+        answered(t, ok, t.note);
+      }));
+    }
+
+    function arcadeIntro(arena, title, text, onStart) {
+      const ov = document.createElement('div');
+      ov.className = 'arcade-start';
+      ov.innerHTML = `<div class="owl-mini" style="width:80px">${owlSVG('happy')}</div><h3>${title}</h3><p>${text}</p>
+        <button class="btn" id="goBtn">▶ Start!</button>`;
+      arena.appendChild(ov);
+      ov.querySelector('#goBtn').addEventListener('click', () => { ov.remove(); sfx.tap(); onStart(); });
+    }
+    function arcadeLose(arena, line) {
+      stopGame(); sfx.lose();
+      const ov = document.createElement('div');
+      ov.className = 'arcade-start';
+      ov.innerHTML = `<div class="owl-mini" style="width:80px">${owlSVG('sad')}</div><h3>Ojej, koniec serduszek!</h3><p>${line}</p>
+        <button class="btn" id="againBtn">🔁 Jeszcze raz</button><button class="btn soft" id="mapBtn">🗺️ Mapa</button>`;
+      arena.appendChild(ov);
+      ov.querySelector('#againBtn').addEventListener('click', () => startLevel(session.idx));
+      ov.querySelector('#mapBtn').addEventListener('click', renderMap);
+    }
+    function drawHearts(h) { $('#hearts').innerHTML = [0, 1, 2].map(i => `<span class="${i < h ? '' : 'lost'}">❤️</span>`).join(''); }
+    function floatText(arena, x, y, txt) {
+      const f = document.createElement('div');
+      f.className = 'float-txt'; f.textContent = txt;
+      f.style.left = x + 'px'; f.style.top = y + 'px';
+      arena.appendChild(f); setTimeout(() => f.remove(), 900);
+    }
+
+    /* =====================================================================
+       🎮 SPADAJĄCE PLONY – roślina albo produkt spada z nieba, dotknij
+       paska z właściwą grupą, zanim spadnie na ziemię.
+       ===================================================================== */
+    function startDrop() {
+      const GOAL = 15;
+      shell('', { hearts: true, noGuide: true });
+      const task = $('#task');
+      task.innerHTML = `<div class="arena" id="arena">
+          ${PL_GROUPS.map((g, i) => `<button class="band" data-l="${g}" style="${lc(g)};top:${i * 25}%;height:25%"><span class="bl">${GROUPS[g].icon} ${GROUPS[g].name}</span></button>`).join('')}
+          <div class="score-pill" id="score">0 / ${GOAL}</div>
+        </div>`;
+      const arena = $('#arena');
+      let hearts = 3, score = 0, cur = null, busy = true, deck = [];
+      drawHearts(hearts);
+      const nextItem = () => { if (!deck.length) deck = shuffle(plantish); return deck.pop(); };
+
+      function spawn() {
+        const item = nextItem();
+        const el = document.createElement('div');
+        el.className = 'faller';
+        el.innerHTML = `${phHTML(item)}<span>${item.name}</span>`;
+        arena.appendChild(el);
+        const W = arena.clientWidth;
+        const x = W * 0.55 + Math.random() * (W * 0.45 - 100);
+        el.style.left = Math.max(W * 0.45, x) + 'px';
+        el.style.top = '-110px';
+        cur = { item, el, y: -110, dur: Math.max(3400, 7600 - score * 280) };
+        busy = false;
+      }
+      function resolve(l) {
+        if (busy || !cur) return;
+        busy = true;
+        const { item, el } = cur;
+        const H = arena.clientHeight;
+        const ok = l && inGroup(item, l);
+        const showG = ok ? l : item.g;
+        const okBand = arena.querySelector(`.band[data-l="${showG}"]`);
+        const target = PL_GROUPS.indexOf(showG) * 0.25 * H + 0.125 * H - 55;
+        el.style.top = target + 'px'; el.style.transition = 'top .35s ease, opacity .35s ease';
+        okBand.classList.remove('flash-ok'); void okBand.offsetWidth; okBand.classList.add('flash-ok');
+        if (ok) {
+          score++; if (item.kind === 'pl') markFound(item.id); sfx.good();
+          floatText(arena, 20, target + 40, '+1 ⭐');
+          $('#score').textContent = `${score} / ${GOAL}`;
+        } else {
+          hearts--; sfx.bad(); drawHearts(hearts);
+          if (l) { const wb = arena.querySelector(`.band[data-l="${l}"]`); wb.classList.remove('flash-bad'); void wb.offsetWidth; wb.classList.add('flash-bad'); }
+          floatText(arena, 20, target + 40, `${item.name}: ${GROUPS[item.g].name.toLowerCase()}`);
+        }
+        later(() => {
+          el.style.opacity = '0';
+          later(() => {
+            el.remove(); cur = null;
+            if (hearts <= 0) return arcadeLose(arena, `Udało się ${score} z ${GOAL}. Spróbuj jeszcze raz – za każdym razem idzie lepiej!`);
+            if (score >= GOAL) { save(); return finishLevel(hearts, `Wszystkie ${GOAL} plonów trafiło do swojej grupy! Zostało serduszek: ${hearts} ❤️`); }
+            spawn();
+          }, 300);
+        }, ok ? 450 : 1300);
+      }
+      arena.querySelectorAll('.band').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); resolve(b.dataset.l); }));
+      keyHandler = e => { const i = ['1', '2', '3', '4'].indexOf(e.key); if (i >= 0) resolve(PL_GROUPS[i]); };
+
+      arcadeIntro(arena, '🎮 Spadające plony',
+        `Rośliny i to, co z nich robimy, spadają z nieba! <b>Dotknij paska z właściwą grupą</b>, zanim spadną na ziemię. Masz 3 ❤️. Zbierz ${GOAL} punktów!<br><small>Na komputerze: klawisze 1–4.</small>`,
+        () => {
+          spawn();
+          gameLoop(dt => {
+            if (!cur || busy) return;
+            const H = arena.clientHeight;
+            cur.y += dt * (H + 110) / cur.dur;
+            cur.el.style.top = cur.y + 'px';
+            if (cur.y > H - 60) resolve(null);
+          });
+        });
+    }
+
+    /* =====================================================================
+       🧺 GŁODNY KOSZYK – łap koszykiem tylko zwierzęta ze wskazanej grupy.
+       ===================================================================== */
+    function startCatch() {
+      const GOAL = 12, PER_TARGET = 3;
+      shell('', { hearts: true, noGuide: true });
+      const task = $('#task');
+      task.innerHTML = `<div class="arena" id="arena">
+          <div class="target-pill" id="target"></div>
+          <div class="score-pill" id="score">0 / ${GOAL}</div>
+          <div class="basket" id="basket">🧺</div>
+        </div>`;
+      const arena = $('#arena'), basket = $('#basket');
+      let hearts = 3, score = 0, falling = [], spawnIn = 600, bx = 0, targets = shuffle(ZW_GROUPS), tIdx = 0, keyDir = 0;
+      drawHearts(hearts);
+      const target = () => targets[tIdx % targets.length];
+      function showTarget() {
+        const G = GROUPS[target()];
+        const tp = $('#target');
+        tp.setAttribute('style', lc(G.id));
+        tp.innerHTML = `Łap tylko: ${G.icon} ${G.name.toLowerCase()}`;
+      }
+      function placeBasket() { basket.style.left = (bx - 50) + 'px'; }
+      function moveTo(clientX) {
+        const r = arena.getBoundingClientRect();
+        bx = Math.max(50, Math.min(r.width - 50, clientX - r.left)); placeBasket();
+      }
+      arena.addEventListener('pointerdown', e => moveTo(e.clientX));
+      arena.addEventListener('pointermove', e => moveTo(e.clientX));
+      keyHandler = e => {
+        if (e.type !== 'keydown') return;
+        if (e.key === 'ArrowLeft') keyDir = -1; else if (e.key === 'ArrowRight') keyDir = 1;
+      };
+      const keyUp = e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') keyDir = 0; };
+      document.addEventListener('keyup', keyUp);
+
+      function spawn() {
+        const W = arena.clientWidth;
+        const want = Math.random() < 0.6;
+        const pool = animals.filter(i => want ? i.g === target() : i.g !== target());
+        const item = pick(pool);
+        const el = document.createElement('div');
+        el.className = 'faller small';
+        el.innerHTML = `<img src="${src(item.id)}" alt="" /><span>${item.name}</span>`;
+        arena.appendChild(el);
+        const x = 10 + Math.random() * (W - 96 - 20);
+        el.style.left = x + 'px'; el.style.top = '-100px';
+        falling.push({ item, el, x: x + 48, y: -100, v: 0.075 + Math.min(0.06, score * 0.004) + Math.random() * 0.02 });
+      }
+
+      arcadeIntro(arena, '🧺 Głodny koszyk',
+        `Przesuwaj koszyk palcem w lewo i w prawo. <b>Łap tylko zwierzęta z grupy, którą pokazuje napis u góry</b> – roślinożerne, mięsożerne albo wszystkożerne. Złapanie innego zwierzęcia zabiera ❤️. Złap ${GOAL}!<br><small>Na komputerze: strzałki ← →.</small>`,
+        () => {
+          bx = arena.clientWidth / 2; placeBasket(); showTarget();
+          gameLoop(dt => {
+            const H = arena.clientHeight, W = arena.clientWidth;
+            if (keyDir) { bx = Math.max(50, Math.min(W - 50, bx + keyDir * dt * 0.45)); placeBasket(); }
+            spawnIn -= dt;
+            if (spawnIn <= 0) { spawn(); spawnIn = Math.max(900, 1700 - score * 60); }
+            const basketTop = H - 78;
+            for (const f of falling.slice()) {
+              f.y += f.v * dt;
+              f.el.style.top = f.y + 'px';
+              const caught = f.y + 70 >= basketTop && f.y + 70 <= basketTop + 40 && Math.abs(f.x - bx) < 52;
+              if (caught || f.y > H) {
+                falling.splice(falling.indexOf(f), 1);
+                f.el.remove();
+                if (!caught) continue;
+                if (f.item.g === target()) {
+                  score++; markFound(f.item.id); sfx.good();
+                  floatText(arena, bx - 20, basketTop - 30, '+1 ⭐');
+                  $('#score').textContent = `${score} / ${GOAL}`;
+                  if (score >= GOAL) { document.removeEventListener('keyup', keyUp); save(); finishLevel(hearts, `Złapano ${GOAL} zwierząt z właściwych grup! Zostało serduszek: ${hearts} ❤️`); return false; }
+                  if (score % PER_TARGET === 0) {
+                    tIdx++; showTarget();
+                    falling.forEach(o => o.el.remove()); falling = []; spawnIn = 900;
+                    floatText(arena, 20, 60, `Teraz: ${GROUPS[target()].name.toLowerCase()}!`);
+                  }
+                } else {
+                  hearts--; sfx.bad(); drawHearts(hearts);
+                  floatText(arena, Math.max(10, bx - 90), basketTop - 40, `${f.item.name}: ${GROUPS[f.item.g].name.toLowerCase()}`);
+                  if (hearts <= 0) { document.removeEventListener('keyup', keyUp); arcadeLose(arena, `Złapano ${score} z ${GOAL}. Patrz na napis u góry – podpowiada, którą grupę łapiemy!`); return false; }
+                }
+              }
+            }
+          });
+        });
+    }
+
+    /* =====================================================================
+       🔍 ZNAJDŹ WSZYSTKIE – dotknij wszystkich zdjęć z danej grupy
+       ===================================================================== */
+    function startPick() {
+      const rounds = shuffle(['ro', 'mi', 'ws', 'zb', 'ok']).map(g => {
+        const pool = GROUPS[g].kind === 'zw' ? animals : plantish;
+        const good = shuffle(pool.filter(i => inGroup(i, g))).slice(0, 4);
+        const bad = shuffle(pool.filter(i => !inGroup(i, g))).slice(0, 9 - good.length);
+        return { g, good, tiles: shuffle([...good, ...bad]) };
+      });
+      session.total = rounds.reduce((s, r) => s + r.good.length, 0);
+      let ri = 0;
+      shell('');
+      const render = () => {
+        const R = rounds[ri], G = GROUPS[R.g];
+        setProgress(ri / rounds.length);
+        let got = 0, done = false;
+        const task = $('#task');
+        task.innerHTML = `
+          <div class="target-bar">Znajdź wszystkie: <span class="layer-chip" style="${lc(R.g)}">${G.icon} ${G.short}</span></div>
+          <div class="grid3">${R.tiles.map(i => `<button class="tile" data-id="${i.id}">${phHTML(i)}<span>${i.name}</span></button>`).join('')}</div>
+          <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay(G.kind === 'zw' ? `Dotknij <b>wszystkich</b> zwierząt, które są ${G.name.toLowerCase()} 🔍` : `Dotknij <b>wszystkiego</b>, co należy do grupy: ${G.short} – roślin i produktów 🔍`);
+        task.querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
+          if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
+          const it = ITEM[b.dataset.id];
+          if (inGroup(it, R.g)) {
+            b.classList.add('ok'); got++; if (it.kind !== 'pr') markFound(it.id); sfx.good();
+            $('#cnt').textContent = `Znaleziono: ${got} z ${R.good.length}`;
+            if (got === R.good.length) {
+              done = true; save();
+              owlSay(pick(PRAISE) + ' Wszystko znalezione!', 'happy');
+              $('#feedbackWrap').innerHTML = `<button class="btn" id="nextR">${ri < rounds.length - 1 ? 'Następna grupa →' : 'Zobacz wynik →'}</button>`;
+              $('#nextR').addEventListener('click', () => { if (++ri < rounds.length) render(); else finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Wszystko trafiło do swoich grup!`); });
+              later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            } else owlSay(`Tak! ${it.name} ✅ Szukaj dalej…`, 'happy');
+          } else {
+            b.classList.add('bad'); session.mistakes++; sfx.bad();
+            owlSay(`Ojej, ${lowerFirst(it.name)} to ${GROUPS[it.g].short}. Szukaj dalej! 💪`, 'sad');
+          }
+        }));
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    /* =====================================================================
+       🥔 CO MOŻNA ZROBIĆ? – wybierz wszystko, co pasuje
+       ===================================================================== */
+    function startMulti() {
+      session.total = MULTI.reduce((s, r) => s + r.good.length, 0);
+      let ri = 0;
+      shell('');
+      const render = () => {
+        const R = MULTI[ri];
+        setProgress(ri / MULTI.length);
+        const tiles = shuffle([...R.good.map(g => [...g, true]), ...R.bad.map(b => [...b, false])]);
+        let got = 0, done = false;
+        const task = $('#task');
+        task.innerHTML = `
+          <div class="q-card">${sayMini('#qtext')}<div class="q-num">Runda ${ri + 1} z ${MULTI.length}</div><div class="q-text" id="qtext">${R.q}</div></div>
+          <div class="grid2">${tiles.map((t, i) => `<button class="etile" data-i="${i}"><b>${t[0]}</b>${t[1]}</button>`).join('')}</div>
+          <div class="found-count" id="cnt">Znaleziono: 0 z ${R.good.length}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay(ri === 0 ? 'Pokaż, co dają nam rośliny z pola! 🌾' : 'Dotknij wszystkich dobrych odpowiedzi.');
+        task.querySelectorAll('.etile').forEach(b => b.addEventListener('click', () => {
+          if (done || b.classList.contains('ok') || b.classList.contains('bad')) return;
+          const t = tiles[+b.dataset.i];
+          if (t[2]) {
+            b.classList.add('ok'); got++; sfx.good();
+            $('#cnt').textContent = `Znaleziono: ${got} z ${R.good.length}`;
+            if (got === R.good.length) {
+              done = true;
+              owlSay(pick(PRAISE), 'happy');
+              $('#feedbackWrap').innerHTML = `<div class="note">💡 ${R.note}</div>
+                <button class="btn" id="nextR">${ri < MULTI.length - 1 ? 'Dalej →' : 'Zobacz wynik →'}</button>`;
+              $('#nextR').addEventListener('click', () => { if (++ri < MULTI.length) render(); else finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Wiesz już, co dają nam rośliny! 🌾`); });
+              later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            } else owlSay('Tak! ✅ Co jeszcze?', 'happy');
+          } else {
+            b.classList.add('bad'); session.mistakes++; sfx.bad();
+            owlSay('Hmm, tego z tej rośliny nie zrobimy 🙂 Szukaj dalej!', 'sad');
+          }
+        }));
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    /* =====================================================================
+       🥖 HISTORIA CHLEBA – ułóż kroki po kolei (najpierw, potem, następnie,
+       w końcu), a potem posłuchaj całej opowieści.
+       ===================================================================== */
+    function startOrder() {
+      session.total = STORIES.reduce((s, st) => s + st.steps.length, 0);
+      let ri = 0;
+      shell('');
+      const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+      const render = () => {
+        const st = STORIES[ri], n = st.steps.length;
+        setProgress(ri / STORIES.length);
+        let nextI = 0, done = false, wrongHere = 0;
+        const order = shuffle(st.steps.map((_, i) => i));
+        const task = $('#task');
+        task.innerHTML = `
+          <div class="q-card"><div class="q-num">Historia ${ri + 1} z ${STORIES.length}</div><div class="q-text">${st.title}</div></div>
+          <div class="slots" id="slots">${st.steps.map((s, i) => `<div class="slot ${i === 0 ? 'next' : ''}" data-i="${i}"><span class="cn">${st.conn[i]}</span><span class="sl-txt">…</span></div>`).join('')}</div>
+          <div class="th-hint">👇 Dotknij kroku, który jest teraz</div>
+          <div class="scards" id="scards">${order.map(i => { const s = st.steps[i]; return `<button class="scard" data-i="${i}">${s[0] ? `<img src="${src(s[0])}" alt="" />` : `<div class="semo">${s[1]}</div>`}<span>${cap(s[2])}</span></button>`; }).join('')}</div>
+          <div id="feedbackWrap"></div>`;
+        owlSay(`Ułóż historię po kolei. Co jest <b>${st.conn[0].toLowerCase()}</b>? 🤔`);
+        task.querySelectorAll('.scard').forEach(b => b.addEventListener('click', () => {
+          if (done || b.classList.contains('used')) return;
+          const i = +b.dataset.i;
+          if (i === nextI) {
+            const s = st.steps[i], slot = task.querySelector(`.slot[data-i="${i}"]`);
+            slot.classList.remove('next'); slot.classList.add('filled');
+            slot.querySelector('.sl-txt').outerHTML = `${s[0] ? `<img class="mini" src="${src(s[0])}" alt="" />` : `<span class="memo">${s[1]}</span>`}<span>${s[2]}</span>`;
+            b.classList.add('used'); sfx.good(); nextI++;
+            if (nextI < n) {
+              task.querySelector(`.slot[data-i="${nextI}"]`).classList.add('next');
+              owlSay(`Tak! ✅ A co dzieje się <b>${st.conn[nextI].toLowerCase()}</b>?`, 'happy');
+            } else {
+              done = true;
+              session.solved += n;
+              $('#scards').remove(); task.querySelector('.th-hint').remove();
+              owlSay(pick(PRAISE) + ' Cała historia ułożona!', 'happy');
+              const story = st.steps.map((s, k) => `<b>${st.conn[k]}</b> ${s[2]}`).join(' ');
+              $('#feedbackWrap').innerHTML = `
+                <div class="note" id="storyTxt">📖 ${story}</div>
+                <button class="btn soft" data-say="#storyTxt">🔊 Opowiedz mi całą historię</button>
+                <button class="btn" id="nextR">${ri < STORIES.length - 1 ? 'Następna historia →' : 'Zobacz wynik →'}</button>`;
+              $('#nextR').addEventListener('click', () => { if (++ri < STORIES.length) render(); else finishLevel(starsFor(session.mistakes, session.total), `Pomyłek: ${session.mistakes}. Umiesz opowiedzieć, skąd jest chleb! 🍞`); });
+              later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            }
+          } else {
+            session.mistakes++; wrongHere++; sfx.bad();
+            b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad');
+            const good = st.steps[nextI];
+            owlSay(wrongHere >= 2 ? `Podpowiedź: ${st.conn[nextI].toLowerCase()} ${good[2]} ${good[1]}` : `Hmm, to jeszcze nie teraz. Pomyśl, co musi być <b>${st.conn[nextI].toLowerCase()}</b> 💪`, 'sad');
+          }
+        }));
+        window.scrollTo(0, 0);
+      };
+      render();
+    }
+
+    /* =====================================================================
+       🔗 ŁAŃCUCHY POKARMOWE – uzupełnij brakujące ogniwa łańcucha,
+       potem kilka pytań (producenci, destruenci, równowaga).
+       ===================================================================== */
+    function chainOptions(id, chainIds) {
+      // fałszywe odpowiedzi z innej „roli”, żeby nie było dwóch dobrych odpowiedzi
+      const it = ITEM[id];
+      const carn = animals.filter(a => a.g === 'mi').map(a => [a.id, a.name]);
+      const herb = animals.filter(a => a.g === 'ro').map(a => [a.id, a.name]);
+      const pool = !it || it.kind !== 'zw' ? carn : it.g === 'mi' ? [...FOOD_PLANTS, ...herb] : [...FOOD_PLANTS, ...carn];
+      return shuffle(pool.filter(p => !chainIds.includes(p[0]))).slice(0, 3);
+    }
+    function startChain() {
+      const rounds = CHAINS;
+      const holes = rounds.reduce((s, c) => s + c.hide.length, 0);
+      session.total = holes + CHAIN_Q.length;
+      let ri = 0;
+      shell('');
+      const render = () => {
+        const C = rounds[ri];
+        const known = new Set(C.links.map((_, i) => i).filter(i => !C.hide.includes(i)));
+        let hi = 0, wrongHere = 0;
+        const draw = () => {
+          setProgress(ri / (rounds.length + 1));
+          const holeIdx = C.hide[hi];
+          const task = $('#task');
+          task.innerHTML = `
+            <div class="q-card">${sayMini('#qtext')}<div class="q-num">Łańcuch ${ri + 1} z ${rounds.length}</div><div class="q-text" id="qtext">${holeIdx === undefined ? 'Łańcuch gotowy! 🎉' : holeIdx === 0 ? `Co zjada <b>${C.links[1][1].toLowerCase()}</b>?` : `Kto zjada <b>${ACC[C.links[holeIdx - 1][1]]}</b>?`}</div></div>
+            <div class="chain">${C.links.map(([id, n], i) => {
+              const show = known.has(i);
+              return `${i ? '<span class="arr">→</span>' : ''}<div class="link" style="--lc:${show ? roleColor(id) : '#94a3b8'}"><div class="ph ${show ? '' : 'q'} ${i === holeIdx ? 'now' : ''}">${show ? `<img src="${src(id)}" alt="" />` : '?'}</div><span>${show ? n : '…'}</span>${show ? `<small>${roleName(id)}</small>` : ''}</div>`;
+            }).join('')}</div>
+            <div class="grid2" id="copts"></div>
+            <div id="feedbackWrap"></div>`;
+          if (holeIdx === undefined) {
+            owlSay(pick(PRAISE) + ' Przeczytaj łańcuch od początku: ' + C.links.map(l => l[1].toLowerCase()).join(' → '), 'happy');
+            $('#copts').remove();
+            $('#feedbackWrap').innerHTML = `<div class="note">💡 ${C.links.map(l => l[1]).join(' → ')}. ${C.note}</div><button class="btn" id="nextR">${ri < rounds.length - 1 ? 'Następny łańcuch →' : 'Jeszcze kilka pytań →'}</button>`;
+            $('#nextR').addEventListener('click', () => {
+              if (++ri < rounds.length) render();
+              else {
+                session.queue = shuffle(CHAIN_Q).map(q => ({ type: 'text', ...q }));
+                session.offset = holes; session.span = session.total; session.solved = holes;
+                nextTask();
+              }
+            });
+            later(() => $('#nextR')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
+            return;
+          }
+          const [gid, gname] = C.links[holeIdx];
+          const opts = shuffle([[gid, gname], ...chainOptions(gid, C.links.map(l => l[0]))]);
+          owlSay(holeIdx === 0 ? 'Na początku łańcucha jest zwykle roślina 🌱' : 'Wybierz brakujące ogniwo 🔗');
+          $('#copts').innerHTML = opts.map(([id, n]) => `<button class="tile" data-id="${id}" style="aspect-ratio:1/0.95"><img src="${src(id)}" alt="" /><span>${n}</span></button>`).join('');
+          $('#copts').querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
+            if (b.classList.contains('bad')) return;
+            if (b.dataset.id === gid) {
+              sfx.good(); b.classList.add('ok'); known.add(holeIdx); hi++; wrongHere = 0;
+              if (ITEM[gid] && ITEM[gid].kind !== 'pr') { markFound(gid); save(); }
+              later(draw, 450);
+            } else {
+              session.mistakes++; wrongHere++; sfx.bad(); b.classList.add('bad');
+              const it = ITEM[b.dataset.id];
+              const nm = b.querySelector('span').textContent;
+              owlSay(!it || it.kind !== 'zw' ? `${nm} to roślina – rośliny nikogo nie zjadają 🌱 Spróbuj jeszcze raz!` : holeIdx === 0 ? `${nm} to zwierzę, a łańcuch zaczyna się od rośliny 🌱 Spróbuj jeszcze raz!` : it.g === 'ro' ? `${nm} to zwierzę roślinożerne – je tylko rośliny. Spróbuj jeszcze raz!` : `${nm} to zwierzę mięsożerne – je mięso, a nie rośliny. Spróbuj jeszcze raz!`, 'sad');
+            }
+          }));
+          window.scrollTo(0, 0);
+        };
+        draw();
+      };
+      render();
+    }
+
+    renderMap();
+  </script>
+</body>
+</html>

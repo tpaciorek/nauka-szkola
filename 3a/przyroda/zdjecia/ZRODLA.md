@@ -63,3 +63,41 @@ Wszystkie zdjęcia pochodzą z Wikimedia Commons (zmniejszone do 480 px). Licenc
 | lisc-lipa.jpg | Dmitry Makeev | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2020_year._Herbarium._Tilia_cordata._img-012.jpg |
 | lisc-kasztan.jpg | Mike Pennington | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Horse_Chestnut_(Aesculus_hippocastanum)_leaf,_Halligarth_-_geograph.org.uk_-_1884676.jpg |
 | lisc-buk.jpg | Dominicus Johannes Bergsma | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Blad_van_beuk_(Fagus_sylvatica)_02.JPG |
+
+## Rośliny i zwierzęta (rosliny-zwierzeta.html, dodane 07.11.2026)
+
+Ta gra używa też zdjęć z listy wyżej: sarna, wilk, zajac, jelen, dzik, wiewiorka, mysz, kuna, lis, puszczyk, leszczyna, borowka, muchomor.
+
+| plik | autor | licencja | źródło |
+|---|---|---|---|
+| owies.jpg | Rosendahl | Public domain | https://commons.wikimedia.org/wiki/File:Oats_closeup.jpg |
+| zubr.jpg | Charles J. Sharp | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:European_bison_(Bison_bonasus)_male_Bia%C5%82owieza.jpg |
+| motyl.jpg | Didier Descouens | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Paon-du-jour_MHNT_CUT_2013_3_14_Cahors.jpg |
+| myszolow.jpg | caroline legg | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:Common_Buzzard_by_caroline_legg_(cropped).jpg |
+| bocian.jpg | Carlos Delgado | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Ciconia_ciconia_-_01.jpg |
+| pszenica.jpg | A S M Jobaer | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Wheat_ear_close-up_in_a_field_Bangladesh_02.jpg |
+| zyto.jpg | Rasbak | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Rogge_aar_Secale_cereale_(4%C3%973).jpg |
+| jeczmien.jpg | Lucash | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Barley_in_Slovenia.jpg |
+| kukurydza.jpg | Willis Lam | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:White_Corn_on_the_Cob_with_husk_(27000745034).jpg |
+| ziemniak.jpg | DenesFeri | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Solanales_-_Solanum_tuberosum_-_5.jpg |
+| rzepa.jpg | HaJunkiyada | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Turnip.jpg |
+| marchew.jpg | Jonathunder | GFDL 1.2 | https://commons.wikimedia.org/wiki/File:BunchCarrots.jpg |
+| rzepak.jpg | Richard Bartz, Munich aka Makro Freak | CC BY-SA 2.5 | https://commons.wikimedia.org/wiki/File:Rapsfeld_Rapeseed_Brassica_napus.jpg |
+| slonecznik.jpg | Fir0002 | GFDL 1.2 | https://commons.wikimedia.org/wiki/File:Sunflower_sky_backdrop.jpg |
+| len.jpg | H. Zell | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Linum_usitatissimum_001.JPG |
+| konopie.jpg | Nabokov | Public domain | https://commons.wikimedia.org/wiki/File:Hemp_plants-cannabis_sativa-field.JPG |
+| maka.jpg | Veganbaking.net from USA | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:All-Purpose_Flour_(4107895947).jpg |
+| chleb.jpg | 3268zauber | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Korb_mit_Br%C3%B6tchen.JPG |
+| kot.jpg | Marko Milivojevic (Pixnio) | CC0 | https://commons.wikimedia.org/wiki/File:Domestic_shorthair_cat_portrait_in_grass.jpg |
+| niedzwiedz.jpg | Charles J. Sharp | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Eurasian_brown_bear_(Ursus_arctos_arctos)_female_1.jpg |
+| bazant.jpg | Charles J. Sharp | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Common_pheasant_(Phasianus_colchicus)_male_3.jpg |
+| amarantus.jpg | Jebulon | Public domain | https://commons.wikimedia.org/wiki/File:Amaranthus_caudatus_JdP.jpg |
+| skorzonera.jpg | autor w opisie pliku | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Schwarzwurzeln.jpg |
+| kasza.jpg | Andrey Korzun | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Buckwheat_and_products_from_it_01.jpg |
+| burak.jpg | Ramesh NG | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Beetroot_on_plate.jpg |
+| trawa.jpg | Sandra Aceng | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Close-Up_of_Green_Grass_Blades.jpg |
+| orka.jpg | Richard Schmidt | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Tractor_ploughing_the_field_-_geograph.org.uk_-_272849.jpg |
+| piekarz.jpg | Shixart1985 | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:Baker_woman%27s_hands_kneading_bread_dough.jpg |
+| rys.jpg | David Castor | Public domain | https://commons.wikimedia.org/wiki/File:Lynx_lynx-4.JPG |
+| kombajn.jpg | Dan Kollmann | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Combine_in_wheat_field.jpg |
+| pole.jpg | Nyttend | Public domain | https://commons.wikimedia.org/wiki/File:Ripe_wheat_on_Menokin_Road.jpg |

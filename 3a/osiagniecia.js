@@ -67,6 +67,13 @@
       poziomy: [['czesci', '🧩', 'Części mowy'], ['catch', '🧺', 'Łap wyrazy'], ['alfabet', '🔤', 'Kolejność alfabetyczna'],
         ['zdania', '📝', 'Zdania pojedyncze i złożone'], ['nie', '🚫', '„nie” z czasownikiem'], ['rz', '🌰', 'Wyrazy z rz'],
         ['z', '🫙', 'Wyrazy z ż'], ['rain', '🌧️', 'Ortograficzny deszcz'], ['ch', '🍄', 'Wyrazy z ch'], ['boss', '👑', 'Wielki sprawdzian']]
+    },
+    {
+      id: 'R', grupa: '🌾 Rośliny i zwierzęta', href: 'przyroda/rosliny-zwierzeta.html',
+      key: 'nauka-3a-przyroda-rosliny-zwierzeta-v1', mistrz: ['🏆', 'Znawczyni pola i przyrody'],
+      poziomy: [['plants', '🌾', 'Rośliny uprawne'], ['products', '🍞', 'Co z czego powstaje?'], ['drop', '🎮', 'Spadające plony'],
+        ['bread', '🥖', 'Historia chleba'], ['multi', '🥔', 'Co można zrobić?'], ['farmer', '🚜', 'Rok rolnika'],
+        ['diet', '🦌', 'Kto co je?'], ['catch', '🧺', 'Głodny koszyk'], ['chain', '🔗', 'Łańcuchy pokarmowe'], ['pick', '🔍', 'Znajdź wszystkie'], ['boss', '👑', 'Wielki sprawdzian']]
     }
   ];
   const SEEN_KEY = 'nauka-3a-odznaki-v2';
