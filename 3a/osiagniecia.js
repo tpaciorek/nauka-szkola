@@ -60,6 +60,13 @@
       poziomy: [['learn', '🌳', 'Poznaj piętra lasu'], ['animals', '🐿️', 'Kto gdzie mieszka?'], ['drop', '🎮', 'Spadające znaleziska'],
         ['plants', '🫐', 'Co tu rośnie?'], ['light', '☀️', 'Światło w lesie'], ['catch', '🧺', 'Leśny koszyk'],
         ['pick', '🔍', 'Znajdź wszystkie'], ['color', '🖍️', 'Pokoloruj tabelkę'], ['gives', '🎁', 'Po co nam las?'], ['leaf', '🍃', 'Liść brzozy'], ['boss', '👑', 'Wielki sprawdzian']]
+    },
+    {
+      id: 'G', grupa: '✏️ Gramatyka i ortografia', href: 'polski/gramatyka.html',
+      key: 'nauka-3a-polski-gramatyka-v1', mistrz: ['🏆', 'Mistrzyni ortografii'],
+      poziomy: [['czesci', '🧩', 'Części mowy'], ['catch', '🧺', 'Łap wyrazy'], ['alfabet', '🔤', 'Kolejność alfabetyczna'],
+        ['zdania', '📝', 'Zdania pojedyncze i złożone'], ['nie', '🚫', '„nie” z czasownikiem'], ['rz', '🌰', 'Wyrazy z rz'],
+        ['z', '🫙', 'Wyrazy z ż'], ['rain', '🌧️', 'Ortograficzny deszcz'], ['ch', '🍄', 'Wyrazy z ch'], ['boss', '👑', 'Wielki sprawdzian']]
     }
   ];
   const SEEN_KEY = 'nauka-3a-odznaki-v2';
