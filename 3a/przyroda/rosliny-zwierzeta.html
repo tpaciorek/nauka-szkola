@@ -518,9 +518,17 @@
     .flips.three .flip .fb { font-size: 0.9rem; padding: 6px; }
     .flip.open .ff { transform: rotateY(-180deg); }
     .flip.open .fb { transform: rotateY(0); }
+    .wait .flip:not(.open) { animation: none; cursor: default; }
+    .wait .flip:not(.open) .ff { background: linear-gradient(160deg, #d6d3d1, #a8a29e); box-shadow: 0 5px 0 #78716c; }
+    .wait .flip:not(.open) .ff::after { content: '🔒 słuchaj…'; }
     .flip:not(.open) { animation: wiggle 2.6s ease-in-out infinite; }
     .flip:nth-child(2) { animation-delay: 0.3s; } .flip:nth-child(3) { animation-delay: 0.6s; } .flip:nth-child(4) { animation-delay: 0.9s; }
     @keyframes wiggle { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-3deg); } 95% { transform: rotate(3deg); } }
+    .tempo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; font-weight: 900; font-size: 0.9rem; color: var(--muted); }
+    .reward-bar + .tempo { margin: 12px 0 0; }
+    .tempo span { flex-basis: 100%; }
+    .tempo button { flex: 1; min-height: 46px; border-radius: 14px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 0.95rem; color: var(--ink); touch-action: manipulation; }
+    .tempo button.on { background: var(--primary); border-color: var(--primary-dark); color: #fff; }
 
     /* drzewko „rośliny uprawne” */
     .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
@@ -634,8 +642,13 @@
       img: 'zdjecia/',
       intro: 'Hu hu! 🦉 Dziś idziemy <b>na pole</b>! Poznasz rośliny, które uprawia rolnik, dowiesz się, skąd się bierze chleb, a potem sprawdzimy, <b>kto co je</b> w przyrodzie. Zaczynamy?',
       // tempo czytania (jak czyta uczeń 3 klasy): wolniej i przerwa po każdym zdaniu
-      rate: 0.9,
-      pauseMs: 550,
+      pauseMs: 700,   // pauza po kropce (tempo „normalnie”); po ? 80%, po : ; – 55%, po przecinku 30%
+      // 3 tempa do wyboru – w każdym są przerwy, wolniejsze tempo = trochę dłuższe przerwy
+      tempa: [
+        { id: 'slow', icon: '🐢', name: 'wolno', rate: 0.75, pf: 1.3 },
+        { id: 'mid', icon: '🚶', name: 'normalnie', rate: 0.88, pf: 1 },
+        { id: 'fast', icon: '🐇', name: 'szybciej', rate: 1.02, pf: 0.75 }
+      ],
       // ile czasu daje się na obejrzenie kroku teorii: sekundy na słowo i na zdanie
       secPerWord: 0.45,
       secPerSentence: 0.8
@@ -968,7 +981,7 @@
 
 
     /* ---------- Stan i zapis ---------- */
-    function defaultState() { return { stars: {}, found: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true }; }
+    function defaultState() { return { stars: {}, found: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true, tempo: 'mid' }; }
     function loadState() {
       try {
         const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
@@ -1015,8 +1028,8 @@
     const sfx = { good: () => tone([660, 990], 0.09), bad: () => tone([240, 180], 0.12, 'triangle'), tap: () => tone([520], 0.04, 'sine', 0.07), flip: () => tone([440, 660], 0.06, 'sine', 0.08), win: () => tone([523, 659, 784, 1047], 0.12), lose: () => tone([392, 330, 262], 0.16, 'triangle') };
 
     /* ---------- Czytanie na głos ----------
-       Tempo jak u ucznia 3 klasy: wolniej (CONFIG.rate) i przerwa po każdym
-       zdaniu (CONFIG.pauseMs). Tekst dzielimy na zdania i czytamy po kolei. */
+       Tempo jak u ucznia 3 klasy: 3 tempa do wyboru (CONFIG.tempa), tekst
+       czytamy kawałek po kawałku z pauzą po kropce, pytajniku, dwukropku i przecinku. */
     let plVoice = null, sayBtn = null, sayToken = 0, sayTimer = null;
     function pickVoice() {
       if (!window.speechSynthesis) return;
@@ -1030,36 +1043,51 @@
       d.querySelectorAll('.no-read, .say-mini, .letter, .fb, .ff').forEach(e => e.remove());
       d.querySelectorAll('.blank:not(.filled)').forEach(e => { e.textContent = ' … '; });
       d.querySelectorAll('h2, h3, p, li, .th-tip, .th-rule, .quiz-opt, .q-text, .q-num').forEach(e => e.append(/[.!?:…]\s*$/.test(e.textContent) ? ' ' : '. '));
-      return d.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
+      return d.textContent.replace(/\d️?⃣/gu, ' ').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
         .replace(/→|←|↓|↑|✕|✓|„|”/g, ' ').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
     }
     // dzielimy tylko na prawdziwe zdania: po . ! ? … i gdy dalej jest wielka litera
     // („kto? co?” i dwukropki zostają w jednym kawałku); krótkie kawałki doklejamy do następnego
     function sentences(t) {
-      const raw = t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+      return t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+    }
+    // kawałki do czytania z pauzą po każdym: po kropce/!/? – długa, po : ; – średnia, po przecinku – krótka.
+    // Syntezator sam prawie nie robi przerw, więc czytamy kawałek po kawałku.
+    function chunks(t) {
       const out = [];
-      for (const s of raw) { if (out.length && out[out.length - 1].length < 28) out[out.length - 1] += ' ' + s; else out.push(s); }
+      const re = /[^.!?…:;,–]+(?:[.!?…:;,]+|\s–\s|–|$)/gu;
+      for (const m of t.match(re) || []) {
+        const s = m.trim();
+        if (!/[\p{L}\d]/u.test(s)) { if (out.length) out[out.length - 1].t += ' ' + s; continue; }
+        const end = s.slice(-1);
+        const pm = /[.!…]/.test(end) ? 1 : end === '?' ? 0.8 : /[:;–]/.test(end) ? 0.55 : end === ',' ? 0.3 : 1;
+        out.push({ t: s.replace(/\s*–$/, ''), pm });
+      }
       return out;
     }
     function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
-    let sayQueue = [];
-    function stopSpeak() { sayToken++; sayQueue = []; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    let sayQueue = [], sayActive = false, sayStarted = false, sayTotal = 0;
+    const tempo = () => CONFIG.tempa.find(t => t.id === state.tempo) || CONFIG.tempa[1];
+    function stopSpeak() { sayToken++; sayQueue = []; sayActive = false; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
     // append = true: nie przerywaj tego, co Sówka czyta – dopisz na koniec (np. odwrócona karta)
-    function speak(text, btn, append) {
+    // onDone – wywołane, gdy Sówka przeczyta wszystko do końca (nie przy przerwaniu)
+    function speak(text, btn, append, onDone) {
       if (!window.speechSynthesis || !text) return;
-      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...sentences(text)); return; }
+      if (append && sayActive) { const c = chunks(text); sayQueue.push(...c); sayTotal += c.length; return; }
       stopSpeak();
       const my = sayToken;
-      sayQueue = sentences(text);
+      sayQueue = chunks(text); sayTotal = sayQueue.length; sayActive = true; sayStarted = false;
       markSaying(btn);
       const next = () => {
         if (my !== sayToken) return;
-        if (!sayQueue.length) { markSaying(null); return; }
-        const u = new SpeechSynthesisUtterance(sayQueue.shift());
+        if (!sayQueue.length) { sayActive = false; markSaying(null); if (onDone) onDone(); return; }
+        const c = sayQueue.shift();
+        const u = new SpeechSynthesisUtterance(c.t);
         u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
-        u.rate = CONFIG.rate; u.pitch = 1.05;
+        u.rate = tempo().rate; u.pitch = 1.05;
+        u.onstart = () => { sayStarted = true; };
         let done = false;
-        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs); };
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs * c.pm * tempo().pf); };
         u.onend = u.onerror = go;
         try { speechSynthesis.speak(u); } catch (e) { go(); }
       };
@@ -1072,6 +1100,15 @@
       const el = document.querySelector(b.dataset.say);
       const ex = b.dataset.extra ? document.querySelector(b.dataset.extra) : null;
       if (el) speak(plain(el.innerHTML + (ex ? '. ' + ex.innerHTML : '')), b);
+    });
+    // wybór tempa czytania (🐢 🚶 🐇) – działa od razu, także w trakcie czytania
+    const tempoHTML = () => `<div class="tempo no-read"><span>Tempo czytania:</span>${CONFIG.tempa.map(t => `<button class="${t.id === state.tempo ? 'on' : ''}" data-tempo="${t.id}">${t.icon} ${t.name}</button>`).join('')}</div>`;
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-tempo]');
+      if (!b) return;
+      state.tempo = b.dataset.tempo; save(); sfx.tap();
+      document.querySelectorAll('[data-tempo]').forEach(x => x.classList.toggle('on', x.dataset.tempo === state.tempo));
+      if (!sayActive) speak(`Tak będę czytać: ${tempo().name}. Posłuchaj, czy Ci pasuje.`);
     });
     const sayMini = (sel, extra) => `<button class="say-mini" data-say="${sel}" ${extra ? `data-extra="${extra}"` : ''} aria-label="Przeczytaj na głos">🔊</button>`;
 
@@ -1223,6 +1260,7 @@
           ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
           <div class="bar"><div style="width:${pct}%"></div></div>
         </div>
+        ${tempoHTML()}
         <h2 class="section-title">🗺️ Polna ścieżka</h2>
         <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
         <h2 class="section-title">📸 Mój zielnik i zwierzyniec</h2>
@@ -1286,6 +1324,7 @@
     }
     function bindFlips(root, onFlip) {
       root.querySelectorAll('.flip').forEach(f => f.addEventListener('click', () => {
+        if (root.classList.contains('wait')) return;   // Sówka jeszcze czyta
         const first = !f.classList.contains('open');
         f.classList.add('open'); sfx.flip();
         // pytanie z przodu („Jaki pies?”) czytamy razem z odpowiedzią; wyraz z luką („k_yk”, „leka…”) – tylko gotowy wyraz z tyłu
@@ -1312,7 +1351,8 @@
             <div class="guide"><div class="owl-mini" id="owl">${owlSVG('happy')}</div><div class="bubble" id="bubble">${step === 0 ? `📖 Przypomnij sobie: <b>${th.title}</b>. Obejrzyj każdy krok!` : last ? 'Ostatni krok – i zaczynamy zadania! 💪' : `Krok ${step + 1} z ${n}. Czytamy dalej! 👀`}</div></div>
             <div class="th-card" id="theory"><div class="th-step no-read">Krok ${step + 1} z ${n}</div>${th.steps[step]}</div>
             <div class="theory-actions">
-              <button class="btn soft" id="readTh" data-say="#theory">🔊 Przeczytaj mi</button>
+              ${tempoHTML()}
+              <button class="btn soft" id="readTh">🔊 Przeczytaj mi</button>
               <div class="row2" style="margin-top:12px">
                 ${step > 0 ? '<button class="btn soft" id="prevTh">← Wstecz</button>' : ''}
                 <button class="btn" id="goTh"><span class="fill"></span><span id="goLbl"></span></button>
@@ -1326,17 +1366,35 @@
         const need = free ? 0 : readMs(card.innerHTML);
         const t0 = Date.now();
         const goText = last ? 'Rozumiem – zaczynamy! →' : 'Dalej →';
+        // gdy Sówka czyta na głos: „Dalej” dopiero, gdy skończy czytać (krok i odwrócone karty).
+        // Gdy czytanie wyłączone albo telefon nie ma głosu – czas na samodzielne przeczytanie.
+        let readDone = false;
+        const readBtn = $('#readTh');
+        const startRead = () => { readDone = false; speak(plain(card.innerHTML), readBtn, false, () => { readDone = true; }); };
+        readBtn.addEventListener('click', () => { if (sayBtn === readBtn) stopSpeak(); else startRead(); });
+        const listen = () => state.read && !!window.speechSynthesis && (sayStarted || sayActive || Date.now() - t0 < 3000);
         const check = () => {
           const left = card.querySelectorAll('.flip:not(.open)').length;
           const el = Date.now() - t0;
-          const ok = free || (left === 0 && el >= need);
+          const mustListen = !free && listen();
+          // karty zablokowane, dopóki Sówka czyta (tekst kroku albo poprzednią kartę)
+          const waiting = mustListen && (sayActive || !readDone);
+          card.classList.toggle('wait', waiting && left > 0);
+          if (waiting && left > 0) {
+            go.classList.add('locked'); go.disabled = true;
+            go.style.setProperty('--p', Math.round((nFlips - left) / Math.max(1, nFlips) * 50) + '%');
+            lbl.textContent = sayActive ? '🔊 Słuchaj do końca…' : '🔊 Dotknij „Przeczytaj mi”';
+            return false;
+          }
+          const ok = free || (left === 0 && (mustListen ? readDone && !sayActive : el >= need));
           if (ok) {
             if (go.classList.contains('locked') || !go.dataset.ready) { go.classList.remove('locked'); go.classList.add('ready'); go.dataset.ready = '1'; go.disabled = false; lbl.textContent = goText; }
             return true;
           }
           go.classList.add('locked'); go.disabled = true;
-          go.style.setProperty('--p', Math.min(100, Math.round(((el / need) * (nFlips ? 0.5 : 1) + (nFlips ? (nFlips - left) / nFlips * 0.5 : 0)) * 100)) + '%');
-          lbl.textContent = left ? `👆 Odwróć karty (zostało ${left})` : '⏳ Przeczytaj spokojnie…';
+          const part = mustListen ? (readDone ? 1 : sayActive && sayTotal ? 1 - (sayQueue.length + 1) / sayTotal : 0) : el / need;
+          go.style.setProperty('--p', Math.min(100, Math.round((part * (nFlips ? 0.5 : 1) + (nFlips ? (nFlips - left) / nFlips * 0.5 : 0)) * 100)) + '%');
+          lbl.textContent = left ? `👆 Odwróć karty (zostało ${left})` : !mustListen ? '⏳ Przeczytaj spokojnie…' : sayActive ? '🔊 Słuchaj do końca…' : '🔊 Dotknij „Przeczytaj mi”';
           return false;
         };
         bindFlips(card, check);
@@ -1350,7 +1408,7 @@
         if ($('#skipTh')) $('#skipTh').addEventListener('click', run);
         $('#quitBtn').addEventListener('click', renderMap);
         window.scrollTo(0, 0);
-        if (state.read) speak(plain(card.innerHTML), $('#readTh'));
+        if (state.read) startRead();
       };
       render();
     }
