@@ -32,5 +32,9 @@ W katalogu `mobile/android` uruchom:
 gradle :app:assembleDebug
 ```
 
+Wersja debug jest podpisywana stałym kluczem `app/debug.keystore` (hasło `android`), więc kolejne
+wersje instalują się jako aktualizacja i zachowują postęp. Nie zmieniaj tego pliku – inny klucz
+wymusiłby odinstalowanie aplikacji.
+
 Plik APK powstanie w `app/build/outputs/apk/debug/app-debug.apk`. Repozytorium zawiera
 również workflow GitHub Actions, który buduje gotowy do instalacji artefakt `nauka-szkola-apk`.
