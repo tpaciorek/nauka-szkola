@@ -15,6 +15,15 @@ Przy pierwszym uruchomieniu bez lokalnych wyników aplikacja proponuje jednorazo
 postępu z Chrome. Strona przekazuje wyłącznie klucze `localStorage` zaczynające się od
 `nauka-`, po świadomym naciśnięciu przycisku przez użytkownika.
 
+## Czytanie na głos
+
+WebView na Androidzie nie ma działającego `speechSynthesis`, więc gry same z siebie by milczały.
+Aplikacja wstrzykuje na starcie każdej strony `app/src/main/assets/tts-polyfill.js`, który udaje
+`speechSynthesis` i `SpeechSynthesisUtterance`, a tekst przekazuje do systemowego lektora Androida
+(`TtsBridge.java`, obiekt `AndroidTTS`). Gry nie wymagają żadnych zmian. Lektor używa języka
+z wypowiedzi (`pl-PL`, `en-GB`, `en-US`) i głośności multimediów. Jeśli w telefonie nie ma polskiego
+głosu, trzeba go zainstalować w Ustawieniach → Zamiana tekstu na mowę (np. „Usługi rozpoznawania mowy Google”).
+
 ## Budowanie
 
 W katalogu `mobile/android` uruchom:

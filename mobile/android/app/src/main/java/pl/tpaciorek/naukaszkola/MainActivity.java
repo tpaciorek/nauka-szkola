@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -29,7 +30,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
+
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Collections;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -43,6 +51,9 @@ public final class MainActivity extends Activity {
     private static final int MAX_TRANSFER_BYTES = 512 * 1024;
 
     private WebView webView;
+    private TtsBridge tts;
+    private String ttsPolyfill;
+    private boolean ttsInjectedAtStart;
     private ProgressBar progressBar;
     private LinearLayout errorView;
     private String pendingImportJson;
@@ -80,6 +91,7 @@ public final class MainActivity extends Activity {
         ));
 
         setContentView(root);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         prepareProgressImport(getIntent());
 
@@ -102,6 +114,15 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
+
+        // czytanie na głos: WebView nie ma speechSynthesis – dajemy je przez lektor Androida
+        tts = new TtsBridge(this, view);
+        view.addJavascriptInterface(tts, "AndroidTTS");
+        ttsPolyfill = readAsset("tts-polyfill.js");
+        if (ttsPolyfill != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            WebViewCompat.addDocumentStartJavaScript(view, ttsPolyfill, Collections.singleton("https://" + ALLOWED_HOST));
+            ttsInjectedAtStart = true;
+        }
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, false);
@@ -129,10 +150,13 @@ public final class MainActivity extends Activity {
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 errorView.setVisibility(View.GONE);
                 view.setVisibility(View.VISIBLE);
+                // starsze WebView bez skryptów „na starcie” – wstrzykujemy jak najwcześniej
+                if (!ttsInjectedAtStart && ttsPolyfill != null) view.evaluateJavascript(ttsPolyfill, null);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                tts.pushVoices();
                 if (pendingImportJson != null && url.startsWith(HOME_URL)) {
                     applyPendingProgress(view);
                     return;
@@ -363,8 +387,27 @@ public final class MainActivity extends Activity {
         }
     }
 
+    private String readAsset(String name) {
+        try (InputStream in = getAssets().open(name); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return out.toString("UTF-8");
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        // aplikacja schowana – Sówka przestaje czytać
+        webView.evaluateJavascript("window.speechSynthesis&&window.speechSynthesis.cancel()", null);
+        super.onPause();
+    }
+
     @Override
     protected void onDestroy() {
+        if (tts != null) tts.shutdown();
         webView.stopLoading();
         webView.destroy();
         super.onDestroy();
