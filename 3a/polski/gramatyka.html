@@ -276,8 +276,8 @@
       storageKey: 'nauka-3a-polski-gramatyka-v1',
       intro: 'Hu hu! 🦉 Przed sprawdzianem powtórzymy razem: <b>części mowy</b>, <b>alfabet</b>, <b>zdania</b>, <b>„nie” z czasownikiem</b> i trudne <b>rz, ż, ch</b>. Najpierw zawsze Ci opowiem, potem zadania. Zaczynamy?',
       // tempo czytania (jak czyta uczeń 3 klasy): wolniej i przerwa po każdym zdaniu
-      rate: 0.9,
-      pauseMs: 550,
+      rate: 0.88,
+      pauseMs: 1000,   // pauza po kropce; po ? 80%, po : ; – 55%, po przecinku 30%
       // ile czasu daje się na obejrzenie kroku teorii: sekundy na słowo i na zdanie
       secPerWord: 0.45,
       secPerSentence: 0.8
@@ -640,15 +640,26 @@
       d.querySelectorAll('.no-read, .say-mini, .letter, .fb, .ff').forEach(e => e.remove());
       d.querySelectorAll('.blank:not(.filled)').forEach(e => { e.textContent = ' … '; });
       d.querySelectorAll('h2, h3, p, li, .th-tip, .th-rule, .quiz-opt, .q-text, .q-num').forEach(e => e.append(/[.!?:…]\s*$/.test(e.textContent) ? ' ' : '. '));
-      return d.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
+      return d.textContent.replace(/\d️?⃣/gu, ' ').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
         .replace(/→|←|↓|↑|✕|✓|„|”/g, ' ').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
     }
     // dzielimy tylko na prawdziwe zdania: po . ! ? … i gdy dalej jest wielka litera
     // („kto? co?” i dwukropki zostają w jednym kawałku); krótkie kawałki doklejamy do następnego
     function sentences(t) {
-      const raw = t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+      return t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+    }
+    // kawałki do czytania z pauzą po każdym: po kropce/!/? – długa, po : ; – średnia, po przecinku – krótka.
+    // Syntezator sam prawie nie robi przerw, więc czytamy kawałek po kawałku.
+    function chunks(t) {
       const out = [];
-      for (const s of raw) { if (out.length && out[out.length - 1].length < 28) out[out.length - 1] += ' ' + s; else out.push(s); }
+      const re = /[^.!?…:;,–]+(?:[.!?…:;,]+|\s–\s|–|$)/gu;
+      for (const m of t.match(re) || []) {
+        const s = m.trim();
+        if (!/[\p{L}\d]/u.test(s)) { if (out.length) out[out.length - 1].t += ' ' + s; continue; }
+        const end = s.slice(-1);
+        const pause = /[.!…]/.test(end) ? CONFIG.pauseMs : end === '?' ? CONFIG.pauseMs * 0.8 : /[:;–]/.test(end) ? CONFIG.pauseMs * 0.55 : end === ',' ? CONFIG.pauseMs * 0.3 : CONFIG.pauseMs;
+        out.push({ t: s.replace(/\s*–$/, ''), pause });
+      }
       return out;
     }
     function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
@@ -657,19 +668,20 @@
     // append = true: nie przerywaj tego, co Sówka czyta – dopisz na koniec (np. odwrócona karta)
     function speak(text, btn, append) {
       if (!window.speechSynthesis || !text) return;
-      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...sentences(text)); return; }
+      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...chunks(text)); return; }
       stopSpeak();
       const my = sayToken;
-      sayQueue = sentences(text);
+      sayQueue = chunks(text);
       markSaying(btn);
       const next = () => {
         if (my !== sayToken) return;
         if (!sayQueue.length) { markSaying(null); return; }
-        const u = new SpeechSynthesisUtterance(sayQueue.shift());
+        const c = sayQueue.shift();
+        const u = new SpeechSynthesisUtterance(c.t);
         u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
         u.rate = CONFIG.rate; u.pitch = 1.05;
         let done = false;
-        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs); };
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, c.pause); };
         u.onend = u.onerror = go;
         try { speechSynthesis.speak(u); } catch (e) { go(); }
       };
