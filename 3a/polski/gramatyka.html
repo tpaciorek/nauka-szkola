@@ -276,8 +276,8 @@
       storageKey: 'nauka-3a-polski-gramatyka-v1',
       intro: 'Hu hu! 🦉 Przed sprawdzianem powtórzymy razem: <b>części mowy</b>, <b>alfabet</b>, <b>zdania</b>, <b>„nie” z czasownikiem</b> i trudne <b>rz, ż, ch</b>. Najpierw zawsze Ci opowiem, potem zadania. Zaczynamy?',
       // tempo czytania (jak czyta uczeń 3 klasy): wolniej i przerwa po każdym zdaniu
-      rate: 0.82,
-      pauseMs: 750,
+      rate: 0.9,
+      pauseMs: 550,
       // ile czasu daje się na obejrzenie kroku teorii: sekundy na słowo i na zdanie
       secPerWord: 0.45,
       secPerSentence: 0.8
@@ -643,24 +643,37 @@
       return d.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
         .replace(/→|←|↓|↑|✕|✓|„|”/g, ' ').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
     }
-    const sentences = t => t.split(/(?<=[.!?…:])\s+/).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+    // dzielimy tylko na prawdziwe zdania: po . ! ? … i gdy dalej jest wielka litera
+    // („kto? co?” i dwukropki zostają w jednym kawałku); krótkie kawałki doklejamy do następnego
+    function sentences(t) {
+      const raw = t.split(/(?<=[.!?…])\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ0-9])/u).map(s => s.trim()).filter(s => /[\p{L}\d]/u.test(s));
+      const out = [];
+      for (const s of raw) { if (out.length && out[out.length - 1].length < 28) out[out.length - 1] += ' ' + s; else out.push(s); }
+      return out;
+    }
     function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
-    function stopSpeak() { sayToken++; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
-    function speak(text, btn) {
+    let sayQueue = [];
+    function stopSpeak() { sayToken++; sayQueue = []; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    // append = true: nie przerywaj tego, co Sówka czyta – dopisz na koniec (np. odwrócona karta)
+    function speak(text, btn, append) {
       if (!window.speechSynthesis || !text) return;
+      if (append && sayQueue.length + (sayBtn || speechSynthesis.speaking ? 1 : 0) > 0) { sayQueue.push(...sentences(text)); return; }
       stopSpeak();
-      const my = sayToken, parts = sentences(text);
+      const my = sayToken;
+      sayQueue = sentences(text);
       markSaying(btn);
-      const next = i => {
+      const next = () => {
         if (my !== sayToken) return;
-        if (i >= parts.length) { if (sayBtn === btn) markSaying(null); return; }
-        const u = new SpeechSynthesisUtterance(parts[i]);
+        if (!sayQueue.length) { markSaying(null); return; }
+        const u = new SpeechSynthesisUtterance(sayQueue.shift());
         u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
-        u.rate = CONFIG.rate; u.pitch = 1.1;
-        u.onend = u.onerror = () => { if (my === sayToken) sayTimer = setTimeout(() => next(i + 1), CONFIG.pauseMs); };
-        try { speechSynthesis.speak(u); } catch (e) {}
+        u.rate = CONFIG.rate; u.pitch = 1.05;
+        let done = false;
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs); };
+        u.onend = u.onerror = go;
+        try { speechSynthesis.speak(u); } catch (e) { go(); }
       };
-      next(0);
+      next();
     }
     document.addEventListener('click', e => {
       const b = e.target.closest('[data-say]');
@@ -804,7 +817,9 @@
       root.querySelectorAll('.flip').forEach(f => f.addEventListener('click', () => {
         const first = !f.classList.contains('open');
         f.classList.add('open'); sfx.flip();
-        if (state.read && first) speak(plain(f.querySelector('.ff').innerHTML) + ' – ' + plain(f.querySelector('.fb').innerHTML));
+        // pytanie z przodu („Jaki pies?”) czytamy razem z odpowiedzią; wyraz z luką („k_yk”, „leka…”) – tylko gotowy wyraz z tyłu
+        const front = plain(f.querySelector('.ff').innerHTML), back = plain(f.querySelector('.fb').innerHTML);
+        if (state.read && first) speak((/\?/.test(front) ? front + ' ' : '') + back + '.', null, true);
         if (first && onFlip) onFlip();
       }));
     }
