@@ -92,6 +92,7 @@ public final class MainActivity extends Activity {
 
         setContentView(root);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        keepClearOfSystemBars(root);
 
         prepareProgressImport(getIntent());
 
@@ -385,6 +386,33 @@ public final class MainActivity extends Activity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    /**
+     * Od Androida 15 (targetSdk 35) aplikacja rysuje się pod paskiem stanu i paskiem nawigacji.
+     * Bez odsunięcia dół strony (np. koszyk w grach) leży pod przyciskami systemu i nie reaguje
+     * na dotyk. Dlatego odsuwamy całą zawartość o wysokość pasków (i wycięcia aparatu).
+     */
+    private void keepClearOfSystemBars(View root) {
+        root.setBackgroundColor(Color.WHITE);
+        root.setOnApplyWindowInsetsListener((v, insets) -> {
+            int left, top, right, bottom;
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                android.graphics.Insets bars = insets.getInsets(
+                        android.view.WindowInsets.Type.systemBars()
+                                | android.view.WindowInsets.Type.displayCutout()
+                                | android.view.WindowInsets.Type.ime());
+                left = bars.left; top = bars.top; right = bars.right; bottom = bars.bottom;
+            } else {
+                left = insets.getSystemWindowInsetLeft();
+                top = insets.getSystemWindowInsetTop();
+                right = insets.getSystemWindowInsetRight();
+                bottom = insets.getSystemWindowInsetBottom();
+            }
+            v.setPadding(left, top, right, bottom);
+            return insets;
+        });
+        root.requestApplyInsets();
     }
 
     private String readAsset(String name) {

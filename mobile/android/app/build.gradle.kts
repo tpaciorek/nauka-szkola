@@ -10,8 +10,8 @@ android {
         applicationId = "pl.tpaciorek.naukaszkola"
         minSdk = 23
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.2.1"
     }
 
     // Stały klucz do wersji debug: każda nowa wersja z GitHuba instaluje się jako aktualizacja
