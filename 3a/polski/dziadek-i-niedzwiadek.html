@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#b45309" />
+  <title>Dziadek i niedźwiadek – test z lektury</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0c2d48;
+      --muted: #64748b;
+      --primary: #b45309;
+      --primary-dark: #78350f;
+      --primary-soft: #fef3c7;
+      --line: #fde68a;
+      --good: #16a34a;
+      --good-soft: #dcfce7;
+      --bad: #dc2626;
+      --bad-soft: #fee2e2;
+      --gold: #facc15;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', system-ui, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(253, 230, 138, 0.55), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(252, 211, 77, 0.45), transparent 35%),
+        linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    button { font-family: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+    button:disabled { cursor: default; }
+
+    #app {
+      max-width: 560px; margin: 0 auto;
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* ---------- Górny pasek ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255, 251, 235, 0.88);
+      backdrop-filter: blur(10px);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 42px; padding: 8px 14px;
+      border-radius: 999px; border: 2px solid var(--line);
+      background: #fff; font-weight: 900; font-size: 1rem;
+      text-decoration: none; color: var(--ink);
+    }
+    .pill.back { color: var(--primary); }
+    .topbar .spacer { flex: 1; }
+    .topbar .pill { white-space: nowrap; }
+    @media (max-width: 420px) { .topbar { gap: 6px; padding: 10px 10px; } .topbar .pill { padding: 8px 10px; } }
+    body.in-level .topbar { display: none; }
+
+    main { flex: 1; display: flex; flex-direction: column; padding: 0 16px 24px; }
+    body.in-level main { padding-bottom: 0; }
+
+    /* ---------- Sowa ---------- */
+    .owl-svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .owl-big { width: 130px; flex: none; animation: bob 3s ease-in-out infinite; }
+    .owl-mini { width: 62px; flex: none; }
+    .jump { animation: jump 0.6s ease; }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(4deg); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+    .bubble {
+      position: relative; flex: 1;
+      background: #fff; border: 2px solid var(--line);
+      border-radius: 20px; padding: 12px 14px;
+      font-weight: 700; line-height: 1.45; font-size: 1rem;
+      box-shadow: 0 8px 20px rgba(180, 83, 9, 0.1);
+    }
+    .bubble::before {
+      content: ''; position: absolute; left: -10px; top: 22px;
+      border: 9px solid transparent; border-right-color: var(--line); border-left: 0;
+    }
+    .bubble::after {
+      content: ''; position: absolute; left: -7px; top: 23px;
+      border: 8px solid transparent; border-right-color: #fff; border-left: 0;
+    }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes pop { 0% { transform: scale(0.94); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ---------- Mapa ---------- */
+    .hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
+    .reward-bar {
+      background: #fff; border: 2px solid var(--line); border-radius: 20px;
+      padding: 12px 14px; font-weight: 800; font-size: 0.95rem;
+    }
+    .bar { height: 12px; background: var(--primary-soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #f59e0b, var(--primary)); border-radius: 999px; transition: width 0.6s ease; }
+    .section-title { font-size: 1.3rem; font-weight: 900; margin: 24px 0 10px; }
+    .muted { color: var(--muted); font-weight: 700; margin: -4px 0 12px; font-size: 0.95rem; }
+
+    .path { display: flex; flex-direction: column; align-items: flex-start; }
+    .path-dots { width: 4px; height: 18px; margin: 2px 0 2px 40px; border-left: 4px dotted #fcd34d; }
+    .node {
+      position: relative;
+      width: 84%; margin-left: calc(var(--off) * 8%);
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; text-align: left;
+      background: #fff; border: 3px solid var(--line); border-radius: 22px;
+      box-shadow: 0 6px 0 #fde68a;
+      transition: transform 0.12s ease;
+    }
+    .node:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #fde68a; }
+    .node-icon {
+      width: 52px; height: 52px; flex: none; border-radius: 50%;
+      display: grid; place-items: center; font-size: 1.5rem; font-weight: 900;
+      background: var(--primary-soft);
+    }
+    .node-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .node-num { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .node-name { font-size: 1.05rem; font-weight: 900; }
+    .node-desc { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+    .node-stars { font-size: 1.1rem; color: var(--gold); letter-spacing: -1px; flex: none; text-shadow: 0 1px 0 #ca8a04; }
+    .node-stars .off { color: #e5e7eb; text-shadow: none; }
+    .node.done { border-color: #fcd34d; }
+    .node.current { border-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); animation: glow 1.8s ease-in-out infinite; }
+    .node.current .node-icon { background: var(--primary); color: #fff; }
+    .node.locked { opacity: 0.55; background: #f8fafc; box-shadow: 0 6px 0 #e5e7eb; border-color: #e5e7eb; }
+    .node.locked .node-icon { background: #e5e7eb; }
+    @keyframes glow { 0%, 100% { outline: 0 solid rgba(180, 83, 9, 0.25); } 50% { outline: 7px solid rgba(180, 83, 9, 0.15); } }
+    .here {
+      position: absolute; right: 10px; top: -13px;
+      background: var(--gold); color: var(--ink); font-size: 0.75rem; font-weight: 900;
+      padding: 3px 10px; border-radius: 999px; box-shadow: 0 2px 0 #ca8a04;
+    }
+
+    /* kolekcja pamiątek */
+    .coll {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+      background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 12px;
+    }
+    .coll-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 2px; border-radius: 12px;
+    }
+    .coll-icon {
+      width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 1.5rem; background: var(--primary-soft); border: 2px solid var(--line);
+    }
+    .coll-item.locked .coll-icon { background: #f1f5f9; border-color: #e5e7eb; filter: grayscale(1); opacity: 0.55; }
+    .coll-label { font-size: 0.62rem; font-weight: 800; color: var(--muted); text-align: center; line-height: 1.2; }
+    .coll-item.locked .coll-label { opacity: 0.5; }
+
+    .info-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 52px; padding: 10px 16px; margin-top: 14px;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1.02rem; font-weight: 900; color: var(--primary-dark);
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .info-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+
+    /* ---------- Przyciski ---------- */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 58px; padding: 12px 18px;
+      border: 0; border-radius: 18px;
+      font-size: 1.2rem; font-weight: 900;
+      background: var(--primary); color: #fff;
+      box-shadow: 0 5px 0 var(--primary-dark);
+      transition: transform 0.1s ease;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .btn.soft { background: #fff; color: var(--primary); border: 3px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+    .btn.green { background: #22c55e; box-shadow: 0 5px 0 #15803d; }
+    .btn + .btn { margin-top: 12px; }
+    .link-btn.danger { background: none; border: 0; color: #9ca3af; margin: 28px auto 0; display: block; font-size: 0.85rem; font-weight: 800; text-decoration: underline; padding: 8px; }
+
+    /* ---------- Poziom ---------- */
+    .level { flex: 1; display: flex; flex-direction: column; }
+    .level-top { display: flex; align-items: center; gap: 12px; padding: 12px 0 8px; }
+    .icon-btn {
+      width: 44px; height: 44px; flex: none; border-radius: 50%;
+      border: 2px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--muted);
+    }
+    .progress { flex: 1; height: 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 999px; transition: width 0.4s ease; }
+    .level-badge { font-size: 1.5rem; font-weight: 900; }
+    .guide { display: flex; align-items: flex-start; gap: 12px; margin: 4px 0 12px; }
+    .task { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+    /* recap */
+    .recap-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 10px; }
+    .recap-wrap .owl-big { width: 150px; }
+    .recap-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; font-weight: 700; line-height: 1.55; font-size: 1.05rem;
+    }
+    .recap-title { font-size: 1.25rem; font-weight: 900; margin: 0 0 4px; }
+    .recap-sub { color: var(--muted); font-weight: 800; font-size: 0.9rem; margin: 0 0 10px; }
+    .recap-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* pytanie */
+    .q-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 24px;
+      padding: 18px; text-align: center;
+    }
+    .q-num { font-size: 0.82rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .q-text { font-size: 1.2rem; font-weight: 900; line-height: 1.4; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; min-height: 58px; padding: 12px 16px; text-align: left;
+      border-radius: 18px; border: 3px solid var(--line); background: #fff;
+      font-size: 1rem; font-weight: 800; line-height: 1.35;
+      box-shadow: 0 5px 0 var(--line);
+    }
+    .quiz-opt:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+    .quiz-opt .letter {
+      flex: none; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 0.9rem; font-weight: 900;
+      background: var(--primary-soft); color: var(--primary-dark);
+    }
+    .quiz-opt.ok { background: var(--good-soft); border-color: var(--good); box-shadow: 0 5px 0 var(--good); }
+    .quiz-opt.ok .letter { background: var(--good); color: #fff; }
+    .quiz-opt.bad { background: var(--bad-soft); border-color: #fca5a5; box-shadow: none; opacity: 0.8; }
+    .quiz-opt.bad .letter { background: #fca5a5; color: #fff; }
+    .quiz-opt.dim { opacity: 0.55; }
+    .note {
+      text-align: left; background: #fef9c3; border: 2px solid #fde68a; border-radius: 16px;
+      padding: 10px 12px; font-weight: 700; line-height: 1.45; font-size: 0.95rem;
+    }
+    .feedback-head { font-weight: 900; text-align: center; font-size: 1.05rem; }
+    .feedback-head.ok { color: #166534; }
+    .feedback-head.bad { color: #b91c1c; }
+
+    /* ---------- Wynik ---------- */
+    .result { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-top: 24px; }
+    .result .owl-big { width: 160px; }
+    .result h2 { font-size: 1.9rem; margin: 6px 0 0; }
+    .result-stars { display: flex; gap: 8px; font-size: 3.4rem; line-height: 1; }
+    .rs { color: #e5e7eb; }
+    .rs.on { color: var(--gold); text-shadow: 0 3px 0 #ca8a04; animation: starIn 0.5s ease both; animation-delay: var(--d); }
+    @keyframes starIn { 0% { transform: scale(0) rotate(-90deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { transform: scale(1); } }
+    .result p { font-weight: 700; color: var(--muted); margin: 0; font-size: 1.05rem; }
+    .reward-pop {
+      background: #fef9c3; border: 3px solid var(--gold); border-radius: 18px; padding: 12px 18px;
+      font-weight: 900; font-size: 1.1rem; animation: pop 0.5s ease; display: flex; align-items: center; gap: 10px;
+    }
+    .reward-pop .ic { font-size: 2rem; }
+    .result-actions { width: 100%; margin-top: auto; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); }
+
+    /* ciekawostki */
+    .info-wrap { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+    .info-card {
+      background: #fff; border: 3px solid var(--line); border-radius: 22px; padding: 16px;
+    }
+    .info-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .info-card p { margin: 0 0 8px; font-weight: 700; line-height: 1.55; color: #334155; }
+    .info-card p:last-child { margin-bottom: 0; }
+    .info-src { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+
+    .confetti { position: fixed; top: -20px; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 50; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (min-width: 600px) {
+      .owl-big { width: 150px; }
+      main { padding-left: 20px; padding-right: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    /* ---------- Dodatki: czytanie, teoria, wyjaśnienia ---------- */
+    .say-mini {
+      flex: none; width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid var(--line); background: #fff; font-size: 1.2rem;
+    }
+    .say-mini.on, .pill.on { background: var(--primary); border-color: var(--primary-dark); color: #fff; }
+    .tempo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; font-weight: 900; font-size: 0.9rem; color: var(--muted); }
+    .tempo span { flex-basis: 100%; }
+    .tempo button { flex: 1; min-height: 46px; border-radius: 14px; border: 2px solid var(--line); background: #fff; font-weight: 900; font-size: 0.95rem; color: var(--ink); }
+    .tempo button.on { background: var(--primary); border-color: var(--primary-dark); color: #fff; }
+    .th-head { display: flex; align-items: center; gap: 10px; }
+    .th-head .recap-title { flex: 1; text-align: left; }
+    .recap-card { text-align: left; width: 100%; }
+    .recap-card p { margin: 0 0 10px; }
+    .th-box { border-radius: 16px; padding: 10px 12px; margin: 10px 0; border: 2px solid; }
+    .th-box.a { background: #fef3c7; border-color: #fcd34d; }
+    .th-box.b { background: #dcfce7; border-color: #86efac; }
+    .th-box.c { background: #e0f2fe; border-color: #7dd3fc; }
+    .th-tip { background: #fae8ff; border: 2px dashed #e879f9; border-radius: 16px; padding: 10px 12px; margin-top: 10px; }
+    .photo { margin: 10px 0; text-align: center; }
+    .photo img { width: 100%; max-width: 320px; border-radius: 16px; border: 3px solid var(--line); display: block; margin: 0 auto; }
+    .photo figcaption { font-size: 0.75rem; color: var(--muted); font-weight: 700; margin-top: 4px; }
+    .q-top { display: flex; align-items: flex-start; gap: 8px; }
+    .q-top .q-text { flex: 1; }
+    .why {
+      text-align: left; background: #fff7ed; border: 3px solid #fdba74; border-radius: 18px;
+      padding: 12px 14px; font-weight: 800; line-height: 1.5; font-size: 1rem;
+    }
+    .why .good-ans { color: #166534; font-weight: 900; }
+    .why-head { display: flex; align-items: center; gap: 8px; font-weight: 900; color: #9a3412; margin-bottom: 6px; }
+    .why-head span { flex: 1; }
+    .btn.wait { background: #e5e7eb; color: #6b7280; box-shadow: 0 5px 0 #d1d5db; }
+    .modal { position: fixed; inset: 0; z-index: 40; background: rgba(12, 45, 72, 0.45); display: flex; align-items: flex-end; justify-content: center; }
+    .modal-box { background: #fffbeb; width: 100%; max-width: 560px; max-height: 88vh; overflow: auto; border-radius: 24px 24px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <a class="pill back" href="./index.html" aria-label="Wróć do polskiego">← Wróć</a>
+      <span class="spacer"></span>
+      <a class="pill" href="../osiagniecia.html" title="Moje odznaki" aria-label="Moje odznaki">🏅</a>
+      <span class="pill" title="Zdobyte gwiazdki">⭐ <span id="starCount">0</span></span>
+      <span class="pill" title="Dni nauki z rzędu">🔥 <span id="streakCount">0</span></span>
+      <button class="pill" id="readBtn" aria-label="Włącz lub wyłącz czytanie na głos">🗣️</button>
+      <button class="pill" id="sfxBtn" aria-label="Włącz lub wyłącz dźwięki">🔔</button>
+    </header>
+    <main id="screen"></main>
+  </div>
+
+  <script src="../osiagniecia.js"></script>
+  <script>
+    /* =====================================================================
+       DZIADEK I NIEDŹWIADEK – test z lektury (Łukasz Wierzbicki)
+       5 części książki: najpierw „Przypomnij sobie” (czytane na głos),
+       potem pytania. Zła odpowiedź → Sówka czyta wyjaśnienie, a „Dalej”
+       odblokowuje się dopiero po przeczytaniu. Błędne pytanie wraca na koniec.
+       Fakty sprawdzone w kilku streszczeniach lektury (18.11.2026).
+       ===================================================================== */
+    const CONFIG = {
+      storageKey: 'nauka-3a-polski-dziadek-niedzwiadek-v1',
+      intro: 'Cześć! Jestem <b>Sówka Lulu</b> 🦉. Przypomnimy sobie prawdziwą historię niedźwiedzia <b>Wojtka</b> z książki „Dziadek i niedźwiadek”. Przed każdą częścią opowiem, co się wydarzyło, a potem zadam kilka pytań. Gdy się pomylisz, wytłumaczę Ci dobrą odpowiedź. Zaczynamy?',
+      pauseMs: 700,
+      tempa: [
+        { id: 'slow', icon: '🐢', name: 'wolno', rate: 0.75, pf: 1.3 },
+        { id: 'mid', icon: '🚶', name: 'normalnie', rate: 0.88, pf: 1 },
+        { id: 'fast', icon: '🐇', name: 'szybciej', rate: 1.02, pf: 0.75 }
+      ]
+    };
+
+    const PHOTO = {
+      wojtek: `<figure class="photo"><img src="zdjecia/wojtek-1942.jpg" alt="Prawdziwy niedźwiedź Wojtek z polskim żołnierzem" loading="lazy"><figcaption class="no-read">Prawdziwy Wojtek z żołnierzem, 1942 r. • fot. Imperial War Museum, domena publiczna</figcaption></figure>`,
+      odznaka: `<figure class="photo"><img src="zdjecia/wojtek-odznaka.jpg" alt="Znak kompanii: niedźwiedź niosący pocisk" loading="lazy"><figcaption class="no-read">Prawdziwy znak kompanii Wojtka • Imperial War Museum, domena publiczna</figcaption></figure>`
+    };
+
+    const LEVELS = [
+      {
+        id: 'l1', icon: '👴', name: 'Dziadek i Natalka w zoo', desc: 'Początek opowieści',
+        theory: `
+          <p>Książkę <b>„Dziadek i niedźwiadek”</b> napisał <b>Łukasz Wierzbicki</b>. To <b>historia prawdziwa</b> – niedźwiedź Wojtek żył naprawdę!</p>
+          <div class="th-box a">🏞️ Opowieść zaczyna się w <b>ogrodzie zoologicznym w Edynburgu</b>. Edynburg to miasto w <b>Szkocji</b>.</div>
+          <div class="th-box b">👴👧 Do zoo przychodzi <b>dziadek</b> ze swoją wnuczką <b>Natalką</b>. Natalka ogląda wielkiego <b>niedźwiedzia brunatnego</b>.</div>
+          <div class="th-box c">🐻 Niedźwiedź poznaje głos dziadka! Dziadek zna go od dawna. Zaczyna opowiadać wnuczce jego niezwykłą historię – z czasów wojny, gdy był żołnierzem.</div>
+          ${PHOTO.wojtek}
+          <div class="th-tip">🦉 Sztuczka Sówki: <b>dziadek</b> opowiada, <b>Natalka</b> słucha, a <b>Wojtek</b> to bohater opowieści.</div>`,
+        reward: { icon: '🎟️', name: 'bilet do zoo w Edynburgu' },
+        questions: [
+          { q: 'Kto napisał książkę „Dziadek i niedźwiadek”?', options: ['Łukasz Wierzbicki', 'Jan Brzechwa', 'Maria Krüger', 'Julian Tuwim'], a: 'Łukasz Wierzbicki', why: 'Autorem tej książki jest Łukasz Wierzbicki. Maria Krüger napisała „Karolcię”, a Jan Brzechwa i Julian Tuwim pisali wiersze dla dzieci.' },
+          { q: 'Gdzie dziadek opowiada Natalce historię niedźwiedzia?', options: ['W zoo w Edynburgu', 'W domu przy kominku', 'W lesie na wycieczce', 'W szkole na lekcji'], a: 'W zoo w Edynburgu', why: 'Dziadek i Natalka są w ogrodzie zoologicznym w Edynburgu, w Szkocji. Tam mieszka niedźwiedź z opowieści.' },
+          { q: 'Komu dziadek opowiada historię Wojtka?', options: ['Wnuczce Natalce', 'Żołnierzowi Staszkowi', 'Swojej sąsiadce', 'Całej klasie'], a: 'Wnuczce Natalce', why: 'Słucha wnuczka dziadka – Natalka. Staszek to żołnierz, który występuje w samej opowieści.' },
+          { q: 'Czy historia z książki wydarzyła się naprawdę?', options: ['Tak, to historia prawdziwa', 'Nie, to bajka o czarach', 'To był tylko sen Natalki', 'Dziadek ją wymyślił na urodziny'], a: 'Tak, to historia prawdziwa', why: 'Książka ma podtytuł „Historia prawdziwa”. Niedźwiedź Wojtek żył naprawdę – są nawet jego zdjęcia z czasów wojny.' },
+          { q: 'Jakim zwierzęciem jest Wojtek?', options: ['Niedźwiedziem brunatnym', 'Niedźwiedziem polarnym', 'Pandą', 'Dużym psem'], a: 'Niedźwiedziem brunatnym', why: 'Wojtek to niedźwiedź brunatny. Gdy żołnierze go dostali, był malutkim, chudym niedźwiadkiem.' }
+        ]
+      },
+      {
+        id: 'l2', icon: '🍼', name: 'Niedźwiadek z Persji', desc: 'Jak żołnierze dostali misia',
+        theory: `
+          <p>Jest rok <b>1942</b>. Trwa druga wojna światowa.</p>
+          <div class="th-box a">🪖 <b>Polscy żołnierze</b> z armii <b>generała Andersa</b> wędrują przez <b>Persję</b>. Dziś ten kraj nazywa się <b>Iran</b>.</div>
+          <div class="th-box b">👦 Na postoju żołnierz <b>Staszek</b> spotyka głodnego chłopca, który ma malutkiego niedźwiadka. Staszek daje chłopcu <b>jedzenie i scyzoryk</b>, a misia zabiera do obozu.</div>
+          <div class="th-box c">🍼 Niedźwiadek jest chudy i głodny. Żołnierze karmią go <b>mlekiem z butelki</b> – jak małe dziecko. Miś wypija kilka butelek naraz!</div>
+          <div class="th-tip">🦉 Sztuczka Sówki: <b>1942 – Persja – Staszek – mleko z butelki</b>. Tak zaczęła się przyjaźń żołnierzy z misiem.</div>`,
+        reward: { icon: '🍼', name: 'butelka mleka dla misia' },
+        questions: [
+          { q: 'W którym roku żołnierze dostali niedźwiadka?', options: ['W 1942 roku', 'W 1920 roku', 'W 1999 roku', 'W 1963 roku'], a: 'W 1942 roku', why: 'Było to w 1942 roku, w czasie drugiej wojny światowej.' },
+          { q: 'W jakim kraju żołnierze dostali małego misia?', options: ['W Persji (dziś Iran)', 'We Włoszech', 'W Szkocji', 'W Polsce'], a: 'W Persji (dziś Iran)', why: 'Niedźwiadek trafił do żołnierzy w Persji, która dziś nazywa się Iran. Do Włoch i Szkocji Wojtek pojechał dopiero później.' },
+          { q: 'Kto przyniósł niedźwiadka do obozu?', options: ['Żołnierz Staszek', 'Generał Anders', 'Kucharz', 'Natalka'], a: 'Żołnierz Staszek', why: 'To żołnierz Staszek spotkał głodnego chłopca i zabrał od niego niedźwiadka do obozu.' },
+          { q: 'Co dostał chłopiec w zamian za niedźwiadka?', options: ['Jedzenie i scyzoryk', 'Rower', 'Złotą monetę', 'Szczeniaka'], a: 'Jedzenie i scyzoryk', why: 'Chłopiec był głodny, więc Staszek dał mu jedzenie i scyzoryk, a w zamian wziął misia.' },
+          { q: 'Czym żołnierze karmili maleńkiego niedźwiadka?', options: ['Mlekiem z butelki', 'Surowymi rybami', 'Chlebem z masłem', 'Trawą z łąki'], a: 'Mlekiem z butelki', why: 'Niedźwiadek był malutki jak niemowlę, więc żołnierze karmili go mlekiem z butelki.' },
+          { q: 'Kim byli opiekunowie Wojtka?', options: ['Polskimi żołnierzami generała Andersa', 'Angielskimi marynarzami', 'Strażakami z Persji', 'Pracownikami cyrku'], a: 'Polskimi żołnierzami generała Andersa', why: 'Wojtek zamieszkał z polskimi żołnierzami z armii generała Władysława Andersa.' }
+        ]
+      },
+      {
+        id: 'l3', icon: '🍑', name: 'Psoty i przyjaciele w obozie', desc: 'Wojtek, Chips, Kaśka i Michał',
+        theory: `
+          <p>Niedźwiadek dostaje imię <b>Wojtek</b> (Wojciech) i zostaje z żołnierzami na dobre.</p>
+          <div class="th-box a">🛁 Wojtek uwielbia <b>jeść</b> i <b>się kąpać</b>. Raz zabrał <b>słoik brzoskwiń</b> i wskoczył z nim do <b>balii z wodą</b>! Lubi też siłować się z żołnierzami dla zabawy.</div>
+          <div class="th-box b">🐶 Jego przyjacielem zostaje <b>Chips</b> – pies dalmatyńczyk, biały w czarne łatki. 🐒 Do obozu trafia też psotna <b>małpka Kaśka</b>.</div>
+          <div class="th-box c">🏥 Wojtek odwiedza <b>chore polskie dzieci w szpitalu</b> i bardzo je rozwesela. 🐻 Był też drugi miś, <b>Michał</b> – ale walczył z Wojtkiem i trafił do <b>zoo</b>.</div>
+          <div class="th-tip">🦉 Sztuczka Sówki: <b>Chips</b> to pies, <b>Kaśka</b> to małpka, <b>Michał</b> to drugi miś.</div>`,
+        reward: { icon: '🍑', name: 'słoik brzoskwiń' },
+        questions: [
+          { q: 'Jakie imię dostał niedźwiadek?', options: ['Wojtek (Wojciech)', 'Michał', 'Uszatek', 'Chips'], a: 'Wojtek (Wojciech)', why: 'Niedźwiadek dostał imię Wojciech, a wszyscy mówili na niego Wojtek. Michał to inny miś, a Chips to pies.' },
+          { q: 'Co zrobił Wojtek ze słoikiem brzoskwiń?', options: ['Wskoczył z nim do balii z wodą', 'Zakopał go w piasku', 'Oddał go kucharzowi', 'Rozbił go o kamień'], a: 'Wskoczył z nim do balii z wodą', why: 'Wojtek kochał jedzenie i kąpiele, więc zrobił jedno i drugie naraz: wskoczył ze słoikiem brzoskwiń do balii z wodą.' },
+          { q: 'Jak nazywał się pies, przyjaciel Wojtka?', options: ['Chips', 'Burek', 'Reks', 'Azor'], a: 'Chips', why: 'Przyjacielem Wojtka był Chips – pies rasy dalmatyńczyk, biały w czarne łatki.' },
+          { q: 'Jakie zwierzątko płatało figle w obozie?', options: ['Małpka Kaśka', 'Papuga Kasia', 'Kot Mruczek', 'Osiołek Kłapek'], a: 'Małpka Kaśka', why: 'Do obozu trafiła małpka Kaśka. Była bardzo psotna – lubiła na przykład ciągnąć Wojtka za futro.' },
+          { q: 'Kogo Wojtek rozweselał w szpitalu?', options: ['Chore polskie dzieci', 'Chore kotki', 'Lekarzy na zebraniu', 'Nikogo – tylko tam spał'], a: 'Chore polskie dzieci', why: 'Wojtek odwiedził szpital, w którym leżały chore polskie dzieci. Bardzo je rozśmieszył i rozweselił.' },
+          { q: 'Co stało się z drugim misiem, Michałem?', options: ['Trafił do zoo', 'Został kucharzem', 'Popłynął z Wojtkiem do Szkocji', 'Uciekł w góry'], a: 'Trafił do zoo', why: 'Michał walczył z Wojtkiem i był zbyt dziki, żeby zostać w obozie, więc oddano go do zoo.' }
+        ]
+      },
+      {
+        id: 'l4', icon: '🎖️', name: 'Szeregowy Wojtek i Monte Cassino', desc: 'Wojtek zostaje żołnierzem',
+        theory: `
+          <p>Żołnierze wędrują dalej – przez <b>Irak</b> i <b>Palestynę</b> aż do <b>Egiptu</b>. Stamtąd mają popłynąć statkiem do <b>Włoch</b>.</p>
+          <div class="th-box a">🚢 Kłopot! Na statek mogą wejść <b>tylko żołnierze</b>. Co zrobić z misiem?</div>
+          <div class="th-box b">🎖️ Wojtka <b>zapisują do wojska</b>! Zostaje <b>szeregowym</b> Wojciechem Misiem. Dostaje nawet mundur i hełm.</div>
+          <div class="th-box c">💪 W <b>1944 roku</b> we Włoszech trwa bitwa o wzgórze <b>Monte Cassino</b>. Wojtek patrzy, jak żołnierze noszą skrzynie z amunicją – i zaczyna im <b>pomagać nosić ciężkie skrzynie</b>!</div>
+          <p>Po bitwie <b>znakiem kompanii</b> Wojtka zostaje <b>niedźwiedź niosący pocisk</b>. Malowano go na samochodach.</p>
+          ${PHOTO.odznaka}
+          <div class="th-tip">🦉 Sztuczka Sówki: <b>szeregowy Wojtek</b> + <b>Monte Cassino we Włoszech</b> + <b>skrzynie z amunicją</b> = najsłynniejszy miś-żołnierz!</div>`,
+        reward: { icon: '🎖️', name: 'odznaka z misiem' },
+        questions: [
+          { q: 'Dlaczego Wojtka zapisano do wojska?', options: ['Bo na statek mogli wejść tylko żołnierze', 'Bo chciał dostać medal', 'Bo umiał strzelać', 'Bo był najstarszy w obozie'], a: 'Bo na statek mogli wejść tylko żołnierze', why: 'Żołnierze mieli płynąć statkiem do Włoch, a wpuszczano tylko żołnierzy. Dlatego Wojtka zapisano do wojska – i mógł płynąć z przyjaciółmi.' },
+          { q: 'Jaki stopień wojskowy dostał Wojtek, gdy zapisano go do wojska?', options: ['Szeregowy', 'Generał', 'Kapitan', 'Admirał'], a: 'Szeregowy', why: 'Wojtek został szeregowym – tak nazywa się zwykły żołnierz. Generał to najważniejszy dowódca, a admirał dowodzi okrętami.' },
+          { q: 'W jakim kraju jest wzgórze Monte Cassino?', options: ['We Włoszech', 'W Egipcie', 'W Szkocji', 'W Persji'], a: 'We Włoszech', why: 'Monte Cassino to wzgórze we Włoszech. Właśnie tam w 1944 roku walczyli polscy żołnierze.' },
+          { q: 'Jak Wojtek pomagał żołnierzom pod Monte Cassino?', options: ['Nosił skrzynie z amunicją', 'Gotował zupę', 'Prowadził ciężarówkę', 'Grał na trąbce'], a: 'Nosił skrzynie z amunicją', why: 'Wojtek patrzył, jak żołnierze noszą ciężkie skrzynie z amunicją, i zaczął robić to samo. Nie upuścił żadnej skrzyni!' },
+          { q: 'Co przedstawia znak kompanii Wojtka?', options: ['Niedźwiedzia niosącego pocisk', 'Orła z koroną', 'Psa Chipsa', 'Statek na morzu'], a: 'Niedźwiedzia niosącego pocisk', why: 'Na pamiątkę pomocy Wojtka pod Monte Cassino znakiem kompanii został niedźwiedź niosący pocisk.' },
+          { q: 'W którym roku była bitwa o Monte Cassino?', options: ['W 1944 roku', 'W 1942 roku', 'W 1947 roku', 'W 1963 roku'], a: 'W 1944 roku', why: 'Bitwa o Monte Cassino była w 1944 roku. W 1942 roku żołnierze dopiero dostali małego misia.' }
+        ]
+      },
+      {
+        id: 'l5', icon: '🔑', name: 'Szkocja i klucz', desc: 'Koniec wojny i powrót do zoo',
+        theory: `
+          <p>W <b>1945 roku</b> wojna się kończy. Żołnierze razem z Wojtkiem płyną do <b>Szkocji</b>. Mieszkańcy bardzo lubią misia.</p>
+          <div class="th-box a">🌲 Wojsko jednak się rozchodzi. Wojtek jest oswojony – <b>nie umiałby żyć w dzikim lesie</b>. Dlatego w <b>1947 roku</b> zamieszkał w <b>zoo w Edynburgu</b>.</div>
+          <div class="th-box b">🔑 Żołnierze proszą o <b>klucz</b>, żeby móc <b>zawsze odwiedzać</b> przyjaciela.</div>
+          <div class="th-box c">👧 Na końcu Natalka rozumie: niedźwiedź w zoo to <b>właśnie Wojtek</b>! Dziadek wciąż ma <b>klucz w kieszeni płaszcza</b> – to dowód, że opowieść jest prawdziwa. A Wojtek poznaje dawnych kolegów <b>po głosie</b> i lubi słuchać, gdy mówi się do niego po polsku.</div>
+          <div class="th-tip">🦉 Sztuczka Sówki: książka kończy się tam, gdzie się zaczęła – w <b>zoo w Edynburgu</b>. A <b>klucz</b> łączy dziadka z Wojtkiem.</div>`,
+        reward: { icon: '🔑', name: 'mosiężny klucz' },
+        questions: [
+          { q: 'Dokąd popłynęli żołnierze z Wojtkiem po wojnie?', options: ['Do Szkocji', 'Do Ameryki', 'Do Australii', 'Do Japonii'], a: 'Do Szkocji', why: 'Po wojnie żołnierze razem z Wojtkiem popłynęli do Szkocji. Tam Wojtek został już na zawsze.' },
+          { q: 'Dlaczego Wojtek zamieszkał w zoo, a nie w lesie?', options: ['Bo był oswojony i nie umiałby żyć na wolności', 'Bo w Szkocji nie ma lasów', 'Bo za głośno chrapał', 'Bo sam poszedł do zoo'], a: 'Bo był oswojony i nie umiałby żyć na wolności', why: 'Wojtek wychował się wśród ludzi. Nie umiałby sam zdobywać jedzenia w lesie, więc najbezpieczniej było mu w zoo.' },
+          { q: 'W jakim mieście było zoo, w którym zamieszkał Wojtek?', options: ['W Edynburgu', 'W Krakowie', 'W Rzymie', 'W Kairze'], a: 'W Edynburgu', why: 'Wojtek zamieszkał w zoo w Edynburgu, w Szkocji – w tym samym zoo, do którego przyszli dziadek i Natalka.' },
+          { q: 'Po co żołnierze dostali klucz?', options: ['Żeby zawsze móc odwiedzać Wojtka', 'Do skrzyni z amunicją', 'Do kajuty na statku', 'Do domu Natalki'], a: 'Żeby zawsze móc odwiedzać Wojtka', why: 'Żołnierze kochali Wojtka i nie chcieli go zostawić. Klucz pozwalał im odwiedzać przyjaciela, kiedy tylko chcieli.' },
+          { q: 'Co dziadek ma w kieszeni płaszcza i pokazuje Natalce?', options: ['Klucz od Wojtka', 'Medal', 'Słoik brzoskwiń', 'Butelkę mleka'], a: 'Klucz od Wojtka', why: 'Dziadek wciąż nosi w płaszczu klucz. Pokazuje go Natalce jako dowód, że jego opowieść jest prawdziwa.' },
+          { q: 'Po czym Wojtek poznaje dawnych kolegów?', options: ['Po głosie – lubi słyszeć mowę polską', 'Po kolorze butów', 'Po czapkach', 'Nikogo już nie poznaje'], a: 'Po głosie – lubi słyszeć mowę polską', why: 'Wojtek pamiętał swoich przyjaciół. Poznawał ich po głosie i cieszył się, gdy ktoś mówił do niego po polsku.' }
+        ]
+      },
+      {
+        id: 'l6', icon: '🏆', name: 'Wielki test z lektury', desc: '10 losowych pytań z całej książki', final: true,
+        reward: { icon: '📜', name: 'dyplom znawcy Wojtka' },
+        questions: []
+      }
+    ];
+
+    const FINAL_QUESTION_COUNT = 10;
+    const ALL_QUESTIONS = LEVELS.filter(l => !l.final).flatMap(l => l.questions);
+
+    const MAX_STARS = LEVELS.length * 3;
+    const REWARDS = [
+      { frac: 0.15, id: 'glasses', name: 'okulary', icon: '👓' },
+      { frac: 0.35, id: 'scarf', name: 'szalik', icon: '🧣' },
+      { frac: 0.6, id: 'hat', name: 'czapka mądrości', icon: '🎓' },
+      { frac: 0.85, id: 'crown', name: 'złota korona', icon: '👑' }
+    ].map(r => ({ ...r, at: Math.max(1, Math.round(r.frac * MAX_STARS)) }));
+    const PRAISE = ['Super!', 'Brawo!', 'Hoot hoot! Świetnie!', 'Ekstra!', 'Tak jest! 🎉', 'Znasz tę książkę!', 'Wow, pięknie!', 'Doskonale!'];
+
+    const $ = (s, r = document) => r.querySelector(s);
+    const screen = $('#screen');
+
+    /* ---------- Stan i zapis ---------- */
+    function defaultState() { return { stars: {}, collected: {}, seen: {}, streak: { last: null, count: 0 }, sfx: true, read: true, tempo: 'mid' }; }
+    function loadState() {
+      try {
+        const s = JSON.parse(localStorage.getItem(CONFIG.storageKey));
+        if (s) return Object.assign(defaultState(), s);
+      } catch (e) {}
+      return defaultState();
+    }
+    function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(state)); } catch (e) {} }
+    const state = loadState();
+
+    const totalStars = () => LEVELS.reduce((s, l) => s + (state.stars[l.id] || 0), 0);
+    const accessories = () => REWARDS.filter(r => totalStars() >= r.at).map(r => r.id);
+    const unlocked = i => i === 0 || !!state.stars[LEVELS[i - 1].id];
+
+    function dayStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); }
+    function bumpStreak() {
+      const t = dayStr(new Date()), s = state.streak;
+      if (s.last === t) return;
+      s.count = s.last === yesterdayStr() ? s.count + 1 : 1;
+      s.last = t;
+    }
+    const currentStreak = () => state.streak.last === dayStr(new Date()) || state.streak.last === yesterdayStr() ? state.streak.count : 0;
+
+    function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+
+    /* ---------- Dźwięki ---------- */
+    let actx = null;
+    function tone(freqs, dur = 0.1, type = 'sine', vol = 0.15) {
+      if (!state.sfx) return;
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        freqs.forEach((f, i) => {
+          const o = actx.createOscillator(), g = actx.createGain(), st = t0 + i * dur;
+          o.type = type; o.frequency.value = f;
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(vol, st + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur * 1.6);
+          o.connect(g).connect(actx.destination);
+          o.start(st); o.stop(st + dur * 1.7);
+        });
+      } catch (e) {}
+    }
+    const sfx = {
+      good: () => tone([660, 990], 0.09),
+      bad: () => tone([240, 180], 0.12, 'triangle'),
+      tap: () => tone([520], 0.04, 'sine', 0.07),
+      win: () => tone([523, 659, 784, 1047], 0.12)
+    };
+
+    /* ---------- Czytanie na głos ----------
+       Tempo jak u ucznia 3 klasy: 3 tempa, czytanie kawałkami z pauzą po
+       kropce, pytajniku, dwukropku i przecinku (wzór: przyroda/rosliny-zwierzeta). */
+    let plVoice = null, sayBtn = null, sayToken = 0, sayTimer = null;
+    function pickVoice() {
+      if (!window.speechSynthesis) return;
+      const pl = speechSynthesis.getVoices().filter(v => /^pl/i.test(v.lang));
+      plVoice = pl.find(v => /Google|Natural|Online|Neural|Siri|Zosia|Ewa/i.test(v.name)) || pl.find(v => /Paulina|Zofia|Marek/i.test(v.name)) || pl[0] || null;
+    }
+    if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+    function plain(html) {
+      const d = document.createElement('div');
+      d.innerHTML = String(html);
+      d.querySelectorAll('.no-read, .say-mini, .letter, figure').forEach(e => e.remove());
+      d.querySelectorAll('h2, h3, p, li, div, .quiz-opt, .q-text').forEach(e => e.append(/[.!?:…]\s*$/.test(e.textContent) ? ' ' : '. '));
+      return d.textContent.replace(/\d️?⃣/gu, ' ').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️‍]/gu, ' ')
+        .replace(/→|←|↓|↑|✕|✓|„|”|\+|=/g, ' ').replace(/\s+([.,!?])/g, '$1').replace(/(\s*\.\s*){2,}/g, '. ').replace(/\s+/g, ' ').trim();
+    }
+    function chunks(t) {
+      const out = [];
+      const re = /[^.!?…:;,–]+(?:[.!?…:;,]+|\s–\s|–|$)/gu;
+      for (const m of t.match(re) || []) {
+        const s = m.trim();
+        if (!/[\p{L}\d]/u.test(s)) { if (out.length) out[out.length - 1].t += ' ' + s; continue; }
+        const end = s.slice(-1);
+        const pm = /[.!…]/.test(end) ? 1 : end === '?' ? 0.8 : /[:;–]/.test(end) ? 0.55 : end === ',' ? 0.3 : 1;
+        out.push({ t: s.replace(/\s*–$/, ''), pm });
+      }
+      return out;
+    }
+    function markSaying(btn) { if (sayBtn) sayBtn.classList.remove('on'); sayBtn = btn || null; if (sayBtn) sayBtn.classList.add('on'); }
+    let sayQueue = [], sayActive = false, sayStarted = false;
+    const tempo = () => CONFIG.tempa.find(t => t.id === state.tempo) || CONFIG.tempa[1];
+    const canSpeak = () => !!window.speechSynthesis && state.read;
+    function stopSpeak() { sayToken++; sayQueue = []; sayActive = false; clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch (e) {} markSaying(null); }
+    // onDone – gdy Sówka przeczyta wszystko do końca (nie przy przerwaniu)
+    function speak(text, btn, onDone) {
+      if (!window.speechSynthesis || !text) return;
+      stopSpeak();
+      const my = sayToken;
+      sayQueue = chunks(text); sayActive = true; sayStarted = false;
+      markSaying(btn);
+      const next = () => {
+        if (my !== sayToken) return;
+        if (!sayQueue.length) { sayActive = false; markSaying(null); if (onDone) onDone(); return; }
+        const c = sayQueue.shift();
+        const u = new SpeechSynthesisUtterance(c.t);
+        u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice;
+        u.rate = tempo().rate; u.pitch = 1.05;
+        u.onstart = () => { sayStarted = true; };
+        let done = false;
+        const go = () => { if (done || my !== sayToken) return; done = true; sayTimer = setTimeout(next, CONFIG.pauseMs * c.pm * tempo().pf); };
+        u.onend = u.onerror = go;
+        try { speechSynthesis.speak(u); } catch (e) { go(); }
+      };
+      next();
+    }
+    // czas na samodzielne przeczytanie (gdy czytanie wyłączone albo brak głosu)
+    const readMs = text => Math.min(20000, Math.max(2500, text.split(/\s+/).length * 330));
+    // Przeczytaj na głos i dopiero potem wywołaj onDone. Gdy głos nie działa
+    // (brak syntezatora, nic nie zaczęło mówić) – odblokuj po czasie na przeczytanie.
+    function readThen(text, onDone) {
+      let fired = false;
+      const fire = () => { if (fired) return; fired = true; onDone(); };
+      if (!canSpeak()) { setTimeout(fire, readMs(text)); return; }
+      speak(text, null, fire);
+      const my = sayToken;
+      setTimeout(() => { if (my === sayToken && !sayStarted) { stopSpeak(); setTimeout(fire, readMs(text)); } }, 4000);
+      // zabezpieczenie: gdyby syntezator „zawisł” w połowie, przycisk i tak się odblokuje
+      setTimeout(fire, readMs(text) * 3 + 8000);
+    }
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-say]');
+      if (!b) return;
+      if (sayBtn === b) { stopSpeak(); return; }
+      const el = document.querySelector(b.dataset.say);
+      const ex = b.dataset.extra ? document.querySelector(b.dataset.extra) : null;
+      if (el) speak(plain(el.innerHTML + (ex ? '. ' + ex.innerHTML : '')), b);
+    });
+    const sayMini = (sel, extra) => `<button class="say-mini" data-say="${sel}" ${extra ? `data-extra="${extra}"` : ''} aria-label="Przeczytaj na głos">🔊</button>`;
+    const tempoHTML = () => `<div class="tempo no-read"><span>Tempo czytania:</span>${CONFIG.tempa.map(t => `<button class="${t.id === state.tempo ? 'on' : ''}" data-tempo="${t.id}">${t.icon} ${t.name}</button>`).join('')}</div>`;
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-tempo]');
+      if (!b) return;
+      state.tempo = b.dataset.tempo; save(); sfx.tap();
+      document.querySelectorAll('[data-tempo]').forEach(x => x.classList.toggle('on', x.dataset.tempo === state.tempo));
+      if (!sayActive && canSpeak()) speak(`Tak będę czytać: ${tempo().name}. Posłuchaj, czy Ci pasuje.`);
+    });
+
+    /* ---------- Sówka Lulu ---------- */
+    function owlSVG(mood) {
+      const acc = accessories();
+      const eyes = mood === 'happy'
+        ? `<path d="M31 64 q13 -13 26 0 M63 64 q13 -13 26 0" stroke="#1e1b4b" stroke-width="5" fill="none" stroke-linecap="round"/>`
+        : `<circle cx="44" cy="62" r="14" fill="#fff"/><circle cx="76" cy="62" r="14" fill="#fff"/>
+           <circle cx="46" cy="63" r="7" fill="#1e1b4b"/><circle cx="78" cy="63" r="7" fill="#1e1b4b"/>
+           <circle cx="48.5" cy="60" r="2.3" fill="#fff"/><circle cx="80.5" cy="60" r="2.3" fill="#fff"/>
+           ${mood === 'sad' ? '<path d="M32 44 l20 5 M88 44 l-20 5" stroke="#4c1d95" stroke-width="4" stroke-linecap="round"/>' : ''}`;
+      const scarf = acc.includes('scarf')
+        ? `<rect x="24" y="84" width="72" height="12" rx="6" fill="#ef4444"/><rect x="70" y="90" width="12" height="28" rx="4" fill="#dc2626"/>
+           <path d="M70 104 h12 M70 110 h12" stroke="#fca5a5" stroke-width="2"/>` : '';
+      const glasses = acc.includes('glasses')
+        ? `<circle cx="44" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <circle cx="76" cy="62" r="16" fill="rgba(255,255,255,0.12)" stroke="#1e1b4b" stroke-width="3.5"/>
+           <path d="M58 60 q2 -3 4 0" stroke="#1e1b4b" stroke-width="3.5" fill="none"/>` : '';
+      const crown = acc.includes('crown')
+        ? `<polygon points="36,40 37,12 49,27 60,5 71,27 83,12 84,40" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" stroke-linejoin="round"/>
+           <circle cx="60" cy="30" r="4" fill="#ef4444"/><circle cx="45" cy="33" r="3" fill="#3b82f6"/><circle cx="75" cy="33" r="3" fill="#22c55e"/>` : '';
+      const hat = acc.includes('hat') && !acc.includes('crown')
+        ? `<path d="M44 34 v10 q16 7 32 0 v-10z" fill="#374151"/>
+           <polygon points="26,30 60,16 94,30 60,44" fill="#1f2937"/>
+           <path d="M60 30 L90 33 V48" stroke="#facc15" stroke-width="3" fill="none"/><circle cx="90" cy="50" r="4" fill="#facc15"/>` : '';
+      return `<svg class="owl-svg" viewBox="0 0 120 135" aria-hidden="true">
+        <ellipse cx="60" cy="131" rx="34" ry="4" fill="rgba(12,45,72,0.12)"/>
+        <polygon points="26,46 19,14 47,32" fill="#92400e"/>
+        <polygon points="94,46 101,14 73,32" fill="#92400e"/>
+        <ellipse cx="60" cy="80" rx="42" ry="46" fill="#d97706"/>
+        <ellipse cx="21" cy="92" rx="11" ry="24" fill="#92400e" transform="rotate(14 21 92)"/>
+        <ellipse cx="99" cy="92" rx="11" ry="24" fill="#92400e" transform="rotate(-14 99 92)"/>
+        <ellipse cx="60" cy="98" rx="26" ry="27" fill="#fef3c7"/>
+        <path d="M48 96 q5 5 10 0 M62 96 q5 5 10 0 M55 107 q5 5 10 0" stroke="#fcd34d" stroke-width="2.5" fill="none"/>
+        ${eyes}
+        <polygon points="54,73 66,73 60,84" fill="#f59e0b" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round"/>
+        <ellipse cx="47" cy="126" rx="8" ry="4.5" fill="#f59e0b"/><ellipse cx="73" cy="126" rx="8" ry="4.5" fill="#f59e0b"/>
+        ${scarf}${glasses}${hat}${crown}
+      </svg>`;
+    }
+
+    function owlSay(html, mood) {
+      const b = $('#bubble');
+      if (b) { b.innerHTML = html; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+      const o = $('#owl');
+      if (o) {
+        o.innerHTML = owlSVG(mood);
+        o.classList.remove('jump', 'shake'); void o.offsetWidth;
+        if (mood === 'happy') o.classList.add('jump');
+        if (mood === 'sad') o.classList.add('shake');
+      }
+    }
+
+    function confetti() {
+      const colors = ['#b45309', '#facc15', '#22c55e', '#ec4899', '#38bdf8', '#f97316'];
+      for (let i = 0; i < 45; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = 1.6 + Math.random() * 1.6 + 's';
+        c.style.animationDelay = Math.random() * 0.4 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3800);
+      }
+    }
+
+    /* ---------- Górny pasek ---------- */
+    function updateTopbar() {
+      $('#starCount').textContent = totalStars();
+      $('#streakCount').textContent = currentStreak();
+      $('#sfxBtn').textContent = state.sfx ? '🔔' : '🔕';
+      $('#readBtn').textContent = state.read ? '🗣️' : '🤐';
+    }
+    $('#sfxBtn').addEventListener('click', () => { state.sfx = !state.sfx; save(); updateTopbar(); });
+    $('#readBtn').addEventListener('click', () => { state.read = !state.read; save(); if (!state.read) stopSpeak(); updateTopbar(); });
+
+    /* =====================================================================
+       MAPA
+       ===================================================================== */
+    function renderMap() {
+      stopSpeak();
+      document.body.classList.remove('in-level');
+      updateTopbar();
+      const tot = totalStars();
+      const next = REWARDS.find(r => tot < r.at);
+      const prevAt = [...REWARDS].reverse().find(r => tot >= r.at)?.at || 0;
+      const pct = next ? Math.round((tot - prevAt) / (next.at - prevAt) * 100) : 100;
+      const cur = LEVELS.findIndex((l, i) => unlocked(i) && !state.stars[l.id]);
+
+      let greet;
+      if (tot === 0) greet = CONFIG.intro;
+      else if (tot === MAX_STARS) greet = 'Hoot hoot! Znasz historię <b>Wojtka</b> na wylot! 🏆 Masz wszystkie pamiątki. Możesz wracać do ulubionych części, kiedy chcesz.';
+      else if (cur >= 0) greet = LEVELS[cur].final
+        ? `Witaj z powrotem! Został już tylko <b>${LEVELS[cur].name}</b> – pytania z całej książki! Dasz radę! 💪`
+        : `Witaj z powrotem! Dziś czeka na Ciebie <b>część ${cur + 1}: ${LEVELS[cur].name}</b>. Dasz radę! 💪`;
+      else greet = 'Wszystkie części odblokowane! Zagraj jeszcze raz tam, gdzie brakuje Ci gwiazdek ⭐.';
+
+      const node = (l, i) => {
+        const s = state.stars[l.id] || 0, un = unlocked(i);
+        const cls = (!un ? 'locked' : i === cur ? 'current' : s ? 'done' : '');
+        return `<button class="node ${cls}" data-level="${i}" ${un ? '' : 'disabled'} style="--off:${[0, 1, 2, 1][i % 4]}">
+          <span class="node-icon">${un ? l.icon : '🔒'}</span>
+          <span class="node-body"><span class="node-num">${l.final ? 'Finał' : `Część ${i + 1}`}</span>
+            <span class="node-name">${l.name}</span><span class="node-desc">${l.desc}</span></span>
+          <span class="node-stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></span>
+          ${i === cur ? '<span class="here">🦉 Tu jesteś!</span>' : ''}
+        </button>`;
+      };
+
+      const collGrid = LEVELS.map(l => {
+        const got = !!state.collected[l.id];
+        return `<div class="coll-item ${got ? '' : 'locked'}" title="${l.reward.name}">
+          <div class="coll-icon">${got ? l.reward.icon : '❔'}</div>
+          <div class="coll-label">${got ? l.reward.name : '???'}</div>
+        </div>`;
+      }).join('');
+
+      screen.innerHTML = `
+        <section class="hero">
+          <div class="owl-big">${owlSVG(tot === MAX_STARS ? 'happy' : '')}</div>
+          <div class="bubble" id="mapBubble">${greet}</div>
+        </section>
+        <div class="reward-bar">
+          ${next ? `🎁 Następna nagroda dla Sówki: ${next.icon} <b>${next.name}</b> – jeszcze ${next.at - tot} ⭐` : '👑 Sówka ma już wszystkie nagrody!'}
+          <div class="bar"><div style="width:${pct}%"></div></div>
+          ${tempoHTML()}
+        </div>
+        <h2 class="section-title">🗺️ Mapa przygody Wojtka</h2>
+        <div class="path">${LEVELS.map(node).join('<div class="path-dots"></div>')}</div>
+        <h2 class="section-title">🎒 Pamiątki z wojennej drogi</h2>
+        <p class="muted">Za każdą ukończoną część dostajesz jedną pamiątkę. Zebrano ${Object.keys(state.collected).length} z ${LEVELS.length}.</p>
+        <div class="coll">${collGrid}</div>
+        <button class="info-btn" id="infoBtn">📚 Prawdziwy Wojtek i skąd są zdjęcia</button>
+        <button class="link-btn danger" id="resetBtn">Zacznij od nowa (dla rodzica)</button>`;
+
+      screen.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => startLevel(+b.dataset.level)));
+      $('#infoBtn').addEventListener('click', renderInfo);
+      $('#resetBtn').addEventListener('click', () => {
+        if (confirm('Usunąć wszystkie gwiazdki i pamiątki w tej grze?')) {
+          try { localStorage.removeItem(CONFIG.storageKey); } catch (e) {}
+          location.reload();
+        }
+      });
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       CIEKAWOSTKI
+       ===================================================================== */
+    function renderInfo() {
+      stopSpeak();
+      screen.innerHTML = `
+        <div class="info-wrap">
+          <section class="hero">
+            <div class="owl-mini">${owlSVG('happy')}</div>
+            <div class="bubble">Wojtek naprawdę istniał! Zobacz, co o nim wiadomo. 🐻</div>
+          </section>
+          <div class="info-card">
+            <h3>🐻 Prawdziwy Wojtek</h3>
+            <p>Wojtek był niedźwiedziem brunatnym, którego polscy żołnierze z armii generała Andersa dostali w 1942 roku w Persji. Był zapisany do wojska jak żołnierz.</p>
+            <p>Po wojnie zamieszkał w zoo w Edynburgu, gdzie żył do 1963 roku. Dziś w Edynburgu stoi jego pomnik.</p>
+            ${PHOTO.wojtek}
+          </div>
+          <div class="info-card">
+            <h3>📷 Skąd są zdjęcia?</h3>
+            <p class="info-src">Oba zdjęcia pochodzą z Wikimedia Commons (zbiory Imperial War Museum) i są w domenie publicznej: „Wojtek the bear” (1942) oraz „The badge of the 22nd Artillery Support Company of the 2nd Polish Corps”.</p>
+          </div>
+          <button class="btn" id="backMapBtn">← Wróć do mapy</button>
+        </div>`;
+      $('#backMapBtn').addEventListener('click', renderMap);
+      window.scrollTo(0, 0);
+    }
+
+    /* =====================================================================
+       CZĘŚĆ: Przypomnij sobie + pytania
+       ===================================================================== */
+    let session = null;
+
+    function buildQuestions(lvl) {
+      const pool = lvl.final ? shuffle(ALL_QUESTIONS).slice(0, FINAL_QUESTION_COUNT) : shuffle(lvl.questions);
+      return pool.map(q => ({ ...q, opts: shuffle(q.options) }));
+    }
+
+    // again = true („Jeszcze raz” z ekranu wyniku) → bez teorii
+    function startLevel(idx, again) {
+      const lvl = LEVELS[idx];
+      session = { idx, lvl, qIndex: 0, correct: 0, firstTotal: 0, questions: buildQuestions(lvl) };
+      session.firstTotal = session.questions.length;
+      document.body.classList.add('in-level');
+      if (lvl.final) renderFinalIntro();
+      else if (again) { renderLevelShell(); nextQuestion(); }
+      else renderTheory();
+    }
+
+    function renderTheory() {
+      const lvl = session.lvl, seen = !!state.seen[lvl.id];
+      screen.innerHTML = `
+        <div class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <div class="progress"><div class="progress-fill"></div></div>
+            <div class="level-badge">${lvl.icon}</div>
+          </div>
+          <div class="recap-wrap">
+            <div class="recap-card" id="theoryCard">
+              <div class="th-head">
+                <p class="recap-title">📖 Przypomnij sobie: ${lvl.name}</p>
+                ${sayMini('#theoryBody')}
+              </div>
+              <div id="theoryBody">${lvl.theory}</div>
+              ${tempoHTML()}
+            </div>
+            <div class="recap-actions">
+              <button class="btn ${seen ? '' : 'wait'}" id="startQuizBtn" ${seen ? '' : 'disabled'}>${seen ? 'Rozumiem – zaczynamy! →' : '🔒 Słuchaj Sówki…'}</button>
+            </div>
+          </div>
+        </div>`;
+      $('#quitBtn').addEventListener('click', renderMap);
+      const btn = $('#startQuizBtn');
+      const unlock = () => {
+        if (!btn.isConnected) return;
+        btn.disabled = false; btn.classList.remove('wait'); btn.textContent = 'Rozumiem – zaczynamy! →';
+        state.seen[lvl.id] = true; save();
+      };
+      const text = plain($('#theoryBody').innerHTML);
+      if (seen) { if (canSpeak()) speak(text, null); }
+      else readThen(text, unlock);
+      btn.addEventListener('click', () => { stopSpeak(); renderLevelShell(); nextQuestion(); });
+      window.scrollTo(0, 0);
+    }
+
+    function renderFinalIntro() {
+      screen.innerHTML = `
+        <div class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <div class="level-badge">🏆</div>
+          </div>
+          <div class="recap-wrap">
+            <div class="owl-big">${owlSVG('happy')}</div>
+            <div class="recap-card" style="text-align:center">
+              <p class="recap-title">Wielki test z lektury</p>
+              Sówka losuje <b>${FINAL_QUESTION_COUNT} pytań z całej książki</b>. Za każdym razem są inne! Jeśli się pomylisz, wytłumaczę Ci dobrą odpowiedź.
+            </div>
+            <div class="recap-actions"><button class="btn" id="startQuizBtn">Zaczynamy test! →</button></div>
+          </div>
+        </div>`;
+      $('#quitBtn').addEventListener('click', renderMap);
+      $('#startQuizBtn').addEventListener('click', () => { renderLevelShell(); nextQuestion(); });
+      window.scrollTo(0, 0);
+    }
+
+    function openTheory() {
+      const lvl = session.lvl;
+      if (!lvl.theory) return;
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = `<div class="modal-box">
+          <div class="th-head"><p class="recap-title">📖 ${lvl.name}</p>${sayMini('#modalBody')}</div>
+          <div id="modalBody" class="recap-card" style="border:0;padding:0;background:none">${lvl.theory}</div>
+          <button class="btn" id="closeModal" style="margin-top:14px">Wracam do pytań →</button>
+        </div>`;
+      document.body.appendChild(m);
+      const close = () => { stopSpeak(); m.remove(); };
+      m.addEventListener('click', e => { if (e.target === m) close(); });
+      $('#closeModal', m).addEventListener('click', close);
+    }
+
+    function renderLevelShell() {
+      screen.innerHTML = `
+        <section class="level">
+          <div class="level-top">
+            <button class="icon-btn" id="quitBtn" aria-label="Wróć do mapy">✕</button>
+            <div class="progress"><div class="progress-fill" id="progFill"></div></div>
+            ${session.lvl.theory ? '<button class="icon-btn" id="theoryBtn" aria-label="Przypomnij sobie">📖</button>' : ''}
+            <div class="level-badge">${session.lvl.icon}</div>
+          </div>
+          <div class="guide"><div class="owl-mini" id="owl">${owlSVG()}</div><div class="bubble" id="bubble">Uważnie przeczytaj pytanie i wybierz odpowiedź.</div></div>
+          <div class="task" id="task"></div>
+        </section>`;
+      $('#quitBtn').addEventListener('click', () => {
+        if (confirm('Przerwać tę część? Gwiazdki i pamiątkę dostaniesz dopiero po wszystkich pytaniach.')) renderMap();
+      });
+      if ($('#theoryBtn')) $('#theoryBtn').addEventListener('click', openTheory);
+      window.scrollTo(0, 0);
+    }
+
+    function nextQuestion() {
+      stopSpeak();
+      if (session.qIndex >= session.questions.length) return finishLevel();
+      $('#progFill').style.width = (session.qIndex / session.questions.length * 100) + '%';
+      renderQuestion(session.questions[session.qIndex]);
+    }
+
+    function renderQuestion(q) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const task = $('#task');
+      task.innerHTML = `
+        <div class="q-card">
+          <div class="q-num">${q.retry ? '🔁 Jeszcze raz to pytanie' : `Pytanie ${session.qIndex + 1} z ${session.questions.length}`}</div>
+          <div class="q-top"><div class="q-text" id="qText">${q.q}</div>${sayMini('#qText', '#opts')}</div>
+        </div>
+        <div class="quiz-opts" id="opts">
+          ${q.opts.map((o, i) => `<button class="quiz-opt" data-i="${i}"><span class="letter">${letters[i]}</span><span>${o}</span></button>`).join('')}
+        </div>
+        <div id="feedbackWrap"></div>`;
+      owlSay(q.retry ? 'To pytanie wróciło. Teraz już wiesz! 💡' : 'Uważnie przeczytaj pytanie i wybierz odpowiedź.');
+
+      let answered = false;
+      task.querySelectorAll('.quiz-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          stopSpeak();
+          const chosen = q.opts[+btn.dataset.i];
+          const isOk = chosen === q.a;
+          task.querySelectorAll('.quiz-opt').forEach(b => {
+            b.disabled = true;
+            const txt = b.querySelector('span:last-child').textContent;
+            if (txt === q.a) b.classList.add('ok');
+            else if (b === btn) b.classList.add('bad');
+            else b.classList.add('dim');
+          });
+          const last = session.qIndex >= session.questions.length - 1;
+          if (isOk) {
+            if (!q.retry) session.correct++;
+            sfx.good(); owlSay(pick(PRAISE), 'happy');
+            $('#feedbackWrap').innerHTML = `
+              <div class="feedback-head ok">✅ Zgadza się!</div>
+              <div class="note">💡 ${q.why}</div>
+              <button class="btn green" id="nextQBtn">${last ? 'Zobacz wynik →' : 'Dalej →'}</button>`;
+          } else {
+            sfx.bad(); owlSay('Nic nie szkodzi! Posłuchaj, wytłumaczę Ci 🦉', 'sad');
+            // błędne pytanie wraca raz na koniec części
+            if (!q.retry) session.questions.push({ ...q, retry: true, opts: shuffle(q.options) });
+            $('#feedbackWrap').innerHTML = `
+              <div class="why" id="whyBox">
+                <div class="why-head"><span>🦉 Sówka tłumaczy:</span>${sayMini('#whyText')}</div>
+                <div id="whyText">Dobra odpowiedź to: <span class="good-ans">${q.a}</span>. ${q.why}</div>
+              </div>
+              <button class="btn wait" id="nextQBtn" disabled>🔒 Słuchaj Sówki…</button>`;
+            const nb = $('#nextQBtn');
+            readThen(plain($('#whyText').innerHTML), () => {
+              if (!nb.isConnected) return;
+              nb.disabled = false; nb.classList.remove('wait');
+              nb.textContent = session.qIndex >= session.questions.length - 1 ? 'Zobacz wynik →' : 'Rozumiem, dalej →';
+            });
+          }
+          $('#nextQBtn').addEventListener('click', () => { session.qIndex++; nextQuestion(); });
+          setTimeout(() => $('#feedbackWrap')?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+        });
+      });
+    }
+
+    function finishLevel() {
+      stopSpeak();
+      const total = session.firstTotal;
+      const ratio = session.correct / total;
+      const stars = ratio === 1 ? 3 : ratio >= 0.7 ? 2 : 1;
+      const prevStars = state.stars[session.lvl.id] || 0;
+      state.stars[session.lvl.id] = Math.max(prevStars, stars);
+      const firstTime = !state.collected[session.lvl.id];
+      state.collected[session.lvl.id] = true;
+      bumpStreak();
+      save();
+      if (window.Odznaki) Odznaki.sprawdz();
+
+      document.body.classList.add('in-level');
+      screen.innerHTML = `
+        <section class="result">
+          <div class="owl-big">${owlSVG(stars >= 2 ? 'happy' : '')}</div>
+          <h2>${stars === 3 ? 'Rewelacja!' : stars === 2 ? 'Bardzo dobrze!' : 'Dobra robota!'}</h2>
+          <p>Za pierwszym razem dobrze: ${session.correct} z ${total} pytań.</p>
+          <div class="result-stars">
+            ${[0, 1, 2].map(i => `<span class="rs ${i < stars ? 'on' : ''}" style="--d:${i * 0.15}s">★</span>`).join('')}
+          </div>
+          ${firstTime ? `<div class="reward-pop"><span class="ic">${session.lvl.reward.icon}</span><span>Nowa pamiątka: <b>${session.lvl.reward.name}</b>!</span></div>` : `<p>Pamiątkę za tę część masz już w kolekcji 🎒</p>`}
+          <div class="result-actions">
+            <button class="btn" id="toMapBtn">Powrót do mapy</button>
+            <button class="btn soft" id="againBtn">🔁 Zagraj tę część jeszcze raz</button>
+          </div>
+        </section>`;
+      $('#toMapBtn').addEventListener('click', renderMap);
+      $('#againBtn').addEventListener('click', () => startLevel(session.idx, true));
+      sfx.win();
+      if (stars >= 2) confetti();
+      window.scrollTo(0, 0);
+    }
+
+    renderMap();
+  </script>
+</body>
+</html>

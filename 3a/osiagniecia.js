@@ -55,6 +55,12 @@
         ['l10', '💙', 'Pościg, ZOO i pożegnanie'], ['l11', '🏆', 'Wielki quiz o Karolci']]
     },
     {
+      id: 'D', grupa: '🐻 Dziadek i niedźwiadek', href: 'polski/dziadek-i-niedzwiadek.html',
+      key: 'nauka-3a-polski-dziadek-niedzwiadek-v1', mistrz: ['🏆', 'Znawczyni Wojtka'],
+      poziomy: [['l1', '👴', 'Dziadek i Natalka w zoo'], ['l2', '🍼', 'Niedźwiadek z Persji'], ['l3', '🍑', 'Psoty i przyjaciele'],
+        ['l4', '🎖️', 'Szeregowy Wojtek'], ['l5', '🔑', 'Szkocja i klucz'], ['l6', '🏆', 'Wielki test z lektury']]
+    },
+    {
       id: 'P', grupa: '🌳 Warstwy lasu', href: 'przyroda/warstwy-lasu.html',
       key: 'nauka-3a-przyroda-warstwy-lasu-v1', mistrz: ['🏆', 'Znawczyni lasu'],
       poziomy: [['learn', '🌳', 'Poznaj piętra lasu'], ['animals', '🐿️', 'Kto gdzie mieszka?'], ['drop', '🎮', 'Spadające znaleziska'],
