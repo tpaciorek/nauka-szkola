@@ -75,6 +75,12 @@
         ['z', '🫙', 'Wyrazy z ż'], ['rain', '🌧️', 'Ortograficzny deszcz'], ['ch', '🍄', 'Wyrazy z ch'], ['boss', '👑', 'Wielki sprawdzian']]
     },
     {
+      id: 'HC', grupa: '🍵 H czy ch?', href: 'polski/h-ch.html',
+      key: 'nauka-3a-polski-h-ch-v1', mistrz: ['🏆', 'Mistrzyni h i ch'],
+      poziomy: [['h', '🍵', 'Wyrazy z h'], ['ch', '🤧', 'Wyrazy z ch'], ['catch', '🧺', 'Łap wyrazy'],
+        ['rain', '🌧️', 'Literkowy deszcz'], ['boss', '👑', 'Próbne dyktando']]
+    },
+    {
       id: 'R', grupa: '🌾 Rośliny i zwierzęta', href: 'przyroda/rosliny-zwierzeta.html',
       key: 'nauka-3a-przyroda-rosliny-zwierzeta-v1', mistrz: ['🏆', 'Znawczyni pola i przyrody'],
       poziomy: [['plants', '🌾', 'Rośliny uprawne'], ['products', '🍞', 'Co z czego powstaje?'], ['drop', '🎮', 'Spadające plony'],
